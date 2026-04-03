@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'theme/app_theme.dart';
+
 class AccessBankApp extends StatelessWidget {
   const AccessBankApp({super.key});
 
@@ -8,10 +10,8 @@ class AccessBankApp extends StatelessWidget {
     return MaterialApp(
       title: 'AccessBank',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
-        useMaterial3: true,
-      ),
+      theme: AppTheme.lightTheme,
+      darkTheme: AppTheme.darkTheme,
       home: const Scaffold(
         body: Center(
           child: Text('AccessBank'),
