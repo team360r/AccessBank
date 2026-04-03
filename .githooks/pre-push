@@ -1,0 +1,30 @@
+#!/bin/bash
+#
+# Pre-push hook: warns before pushing to protected tutorial branches.
+# These branches are read-only reference material for students.
+#
+# Install: git config core.hooksPath .githooks
+
+PROTECTED_PATTERN="^(starter|chapter-[0-9]+-)"
+
+while read local_ref local_sha remote_ref remote_sha; do
+  branch_name=$(echo "$remote_ref" | sed 's|refs/heads/||')
+
+  if echo "$branch_name" | grep -qE "$PROTECTED_PATTERN"; then
+    echo ""
+    echo "  HOLD UP! You're about to push to '$branch_name'."
+    echo "  This is a protected tutorial branch (read-only reference material)."
+    echo ""
+    echo "  If you really mean to update it, set FORCE_PUSH=1:"
+    echo "    FORCE_PUSH=1 git push ..."
+    echo ""
+
+    if [ "$FORCE_PUSH" != "1" ]; then
+      exit 1
+    fi
+
+    echo "  FORCE_PUSH=1 detected. Proceeding..."
+  fi
+done
+
+exit 0
