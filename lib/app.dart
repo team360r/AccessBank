@@ -1,6 +1,11 @@
 import 'package:flutter/material.dart';
 
 import 'app_state.dart';
+import 'screens/account_overview/account_overview_screen.dart';
+import 'screens/login/login_screen.dart';
+import 'screens/settings/settings_screen.dart';
+import 'screens/transactions/transactions_screen.dart';
+import 'screens/transfer/transfer_screen.dart';
 import 'theme/app_theme.dart';
 import 'widgets/access_bank_scaffold.dart';
 
@@ -32,7 +37,7 @@ class _AccessBankAppState extends State<AccessBankApp> {
           darkTheme: AppTheme.darkTheme,
           initialRoute: '/login',
           routes: {
-            '/login': (_) => _LoginScreen(appState: _appState),
+            '/login': (_) => _LoginScreenWrapper(appState: _appState),
             '/home': (_) => _HomeScreen(appState: _appState),
             '/guide': (_) => const _GuideScreen(),
           },
@@ -63,33 +68,22 @@ class _AccessBankAppState extends State<AccessBankApp> {
 }
 
 // ---------------------------------------------------------------------------
-// Login screen — placeholder
+// Login screen wrapper
 // ---------------------------------------------------------------------------
 
-class _LoginScreen extends StatelessWidget {
-  const _LoginScreen({required this.appState});
+class _LoginScreenWrapper extends StatelessWidget {
+  const _LoginScreenWrapper({required this.appState});
 
   final AppState appState;
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Text('Login'),
-            const SizedBox(height: 16),
-            FilledButton(
-              onPressed: () {
-                appState.login();
-                Navigator.of(context).pushReplacementNamed('/home');
-              },
-              child: const Text('Sign in'),
-            ),
-          ],
-        ),
-      ),
+    return LoginScreen(
+      accessible: appState.accessible,
+      onLogin: () {
+        appState.login();
+        Navigator.of(context).pushReplacementNamed('/home');
+      },
     );
   }
 }
@@ -115,6 +109,7 @@ class _HomeScreen extends StatelessWidget {
           body: _TabBody(
             tab: appState.currentTab,
             accessible: appState.accessible,
+            appState: appState,
           ),
         );
       },
@@ -123,27 +118,34 @@ class _HomeScreen extends StatelessWidget {
 }
 
 // ---------------------------------------------------------------------------
-// Tab body — placeholder screens for each tab
+// Tab body — real screens for each tab
 // ---------------------------------------------------------------------------
 
 class _TabBody extends StatelessWidget {
-  const _TabBody({required this.tab, required this.accessible});
+  const _TabBody({
+    required this.tab,
+    required this.accessible,
+    required this.appState,
+  });
 
   final int tab;
   final bool accessible;
-
-  static const _titles = [
-    'Overview',
-    'Transactions',
-    'Transfer',
-    'Settings',
-  ];
+  final AppState appState;
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: Text(_titles[tab]),
-    );
+    switch (tab) {
+      case 0:
+        return AccountOverviewScreen(accessible: accessible);
+      case 1:
+        return TransactionsScreen(accessible: accessible);
+      case 2:
+        return TransferScreen(accessible: accessible);
+      case 3:
+        return SettingsScreen(accessible: accessible, appState: appState);
+      default:
+        return const SizedBox.shrink();
+    }
   }
 }
 
