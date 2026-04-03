@@ -7,9 +7,10 @@ import 'widgets/login_form.dart';
 /// Displays the bank logo, a welcome heading, and a [LoginForm].
 /// On successful form submission, navigates to ['/home'].
 ///
-/// The [accessible] parameter is accepted for API consistency but the
-/// accessible variant will be implemented in Phase 5. For now both paths
-/// render the same inaccessible version.
+/// The [accessible] parameter controls which variant is shown:
+/// - [accessible] = false: intentionally inaccessible version for tutorial "before" state
+/// - [accessible] = true: WCAG AA-compliant version with proper labels, focus management,
+///   and screen reader announcements
 class LoginScreen extends StatelessWidget {
   const LoginScreen({
     super.key,
@@ -31,22 +32,46 @@ class LoginScreen extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                // Bank logo — inaccessible: no Semantics label on the icon
-                const Icon(
-                  Icons.account_balance,
-                  size: 64,
-                ),
-                const SizedBox(height: 16),
-                const Text(
-                  'Welcome to AccessBank',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 22,
-                    fontWeight: FontWeight.bold,
+                if (accessible)
+                  // Accessible: Semantics label on the decorative bank icon
+                  Semantics(
+                    label: 'AccessBank logo',
+                    child: const Icon(
+                      Icons.account_balance,
+                      size: 64,
+                    ),
+                  )
+                else
+                  // Inaccessible: no Semantics label on the icon
+                  const Icon(
+                    Icons.account_balance,
+                    size: 64,
                   ),
-                ),
+                const SizedBox(height: 16),
+                if (accessible)
+                  // Accessible: heading role so screen readers navigate by heading
+                  Semantics(
+                    header: true,
+                    child: const Text(
+                      'Welcome to AccessBank',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 22,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  )
+                else
+                  const Text(
+                    'Welcome to AccessBank',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 22,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
                 const SizedBox(height: 32),
-                LoginForm(onSubmit: onLogin),
+                LoginForm(accessible: accessible, onSubmit: onLogin),
               ],
             ),
           ),
