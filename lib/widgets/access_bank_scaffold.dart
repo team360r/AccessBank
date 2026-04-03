@@ -19,9 +19,10 @@ const List<IconData> _tabIcons = [
 /// App shell that wraps post-login screens with a [BottomNavigationBar].
 ///
 /// Pass [accessible] = true to render the navigation bar with WCAG AA-compliant
-/// colours and visible text labels. Pass [accessible] = false (the default in
-/// the tutorial "before" state) to render an intentionally inaccessible variant
-/// that uses low-contrast colours and shows only icons — no labels.
+/// colours, visible text labels, and per-item Semantics that include position
+/// and selection state. Pass [accessible] = false (the default in the tutorial
+/// "before" state) to render an intentionally inaccessible variant that uses
+/// low-contrast colours and shows only icons — no labels.
 class AccessBankScaffold extends StatelessWidget {
   const AccessBankScaffold({
     super.key,
@@ -61,9 +62,16 @@ class AccessBankScaffold extends StatelessWidget {
 }
 
 // ---------------------------------------------------------------------------
-// Accessible nav bar — proper contrast + labels
+// Accessible nav bar — proper contrast + labels + full Semantics
 // ---------------------------------------------------------------------------
 
+/// Accessible navigation bar.
+///
+/// Each nav item includes:
+/// - Visible text label
+/// - Semantics label: "{Tab name} tab, {N} of {total}, currently selected/not selected"
+/// - 48x48 minimum touch target
+/// - Accessible colour palette (high contrast)
 class _AccessibleNavBar extends StatelessWidget {
   const _AccessibleNavBar({
     required this.currentIndex,
@@ -75,15 +83,32 @@ class _AccessibleNavBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final total = _tabLabels.length;
+
     return NavigationBar(
       selectedIndex: currentIndex,
       onDestinationSelected: onTabChanged,
       destinations: List.generate(
-        _tabLabels.length,
-        (i) => NavigationDestination(
-          icon: Icon(_tabIcons[i]),
-          label: _tabLabels[i],
-        ),
+        total,
+        (i) {
+          final isSelected = i == currentIndex;
+          final positionLabel =
+              '${_tabLabels[i]} tab, ${i + 1} of $total, '
+              '${isSelected ? "currently selected" : "not selected"}';
+
+          return NavigationDestination(
+            // Accessible: semantic label includes position and selection state
+            icon: Semantics(
+              label: positionLabel,
+              selected: isSelected,
+              // Ensure minimum 48x48 touch target via the NavigationBar default
+              child: ExcludeSemantics(
+                child: Icon(_tabIcons[i]),
+              ),
+            ),
+            label: _tabLabels[i],
+          );
+        },
       ),
     );
   }
