@@ -2,6 +2,16 @@ import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'chapter_model.dart';
+import 'chapters/chapter_0.dart';
+import 'chapters/chapter_1.dart';
+import 'chapters/chapter_2.dart';
+import 'chapters/chapter_3.dart';
+import 'chapters/chapter_4.dart';
+import 'chapters/chapter_5.dart';
+import 'chapters/chapter_6.dart';
+import 'chapters/chapter_7.dart';
+import 'chapters/chapter_8.dart';
+import 'chapters/chapter_9.dart';
 
 /// Manages tutorial state: which chapter/step is active, the before/after
 /// toggle, the accessibility inspector toggle, and persisted progress.
@@ -18,10 +28,19 @@ class TutorialController extends ChangeNotifier {
 
   /// The full ordered list of chapters.
   ///
-  /// Populated by chapter definition files (added in Tasks 18-22).  The
-  /// controller intentionally starts empty so the framework can be wired up
-  /// before any content is authored.
-  List<Chapter> chapters = [];
+  /// All 10 chapters of the AccessBank accessibility tutorial, in order.
+  List<Chapter> chapters = [
+    chapter0,
+    chapter1,
+    chapter2,
+    chapter3,
+    chapter4,
+    chapter5,
+    chapter6,
+    chapter7,
+    chapter8,
+    chapter9,
+  ];
 
   // ---------------------------------------------------------------------------
   // Navigation state
