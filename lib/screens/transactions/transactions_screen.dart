@@ -1,17 +1,24 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/semantics.dart';
 
 import '../../data/mock_transactions.dart';
 import '../../data/models/transaction.dart';
 import 'widgets/filter_bar.dart';
 import 'widgets/transaction_tile.dart';
 
-/// Intentionally inaccessible transactions screen.
+/// Transactions screen for AccessBank.
 ///
-/// Accessibility failures demonstrated here:
+/// When [accessible] = false this is intentionally inaccessible:
 /// - No list count announcement ("Showing 20 transactions")
 /// - No sort change feedback for screen readers
 /// - Filter bar lacks labels
 /// - Dismissible items have no alternative button
+///
+/// When [accessible] = true:
+/// - Announces list count after filter/sort changes
+/// - Filter bar uses labelled DropdownButtonFormField
+/// - Sort button has Semantics label and Tooltip
+/// - TransactionTile has MergeSemantics and a delete button alternative
 class TransactionsScreen extends StatefulWidget {
   const TransactionsScreen({super.key, required this.accessible});
 
@@ -58,6 +65,17 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
     });
   }
 
+  void _announceSortChange() {
+    if (!widget.accessible) return;
+    final filtered = _filtered;
+    final order = _ascending ? 'oldest first' : 'newest first';
+    SemanticsService.sendAnnouncement(
+      View.of(context),
+      'Showing ${filtered.length} transactions, sorted by date, $order',
+      TextDirection.ltr,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final filtered = _filtered;
@@ -65,12 +83,17 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
     return Column(
       children: [
         FilterBar(
+          accessible: widget.accessible,
           selectedCategory: _selectedCategory,
           categories: _allCategories,
+          visibleCount: filtered.length,
           onCategoryChanged: (val) =>
               setState(() => _selectedCategory = val),
           ascending: _ascending,
-          onSortToggle: () => setState(() => _ascending = !_ascending),
+          onSortToggle: () {
+            setState(() => _ascending = !_ascending);
+            _announceSortChange();
+          },
         ),
         const Divider(height: 1),
         Expanded(
@@ -79,6 +102,7 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
             itemBuilder: (context, index) {
               final txn = filtered[index];
               return TransactionTile(
+                accessible: widget.accessible,
                 transaction: txn,
                 onDismissed: () => _remove(txn.id),
               );

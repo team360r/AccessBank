@@ -1,16 +1,30 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/semantics.dart';
 
 import '../../data/models/account.dart';
 import 'widgets/transfer_form.dart';
 import 'widgets/transfer_stepper.dart';
 
-/// Intentionally inaccessible multi-step transfer screen.
+const List<String> _stepNames = [
+  'From Account',
+  'Recipient',
+  'Amount',
+  'Review',
+];
+
+/// Multi-step transfer screen for AccessBank.
 ///
-/// Accessibility failures demonstrated here:
+/// When [accessible] = false this is intentionally inaccessible:
 /// - Stepper communicates progress by colour only
 /// - Form fields use placeholder-only labels
 /// - No screen reader announcements on step transitions
 /// - Confirm dialog is a basic AlertDialog with no live region
+///
+/// When [accessible] = true:
+/// - Stepper has per-step Semantics labels (step number, name, status)
+/// - Form fields use persistent labelText
+/// - SemanticsService.sendAnnouncement on step transitions
+/// - Focus management between steps
 class TransferScreen extends StatefulWidget {
   const TransferScreen({super.key, required this.accessible});
 
@@ -32,6 +46,14 @@ class _TransferScreenState extends State<TransferScreen> {
   void _next() {
     if (_currentStep < _totalSteps - 1) {
       setState(() => _currentStep++);
+      if (widget.accessible) {
+        final nextName = _stepNames[_currentStep];
+        SemanticsService.sendAnnouncement(
+          View.of(context),
+          'Step ${_currentStep + 1} of $_totalSteps: $nextName',
+          TextDirection.ltr,
+        );
+      }
     } else {
       _confirm();
     }
@@ -40,6 +62,14 @@ class _TransferScreenState extends State<TransferScreen> {
   void _back() {
     if (_currentStep > 0) {
       setState(() => _currentStep--);
+      if (widget.accessible) {
+        final prevName = _stepNames[_currentStep];
+        SemanticsService.sendAnnouncement(
+          View.of(context),
+          'Step ${_currentStep + 1} of $_totalSteps: $prevName',
+          TextDirection.ltr,
+        );
+      }
     }
   }
 
@@ -76,11 +106,15 @@ class _TransferScreenState extends State<TransferScreen> {
 
     return Column(
       children: [
-        TransferStepper(currentStep: _currentStep),
+        TransferStepper(
+          currentStep: _currentStep,
+          accessible: widget.accessible,
+        ),
         const Divider(height: 1),
         Expanded(
           child: SingleChildScrollView(
             child: TransferForm(
+              accessible: widget.accessible,
               step: _currentStep,
               fromAccount: _fromAccount,
               recipient: _recipient,
