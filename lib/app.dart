@@ -7,6 +7,8 @@ import 'screens/settings/settings_screen.dart';
 import 'screens/transactions/transactions_screen.dart';
 import 'screens/transfer/transfer_screen.dart';
 import 'theme/app_theme.dart';
+import 'tutorial/tutorial_controller.dart';
+import 'tutorial/tutorial_overlay.dart';
 import 'widgets/access_bank_scaffold.dart';
 
 class AccessBankApp extends StatefulWidget {
@@ -18,10 +20,12 @@ class AccessBankApp extends StatefulWidget {
 
 class _AccessBankAppState extends State<AccessBankApp> {
   final AppState _appState = AppState();
+  final TutorialController _tutorialController = TutorialController();
 
   @override
   void dispose() {
     _appState.dispose();
+    _tutorialController.dispose();
     super.dispose();
   }
 
@@ -39,7 +43,10 @@ class _AccessBankAppState extends State<AccessBankApp> {
           routes: {
             '/login': (_) => _LoginScreenWrapper(appState: _appState),
             '/home': (_) => _HomeScreen(appState: _appState),
-            '/guide': (_) => const _GuideScreen(),
+            '/guide': (_) => _GuideScreen(
+                  tutorialController: _tutorialController,
+                  appState: _appState,
+                ),
           },
           onGenerateRoute: (settings) {
             // Handle /guide/chapter-{n}
@@ -54,7 +61,11 @@ class _AccessBankAppState extends State<AccessBankApp> {
                 if (n != null) {
                   return MaterialPageRoute(
                     settings: settings,
-                    builder: (_) => _GuideChapterScreen(chapter: n),
+                    builder: (_) => _GuideChapterScreen(
+                      chapter: n,
+                      tutorialController: _tutorialController,
+                      appState: _appState,
+                    ),
                   );
                 }
               }
@@ -150,31 +161,102 @@ class _TabBody extends StatelessWidget {
 }
 
 // ---------------------------------------------------------------------------
-// Guide screens — placeholders for tutorial content
+// Guide screens — TutorialOverlay wrapping the current banking screen
 // ---------------------------------------------------------------------------
 
 class _GuideScreen extends StatelessWidget {
-  const _GuideScreen();
+  const _GuideScreen({
+    required this.tutorialController,
+    required this.appState,
+  });
+
+  final TutorialController tutorialController;
+  final AppState appState;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Accessibility Guide')),
-      body: const Center(child: Text('Guide')),
+      body: ListenableBuilder(
+        listenable: tutorialController,
+        builder: (context, _) {
+          return TutorialOverlay(
+            controller: tutorialController,
+            bankingContent: _BankingContentForTutorial(
+              appState: appState,
+              accessible: tutorialController.showAccessible,
+            ),
+          );
+        },
+      ),
     );
   }
 }
 
 class _GuideChapterScreen extends StatelessWidget {
-  const _GuideChapterScreen({required this.chapter});
+  const _GuideChapterScreen({
+    required this.chapter,
+    required this.tutorialController,
+    required this.appState,
+  });
 
   final int chapter;
+  final TutorialController tutorialController;
+  final AppState appState;
 
   @override
   Widget build(BuildContext context) {
+    // Navigate the controller to the requested chapter once, after the first
+    // frame so the widget tree is stable.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      tutorialController.goToChapter(chapter);
+    });
+
     return Scaffold(
-      appBar: AppBar(title: Text('Chapter $chapter')),
-      body: Center(child: Text('Guide — Chapter $chapter')),
+      body: ListenableBuilder(
+        listenable: tutorialController,
+        builder: (context, _) {
+          return TutorialOverlay(
+            controller: tutorialController,
+            bankingContent: _BankingContentForTutorial(
+              appState: appState,
+              accessible: tutorialController.showAccessible,
+            ),
+          );
+        },
+      ),
+    );
+  }
+}
+
+/// Banking content widget used inside the tutorial overlay.
+///
+/// Shows the same tab body as [_HomeScreen] but driven by the tutorial
+/// controller's [showAccessible] flag rather than [AppState.accessible].
+class _BankingContentForTutorial extends StatelessWidget {
+  const _BankingContentForTutorial({
+    required this.appState,
+    required this.accessible,
+  });
+
+  final AppState appState;
+  final bool accessible;
+
+  @override
+  Widget build(BuildContext context) {
+    return ListenableBuilder(
+      listenable: appState,
+      builder: (context, _) {
+        return AccessBankScaffold(
+          accessible: accessible,
+          currentIndex: appState.currentTab,
+          onTabChanged: appState.setTab,
+          body: _TabBody(
+            tab: appState.currentTab,
+            accessible: accessible,
+            appState: appState,
+          ),
+        );
+      },
     );
   }
 }
