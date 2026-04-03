@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'tutorial_controller.dart';
+import 'widgets/a11y_inspector_overlay.dart';
 import 'widgets/chapter_list.dart';
 import 'widgets/progress_bar.dart';
 import 'widgets/step_card.dart';
@@ -72,7 +73,10 @@ class _WideLayout extends StatelessWidget {
         const VerticalDivider(width: 1),
         Expanded(
           flex: 3,
-          child: bankingContent,
+          child: A11yInspectorOverlay(
+            active: controller.showInspector,
+            child: bankingContent,
+          ),
         ),
       ],
     );
@@ -96,7 +100,10 @@ class _NarrowLayout extends StatelessWidget {
   Widget build(BuildContext context) {
     return Stack(
       children: [
-        bankingContent,
+        A11yInspectorOverlay(
+          active: controller.showInspector,
+          child: bankingContent,
+        ),
         DraggableScrollableSheet(
           initialChildSize: 0.38,
           minChildSize: 0.08,
