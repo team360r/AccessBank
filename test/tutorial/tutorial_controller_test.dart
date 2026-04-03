@@ -146,8 +146,6 @@ void main() {
       for (int i = 0; i < lastStepCount - 1; i++) {
         controller.nextStep();
       }
-      final lastStep = controller.currentStepIndex;
-
       // Calling nextStep one more time at the end should complete but not crash
       controller.nextStep();
       // Chapter is completed, so we may stay or move — just no exception
