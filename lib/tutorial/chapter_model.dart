@@ -28,6 +28,13 @@ class CodeDiff {
 
   /// Relative path of the file being changed (e.g. `'lib/screens/login.dart'`).
   final String filePath;
+
+  Map<String, dynamic> toJson() => {
+        'before': before,
+        'after': after,
+        'language': language,
+        'filePath': filePath,
+      };
 }
 
 // ---------------------------------------------------------------------------
@@ -54,6 +61,13 @@ class QuizQuestion {
 
   /// Explanation shown after the learner submits their answer.
   final String explanation;
+
+  Map<String, dynamic> toJson() => {
+        'question': question,
+        'options': options,
+        'correctIndex': correctIndex,
+        'explanation': explanation,
+      };
 }
 
 // ---------------------------------------------------------------------------
@@ -72,6 +86,11 @@ class Quiz {
 
   /// The questions in this quiz.
   final List<QuizQuestion> questions;
+
+  Map<String, dynamic> toJson() => {
+        'title': title,
+        'questions': questions.map((q) => q.toJson()).toList(),
+      };
 }
 
 // ---------------------------------------------------------------------------
@@ -110,6 +129,16 @@ class TutorialStep {
 
   /// URLs to WCAG guidelines, Flutter docs, or other reference material.
   final List<String> referenceLinks;
+
+  Map<String, dynamic> toJson() => {
+        'id': id,
+        'title': title,
+        'explanation': explanation,
+        'codeDiff': codeDiff?.toJson(),
+        'whyItMatters': whyItMatters,
+        'tryItPrompt': tryItPrompt,
+        'referenceLinks': referenceLinks,
+      };
 }
 
 // ---------------------------------------------------------------------------
@@ -158,4 +187,16 @@ class Chapter {
 
   /// Optional quiz shown at the end of the chapter.
   final Quiz? quiz;
+
+  Map<String, dynamic> toJson() => {
+        'id': id,
+        'title': title,
+        'branchName': branchName,
+        'description': description,
+        'screenFocus': screenFocus,
+        'estimatedMinutes': estimatedMinutes,
+        'vibe': vibe,
+        'steps': steps.map((s) => s.toJson()).toList(),
+        'quiz': quiz?.toJson(),
+      };
 }
