@@ -76,8 +76,8 @@ else
 fi
 
 # ── 7. Android Studio plugin ──────────────────────────────────────────────────
-AS_PLUGIN_ZIP=$(ls tools/android-studio-plugin/build/distributions/*.zip 2>/dev/null | head -1)
-AS_PLUGINS_DIR=$(ls -d "$HOME/Library/Application Support/Google/AndroidStudio"*/plugins 2>/dev/null | head -1)
+AS_PLUGIN_ZIP=$(ls tools/android-studio-plugin/build/distributions/*.zip 2>/dev/null | head -1 || true)
+AS_PLUGINS_DIR=$(ls -d "$HOME/Library/Application Support/Google/AndroidStudio"*/plugins 2>/dev/null | head -1 || true)
 
 if [[ -d "/Applications/Android Studio.app" ]]; then
   info "Installing Android Studio plugin..."
