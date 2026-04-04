@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:accessible/tutorial/chapter_model.dart';
 import 'package:accessible/tutorial/chapters/chapter_0.dart';
@@ -253,6 +255,98 @@ void main() {
               reason:
                   'Chapter ${ch.id} quiz question should have at least 2 options');
         }
+      }
+    });
+  });
+
+  group('toJson serialization', () {
+    test('CodeDiff serializes all fields', () {
+      const diff = CodeDiff(
+        before: 'Text("hello")',
+        after: 'Semantics(label: "greeting", child: Text("hello"))',
+        language: 'dart',
+        filePath: 'lib/screens/login.dart',
+      );
+      final json = diff.toJson();
+      expect(json['before'], 'Text("hello")');
+      expect(json['after'], contains('Semantics'));
+      expect(json['language'], 'dart');
+      expect(json['filePath'], 'lib/screens/login.dart');
+    });
+
+    test('QuizQuestion serializes all fields', () {
+      const q = QuizQuestion(
+        question: 'What does Semantics do?',
+        options: ['A', 'B', 'C'],
+        correctIndex: 1,
+        explanation: 'It describes widgets to the OS.',
+      );
+      final json = q.toJson();
+      expect(json['question'], 'What does Semantics do?');
+      expect(json['options'], ['A', 'B', 'C']);
+      expect(json['correctIndex'], 1);
+      expect(json['explanation'], 'It describes widgets to the OS.');
+    });
+
+    test('Quiz serializes title and questions', () {
+      const quiz = Quiz(
+        title: 'Check Your Understanding',
+        questions: [
+          QuizQuestion(
+            question: 'Q1?',
+            options: ['A', 'B'],
+            correctIndex: 0,
+            explanation: 'A is correct',
+          ),
+        ],
+      );
+      final json = quiz.toJson();
+      expect(json['title'], 'Check Your Understanding');
+      expect((json['questions'] as List).length, 1);
+      expect((json['questions'] as List).first['correctIndex'], 0);
+    });
+
+    test('TutorialStep serializes with optional fields null', () {
+      const step = TutorialStep(id: 1, title: 'Step 1', explanation: 'Explains.');
+      final json = step.toJson();
+      expect(json['id'], 1);
+      expect(json['title'], 'Step 1');
+      expect(json['codeDiff'], isNull);
+      expect(json['whyItMatters'], isNull);
+      expect(json['tryItPrompt'], isNull);
+      expect(json['referenceLinks'], isEmpty);
+    });
+
+    test('TutorialStep serializes codeDiff when present', () {
+      const step = TutorialStep(
+        id: 2,
+        title: 'Step 2',
+        explanation: 'Add a label.',
+        codeDiff: CodeDiff(
+          before: 'Icon(Icons.home)',
+          after: 'Semantics(label: "Home", child: Icon(Icons.home))',
+          language: 'dart',
+          filePath: 'lib/screens/home.dart',
+        ),
+      );
+      final json = step.toJson();
+      expect(json['codeDiff'], isNotNull);
+      expect(json['codeDiff']['filePath'], 'lib/screens/home.dart');
+    });
+
+    test('Chapter serializes all 10 real chapters without throwing', () {
+      for (final chapter in allChapters) {
+        expect(() => chapter.toJson(), returnsNormally);
+        final json = chapter.toJson();
+        expect(json['id'], chapter.id);
+        expect(json['title'], chapter.title);
+        expect((json['steps'] as List).length, chapter.steps.length);
+      }
+    });
+
+    test('all 10 chapters produce valid JSON string', () {
+      for (final chapter in allChapters) {
+        expect(() => jsonEncode(chapter.toJson()), returnsNormally);
       }
     });
   });

@@ -52,4 +52,19 @@ class AppState extends ChangeNotifier {
     _accessible = !_accessible;
     notifyListeners();
   }
+
+  /// Sets the accessible flag to an explicit value (used by the tutorial bridge).
+  void setAccessible(bool value) {
+    if (_accessible == value) return;
+    _accessible = value;
+    notifyListeners();
+  }
+
+  /// Sets the logged-in state directly (used by tutorial to show login screen).
+  void setLoggedIn(bool value) {
+    if (_isLoggedIn == value) return;
+    _isLoggedIn = value;
+    if (!value) _currentTab = 0;
+    notifyListeners();
+  }
 }
