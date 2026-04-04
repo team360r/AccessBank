@@ -33,6 +33,6 @@ void main() {
         matching: find.byType(Container).first,
       ),
     );
-    expect((container.color as Color).value, const Color(0xFF616161).value);
+    expect(container.color, const Color(0xFF616161));
   });
 }
