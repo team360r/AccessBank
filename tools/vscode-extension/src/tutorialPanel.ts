@@ -34,26 +34,27 @@ export class TutorialPanelProvider implements vscode.WebviewViewProvider {
       localResourceRoots: [vscode.Uri.joinPath(this.extensionUri, 'media')],
     };
 
-    webviewView.webview.html = this.getHtml(webviewView.webview);
-
-    // Messages from the HTML panel → relay server.
+    // Register message handler BEFORE setting html to avoid missing the 'ready' event.
     webviewView.webview.onDidReceiveMessage((msg: { action: string; payload: unknown }) => {
       switch (msg.action) {
         case 'ready':
-          // Push content and current state to the fresh WebView.
           this.sendContent();
           break;
         case 'open_url':
           vscode.env.openExternal(vscode.Uri.parse((msg.payload as { url: string }).url));
           break;
         default:
-          // Forward all other actions to the relay server.
           this.relay.send({
             type: 'command', source: 'ide', action: msg.action,
             payload: msg.payload as Record<string, unknown>,
           });
       }
     });
+
+    webviewView.webview.html = this.getHtml(webviewView.webview);
+
+    // Belt-and-suspenders: also push content immediately in case 'ready' was already missed.
+    setTimeout(() => this.sendContent(), 200);
   }
 
   private handleRelayMessage(msg: RelayMessage): void {
