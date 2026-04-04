@@ -285,7 +285,25 @@ void main() {
       expect(json['question'], 'What does Semantics do?');
       expect(json['options'], ['A', 'B', 'C']);
       expect(json['correctIndex'], 1);
-      expect(json['explanation'], isNotEmpty);
+      expect(json['explanation'], 'It describes widgets to the OS.');
+    });
+
+    test('Quiz serializes title and questions', () {
+      const quiz = Quiz(
+        title: 'Check Your Understanding',
+        questions: [
+          QuizQuestion(
+            question: 'Q1?',
+            options: ['A', 'B'],
+            correctIndex: 0,
+            explanation: 'A is correct',
+          ),
+        ],
+      );
+      final json = quiz.toJson();
+      expect(json['title'], 'Check Your Understanding');
+      expect((json['questions'] as List).length, 1);
+      expect((json['questions'] as List).first['correctIndex'], 0);
     });
 
     test('TutorialStep serializes with optional fields null', () {
