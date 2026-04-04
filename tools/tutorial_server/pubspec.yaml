@@ -1,0 +1,11 @@
+name: tutorial_server
+description: AccessGuide WebSocket relay server
+publish_to: none
+environment:
+  sdk: ">=3.0.0 <4.0.0"
+dependencies:
+  args: ^2.5.0
+  path: ^1.9.0
+dev_dependencies:
+  test: ^1.25.0
+  lints: ^4.0.0
