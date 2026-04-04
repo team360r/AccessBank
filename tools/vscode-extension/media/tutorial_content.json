@@ -1,0 +1,1183 @@
+{
+  "version": 1,
+  "generatedAt": "2026-04-04T14:15:56.971450",
+  "chapters": [
+    {
+      "id": 0,
+      "title": "Your Accessibility Toolkit",
+      "branchName": "chapter-0-toolkit",
+      "description": "Before writing a single line of accessible code you need to know how to hear what your users hear. In this chapter you will enable a screen reader, learn the key gestures, and discover the Flutter and in-app tools that make accessibility testing fast and repeatable.",
+      "screenFocus": "Demo",
+      "estimatedMinutes": 15,
+      "vibe": "Now I know how to hear what my users hear",
+      "steps": [
+        {
+          "id": 1,
+          "title": "Enable Your Screen Reader",
+          "explanation": "Every platform ships with a built-in screen reader. On **Android** it is called **TalkBack** — enable it under Settings > Accessibility > TalkBack. On **iOS** it is called **VoiceOver** — enable it under Settings > Accessibility > VoiceOver (or triple-click the side button if you have set up the Accessibility Shortcut). On **Flutter Web** you can use the browser's built-in screen reader: NVDA or JAWS on Windows, or VoiceOver in Safari/Chrome on macOS.\n\nOnce enabled, the screen reader takes over all touch and keyboard input — every tap now *focuses* an element and reads its label aloud instead of activating it immediately.",
+          "codeDiff": null,
+          "whyItMatters": null,
+          "tryItPrompt": "Enable your platform's screen reader now.",
+          "referenceLinks": [
+            "https://support.google.com/accessibility/android/answer/6007100",
+            "https://support.apple.com/guide/iphone/turn-on-and-practice-voiceover-iph3e2e415f/ios"
+          ]
+        },
+        {
+          "id": 2,
+          "title": "Key Screen Reader Gestures",
+          "explanation": "Screen readers completely change how you interact with a device. Here are the gestures you will use constantly:\n\n**Navigate forward/backward** — Swipe right or left to move to the next or previous accessible element.\n\n**Activate an element** — Double-tap anywhere on screen to activate the currently focused element (a button, link, etc.).\n\n**Explore by touch** — Drag your finger around the screen; the screen reader reads whatever element is under your fingertip.\n\n**Scroll** — Use a three-finger swipe up or down.\n\nOn VoiceOver, navigation also works with a Bluetooth keyboard using Tab / Shift-Tab and Space or Return to activate.",
+          "codeDiff": null,
+          "whyItMatters": "These are the same gestures millions of users rely on daily. Feeling them first-hand is the fastest way to build empathy for what happens when a label is missing or a button is too small.",
+          "tryItPrompt": null,
+          "referenceLinks": []
+        },
+        {
+          "id": 3,
+          "title": "Flutter's Semantics Debugger",
+          "explanation": "Flutter includes a built-in visual overlay that shows you the semantics tree — the data structure the OS accessibility services read. Set `showSemanticsDebugger: true` on your `MaterialApp` and every widget that has semantics will be outlined and labelled on screen.\n\nThis is a quick way to spot missing labels or merged/excluded nodes without turning on a full screen reader.",
+          "codeDiff": {
+            "before": "MaterialApp(\n  title: 'AccessBank',\n  theme: theme,\n  home: const HomeScreen(),\n)",
+            "after": "MaterialApp(\n  title: 'AccessBank',\n  theme: theme,\n  // Set to true to visualise the semantics tree.\n  showSemanticsDebugger: true,\n  home: const HomeScreen(),\n)",
+            "language": "dart",
+            "filePath": "lib/main.dart"
+          },
+          "whyItMatters": null,
+          "tryItPrompt": "Add showSemanticsDebugger: true and hot-reload. Every outlined box is a semantics node — tap one to see its label in the console.",
+          "referenceLinks": []
+        },
+        {
+          "id": 4,
+          "title": "DevTools Accessibility Inspector",
+          "explanation": "Flutter DevTools ships with a dedicated **Accessibility** tab (also called the Widget Inspector's Semantics pane). Open it with `flutter pub global activate devtools` then `flutter run` and click the DevTools URL printed in your terminal.\n\nThe Accessibility tab lets you:\n- Browse the full semantics tree\n- See every node's label, hint, value, and actions\n- Highlight the widget that corresponds to each node\n\nUse it when you want to audit the whole tree rather than tapping element by element.",
+          "codeDiff": null,
+          "whyItMatters": null,
+          "tryItPrompt": null,
+          "referenceLinks": [
+            "https://docs.flutter.dev/tools/devtools/inspector"
+          ]
+        },
+        {
+          "id": 5,
+          "title": "The AccessGuide Inspector",
+          "explanation": "This app has a built-in **inspector overlay** you can toggle without leaving the app. Tap the magnifying-glass icon in the tutorial panel or call `TutorialController.toggleInspector()` programmatically.\n\nWhen the inspector is on, every semantics node on the demo banking screen is highlighted with a coloured border and its label is shown inline — green for labelled nodes, red for unlabelled interactive elements that need attention.\n\nIt works on device, simulator, and Flutter Web — no extra tooling required.",
+          "codeDiff": null,
+          "whyItMatters": null,
+          "tryItPrompt": "Toggle the inspector on and explore the demo screen. How many red (unlabelled interactive) nodes can you spot?",
+          "referenceLinks": []
+        },
+        {
+          "id": 6,
+          "title": "Practice: Navigate by Ear",
+          "explanation": "Now that you have the tools, put them away and use only your ears. Enable the screen reader, lock your eyes closed (or look away from the screen), and attempt to complete a real task in AccessBank.\n\nNotice what is announced clearly and what leaves you guessing. That confusion is exactly what we'll be fixing together in the chapters ahead.",
+          "codeDiff": null,
+          "whyItMatters": "Experiencing the app as a screen reader user — even for 60 seconds — builds more intuition than any amount of reading about accessibility theory.",
+          "tryItPrompt": "Close your eyes, enable the screen reader, and try to check your account balance. What was the experience like?",
+          "referenceLinks": []
+        }
+      ],
+      "quiz": {
+        "title": "Check Your Toolkit Knowledge",
+        "questions": [
+          {
+            "question": "Which gesture activates the currently focused element when using TalkBack or VoiceOver?",
+            "options": [
+              "Single tap",
+              "Double tap",
+              "Long press",
+              "Three-finger swipe"
+            ],
+            "correctIndex": 1,
+            "explanation": "With a screen reader active, a single tap moves focus to an element and announces it. A double tap activates it (like a regular single tap without the screen reader)."
+          },
+          {
+            "question": "What does `showSemanticsDebugger: true` do in MaterialApp?",
+            "options": [
+              "Enables TalkBack automatically on the device",
+              "Draws a visual overlay showing the semantics tree nodes",
+              "Logs the semantics tree to the console",
+              "Breaks the build so you remember to remove it"
+            ],
+            "correctIndex": 1,
+            "explanation": "`showSemanticsDebugger: true` adds a visual overlay to the app that outlines and labels every widget that has associated semantics data — great for a quick visual audit."
+          },
+          {
+            "question": "How do you navigate between elements with a screen reader on a touchscreen?",
+            "options": [
+              "Tap each element directly",
+              "Swipe up and down",
+              "Swipe right and left",
+              "Use the volume buttons"
+            ],
+            "correctIndex": 2,
+            "explanation": "Swiping right moves focus to the next accessible element; swiping left moves to the previous one. This is the primary navigation gesture on both TalkBack (Android) and VoiceOver (iOS)."
+          }
+        ]
+      }
+    },
+    {
+      "id": 1,
+      "title": "Welcome to AccessBank",
+      "branchName": "chapter-1-setup",
+      "description": "Take a tour of the AccessBank demo app — first through sighted eyes, then through a screen reader. You'll spot real barriers that block users from banking independently and get your first look at Flutter's semantics tree, the foundation of everything we'll fix.",
+      "screenFocus": "All screens",
+      "estimatedMinutes": 20,
+      "vibe": "Oh wow, this is what it's like for some users?",
+      "steps": [
+        {
+          "id": 1,
+          "title": "Tour the App",
+          "explanation": "AccessBank has five screens — spend a couple of minutes clicking through all of them before we bring in the screen reader:\n\n1. **Login** — email + password fields and a Sign In button\n2. **Account Overview** — a list of your accounts with balances\n3. **Transaction List** — recent transactions with filter chips\n4. **Transfer** — move money between accounts\n5. **Settings** — profile and notification preferences\n\nNotice what each screen looks like, what actions you can take, and what information is shown. You'll revisit each screen shortly — but this time without your eyes.",
+          "codeDiff": null,
+          "whyItMatters": null,
+          "tryItPrompt": null,
+          "referenceLinks": []
+        },
+        {
+          "id": 2,
+          "title": "The Screen Reader Experience",
+          "explanation": "Now enable TalkBack or VoiceOver and navigate to the Account Overview screen using *only* screen reader gestures — no peeking!\n\nSwipe right to move through elements one by one. Listen carefully to what is announced. You might hear things like \"Image\", \"Button\", or long cryptic strings instead of meaningful account names.\n\nThis is the daily reality for users who rely on assistive technology to access their finances.",
+          "codeDiff": null,
+          "whyItMatters": "About 2.2 billion people worldwide have some form of vision impairment. Even if only a fraction use screen readers, that is still tens of millions of potential AccessBank customers — and right now, our app largely shuts them out.",
+          "tryItPrompt": "Navigate to Account Overview with your screen reader. Can you tell which account has the highest balance?",
+          "referenceLinks": []
+        },
+        {
+          "id": 3,
+          "title": "Spotting the Problems",
+          "explanation": "Here are five categories of accessibility issues already present in AccessBank:\n\n1. **Missing labels** — icon buttons with no text alternative\n2. **Meaningless labels** — \"Image\" or generic widget descriptions\n3. **Poor tab/focus order** — the screen reader jumps around randomly\n4. **Low contrast** — light-grey text on white backgrounds\n5. **Tiny touch targets** — icon buttons under 48×48 dp\n\nThese aren't edge-cases. They are the top five issues found in accessibility audits of real banking apps.",
+          "codeDiff": null,
+          "whyItMatters": "Every one of these issues blocks real users from banking independently. Fixing them isn't just compliance — it is giving people back their financial autonomy.",
+          "tryItPrompt": null,
+          "referenceLinks": []
+        },
+        {
+          "id": 4,
+          "title": "Understanding the Semantics Tree",
+          "explanation": "Flutter renders your UI to a canvas — pixels, not DOM elements. To make that canvas understandable to assistive technology, Flutter maintains a parallel **semantics tree**: a structured description of every meaningful element on screen (labels, roles, states, actions).\n\nWhen you add a `Semantics` widget (or use a widget that adds semantics automatically, like `ElevatedButton`), Flutter updates this tree and the OS accessibility service reads it.\n\nThe diff below shows the difference between a card with no semantics information versus one with a proper label.",
+          "codeDiff": {
+            "before": "// No semantics — TalkBack announces \"Image\" then \"4,285.50\"\n// as two unrelated elements.\nContainer(\n  child: Row(\n    children: [\n      Icon(Icons.account_balance),\n      Text('$4,285.50'),\n    ],\n  ),\n)",
+            "after": "// Semantics wraps the whole card into one meaningful node.\nSemantics(\n  label: 'Everyday Checking, balance four thousand two hundred '\n         'eighty-five dollars and fifty cents',\n  child: Container(\n    child: Row(\n      children: [\n        Icon(Icons.account_balance),\n        Text('$4,285.50'),\n      ],\n    ),\n  ),\n)",
+            "language": "dart",
+            "filePath": "lib/widgets/account_card.dart"
+          },
+          "whyItMatters": null,
+          "tryItPrompt": null,
+          "referenceLinks": [
+            "https://api.flutter.dev/flutter/widgets/Semantics-class.html"
+          ]
+        },
+        {
+          "id": 5,
+          "title": "Exploring SemanticsNodes",
+          "explanation": "Turn on the AccessGuide inspector (magnifying-glass icon) and look at the Account Overview screen. Each coloured box represents a `SemanticsNode` — the same data that gets sent to TalkBack or VoiceOver.\n\n- **Green border** — the node has a label ✓\n- **Red border** — an interactive element with no label ✗\n- **Grey border** — non-interactive, no label (may be fine)\n\nIn the next chapter we will fix every red node on the Account Overview screen by adding proper `Semantics` widgets.",
+          "codeDiff": null,
+          "whyItMatters": null,
+          "tryItPrompt": "Toggle the inspector and count how many elements have labels (green borders) versus missing labels (red borders).",
+          "referenceLinks": []
+        }
+      ],
+      "quiz": {
+        "title": "Check Your Understanding",
+        "questions": [
+          {
+            "question": "What is Flutter's semantics tree?",
+            "options": [
+              "The widget tree rendered to the canvas",
+              "A parallel structure that describes the UI to assistive technology",
+              "A debug overlay shown in DevTools",
+              "The navigation stack of the app"
+            ],
+            "correctIndex": 1,
+            "explanation": "Flutter's semantics tree runs alongside the widget tree. It describes each meaningful element's label, role, state, and actions in a way that OS accessibility services like TalkBack and VoiceOver can read aloud."
+          },
+          {
+            "question": "Approximately how many people worldwide have some form of vision impairment?",
+            "options": [
+              "220 million",
+              "500 million",
+              "2.2 billion",
+              "4 billion"
+            ],
+            "correctIndex": 2,
+            "explanation": "According to the World Health Organization, approximately 2.2 billion people have near or distance vision impairment. This is a huge audience that benefits directly from accessible apps."
+          },
+          {
+            "question": "Which of the following is NOT one of the five common accessibility issues found in AccessBank?",
+            "options": [
+              "Missing labels on icon buttons",
+              "Poor tab/focus order",
+              "Too many animations",
+              "Low contrast text"
+            ],
+            "correctIndex": 2,
+            "explanation": "The five issues we identified are: missing labels, meaningless labels, poor tab/focus order, low contrast, and tiny touch targets. Excessive animation is a separate concern covered in Chapter 6."
+          }
+        ]
+      }
+    },
+    {
+      "id": 2,
+      "title": "Speaking the Language",
+      "branchName": "chapter-2-semantics",
+      "description": "Labels are the words your app speaks to users who can't see it. In this chapter you'll add semantic labels, hints, and values to the Account Overview screen, merge related elements into single meaningful nodes, and silence purely decorative widgets — transforming a confusing screen into one that's a pleasure to navigate by ear.",
+      "screenFocus": "Account Overview",
+      "estimatedMinutes": 25,
+      "vibe": "That was easier than I thought!",
+      "steps": [
+        {
+          "id": 1,
+          "title": "Adding Semantic Labels",
+          "explanation": "The `Semantics` widget's `label` property provides the text that a screen reader announces when it focuses on the node. For account cards, a good label combines the account type and balance in natural spoken language — not the formatted number that appears on screen.\n\nNotice how the \"after\" version spells out the dollar amount in words. Screen readers read \"4,285.50\" as \"four comma two eight five point five zero\" — not what you want!",
+          "codeDiff": {
+            "before": "// TalkBack: \"four two eight five fifty\" — confusing!\nCard(\n  child: Row(\n    children: [\n      Icon(Icons.account_balance),\n      Column(\n        children: [\n          Text('Everyday Checking'),\n          Text('$4,285.50'),\n        ],\n      ),\n    ],\n  ),\n)",
+            "after": "// TalkBack: \"Everyday Checking account, balance four thousand\n// two hundred eighty-five dollars and fifty cents\"\nSemantics(\n  label: 'Everyday Checking account, '\n         'balance four thousand two hundred '\n         'eighty-five dollars and fifty cents',\n  child: Card(\n    child: Row(\n      children: [\n        Icon(Icons.account_balance),\n        Column(\n          children: [\n            Text('Everyday Checking'),\n            Text('$4,285.50'),\n          ],\n        ),\n      ],\n    ),\n  ),\n)",
+            "language": "dart",
+            "filePath": "lib/screens/account_overview.dart"
+          },
+          "whyItMatters": null,
+          "tryItPrompt": null,
+          "referenceLinks": []
+        },
+        {
+          "id": 2,
+          "title": "Hints and Values",
+          "explanation": "Beyond `label`, the `Semantics` widget gives you two more tools:\n\n- **`value`** — the current state of an element (e.g. a toggle's \"on\" or \"off\", a slider's current position).\n- **`hint`** — extra guidance about what will happen when the user activates the element (\"double tap to view transaction history\").\n\nFor the quick-action buttons on the account card, adding a `hint` makes it clear what each button does rather than just announcing an icon name.",
+          "codeDiff": {
+            "before": "// TalkBack announces \"Button\" — useless!\nIconButton(\n  icon: const Icon(Icons.history),\n  onPressed: () => _openTransactions(account),\n)",
+            "after": "Semantics(\n  label: 'View transactions',\n  hint: 'Opens the transaction history for this account',\n  child: IconButton(\n    icon: const Icon(Icons.history),\n    onPressed: () => _openTransactions(account),\n  ),\n)",
+            "language": "dart",
+            "filePath": "lib/screens/account_overview.dart"
+          },
+          "whyItMatters": null,
+          "tryItPrompt": null,
+          "referenceLinks": []
+        },
+        {
+          "id": 3,
+          "title": "The Semantics Widget Deep Dive",
+          "explanation": "The `Semantics` widget has over 30 properties — here are the ones you will reach for most often:\n\n| Property | Purpose |\n|---|---|\n| `label` | What the element *is* |\n| `hint` | What will happen when activated |\n| `value` | Current state or value |\n| `button` | Marks the node as a button role |\n| `header` | Marks the node as a heading |\n| `image` | Marks the node as an image |\n| `liveRegion` | Announces changes automatically |\n| `onTap` / `onLongPress` | Custom semantic actions |\n| `enabled` | Whether the element is interactive |\n\nYou don't always need to set all of these — Flutter's built-in widgets (ElevatedButton, Checkbox, Slider…) set the role properties for you automatically.",
+          "codeDiff": null,
+          "whyItMatters": null,
+          "tryItPrompt": null,
+          "referenceLinks": [
+            "https://api.flutter.dev/flutter/widgets/Semantics-class.html"
+          ]
+        },
+        {
+          "id": 4,
+          "title": "MergeSemantics",
+          "explanation": "`MergeSemantics` combines all descendant semantics nodes into a single node. This is perfect for compound elements — like an account card — where you want the screen reader to announce the whole card as one item rather than visiting the icon, then the name, then the balance separately.\n\nAfter merging, the user hears \"Everyday Checking, $4,285.50, Savings, $12,400.00\" — one announce per account, not six.",
+          "codeDiff": {
+            "before": "// Screen reader visits: icon → account name → balance → 3 buttons\n// = 6 focus stops per account card\nRow(\n  children: [\n    Icon(Icons.account_balance),\n    Text('Everyday Checking'),\n    Text('$4,285.50'),\n  ],\n)",
+            "after": "// Screen reader visits the whole row as one node\nMergeSemantics(\n  child: Row(\n    children: [\n      Icon(Icons.account_balance),\n      Text('Everyday Checking'),\n      Text('$4,285.50'),\n    ],\n  ),\n)",
+            "language": "dart",
+            "filePath": "lib/screens/account_overview.dart"
+          },
+          "whyItMatters": null,
+          "tryItPrompt": null,
+          "referenceLinks": []
+        },
+        {
+          "id": 5,
+          "title": "ExcludeSemantics",
+          "explanation": "`ExcludeSemantics` hides a subtree from the semantics tree entirely. Use it for purely decorative elements that add visual interest but no information — background patterns, separator lines, decorative icon repetitions.\n\nWithout exclusion, a screen reader might announce \"Image, Image, Image\" three times for a row of decorative icons — confusing and noisy.",
+          "codeDiff": {
+            "before": "// TalkBack announces \"Image\" for the decorative background icon\nStack(\n  children: [\n    Positioned.fill(\n      child: Icon(\n        Icons.account_balance_wallet,\n        size: 80,\n        color: Colors.white12,\n      ),\n    ),\n    content,\n  ],\n)",
+            "after": "// Decorative icon is invisible to screen readers\nStack(\n  children: [\n    Positioned.fill(\n      child: ExcludeSemantics(\n        child: Icon(\n          Icons.account_balance_wallet,\n          size: 80,\n          color: Colors.white12,\n        ),\n      ),\n    ),\n    content,\n  ],\n)",
+            "language": "dart",
+            "filePath": "lib/screens/account_overview.dart"
+          },
+          "whyItMatters": null,
+          "tryItPrompt": null,
+          "referenceLinks": []
+        },
+        {
+          "id": 6,
+          "title": "Hear the Difference",
+          "explanation": "Now it is time to experience the improvement you have just made. Use the toggle at the top of the tutorial panel to switch between the \"Before\" (original) and \"After\" (accessible) versions of the Account Overview screen.\n\nEnable your screen reader and swipe through both versions. The \"after\" version should feel dramatically more coherent — each account announces as a single meaningful unit and the decorative noise is gone.",
+          "codeDiff": null,
+          "whyItMatters": null,
+          "tryItPrompt": "Toggle between accessible and original versions with your screen reader active. Notice how many fewer swipes you need to understand the account overview in the \"after\" version.",
+          "referenceLinks": []
+        }
+      ],
+      "quiz": {
+        "title": "Semantics Quiz",
+        "questions": [
+          {
+            "question": "Which Semantics property provides the text a screen reader announces when it focuses on a widget?",
+            "options": [
+              "hint",
+              "value",
+              "label",
+              "tooltip"
+            ],
+            "correctIndex": 2,
+            "explanation": "`label` is the primary text announced when a screen reader focuses on a node. `hint` provides additional guidance about what will happen on activation, and `value` describes the current state."
+          },
+          {
+            "question": "What does the `MergeSemantics` widget do?",
+            "options": [
+              "Removes all semantics from its subtree",
+              "Combines all descendant semantics nodes into one node",
+              "Copies semantics from a sibling widget",
+              "Adds a spoken label to each child widget"
+            ],
+            "correctIndex": 1,
+            "explanation": "`MergeSemantics` merges all descendant semantics nodes into a single node. This is useful for compound elements like cards where you want one announcement per item, not one per child widget."
+          },
+          {
+            "question": "When should you use `ExcludeSemantics`?",
+            "options": [
+              "For all images in the app",
+              "For any element a user might want to interact with",
+              "For purely decorative elements that carry no information",
+              "For text that is already announced elsewhere"
+            ],
+            "correctIndex": 2,
+            "explanation": "`ExcludeSemantics` hides a widget subtree from the semantics tree. It is appropriate for decorative elements — background patterns, separator lines, repeated decorative icons — that would create noise without adding information."
+          }
+        ]
+      }
+    },
+    {
+      "id": 3,
+      "title": "Finding Your Way",
+      "branchName": "chapter-3-navigation",
+      "description": "Broken focus order is one of the most disorienting accessibility failures — imagine trying to fill in a form while focus jumps unpredictably. In this chapter you'll fix the login screen's tab order, trap focus correctly inside modal dialogs, and add skip navigation so keyboard users aren't forced to tab through the entire header on every screen.",
+      "screenFocus": "Login + dialogs",
+      "estimatedMinutes": 20,
+      "vibe": "I never thought about Tab order before",
+      "steps": [
+        {
+          "id": 1,
+          "title": "Fix the Tab Order",
+          "explanation": "By default, Flutter traverses widgets in the order they appear in the widget tree, which usually corresponds to paint order. On the Login screen the floating action button was placed early in the tree for z-order reasons — so the screen reader visits it *before* the email field, which is deeply confusing.\n\n`FocusTraversalGroup` lets you define an independent traversal group so that widgets inside it are ordered separately from the rest of the screen.",
+          "codeDiff": {
+            "before": "// Focus jumps: FAB → Email → Password → Sign In\n// because of widget tree ordering\nScaffold(\n  body: LoginForm(),\n  floatingActionButton: HelpFab(),\n)",
+            "after": "// Focus stays within LoginForm before reaching the FAB\nScaffold(\n  body: FocusTraversalGroup(\n    policy: ReadingOrderTraversalPolicy(),\n    child: LoginForm(),\n  ),\n  floatingActionButton: HelpFab(),\n)",
+            "language": "dart",
+            "filePath": "lib/screens/login_screen.dart"
+          },
+          "whyItMatters": null,
+          "tryItPrompt": null,
+          "referenceLinks": []
+        },
+        {
+          "id": 2,
+          "title": "Custom Traversal Order",
+          "explanation": "`FocusTraversalOrder` with an `OrderedTraversalPolicy` lets you set an explicit numeric order on individual widgets. This is the sledgehammer when the default reading-order policy still gets it wrong — use it sparingly, but it is invaluable when layouts are designed in a non-linear visual flow.\n\nThe login form should flow: Email → Password → Sign In. That's exactly what the numbers enforce.",
+          "codeDiff": {
+            "before": "Column(\n  children: [\n    EmailField(),\n    PasswordField(),\n    ForgotPasswordLink(),\n    SignInButton(),\n  ],\n)",
+            "after": "FocusTraversalGroup(\n  policy: OrderedTraversalPolicy(),\n  child: Column(\n    children: [\n      FocusTraversalOrder(\n        order: const NumericFocusOrder(1),\n        child: EmailField(),\n      ),\n      FocusTraversalOrder(\n        order: const NumericFocusOrder(2),\n        child: PasswordField(),\n      ),\n      FocusTraversalOrder(\n        order: const NumericFocusOrder(4),\n        child: ForgotPasswordLink(),\n      ),\n      FocusTraversalOrder(\n        order: const NumericFocusOrder(3),\n        child: SignInButton(),\n      ),\n    ],\n  ),\n)",
+            "language": "dart",
+            "filePath": "lib/screens/login_screen.dart"
+          },
+          "whyItMatters": null,
+          "tryItPrompt": null,
+          "referenceLinks": []
+        },
+        {
+          "id": 3,
+          "title": "Focus Traps",
+          "explanation": "When a modal dialog or bottom sheet opens, focus must stay inside it until the user dismisses it — otherwise a keyboard user can Tab behind the dialog and interact with blocked UI.\n\nFlutter's `Dialog` widget automatically requests focus when it opens, but you still need to wrap the content in a `FocusTraversalGroup` so that Tab cycles within the dialog and does not escape.\n\nSetting `autofocus: true` on the first interactive element ensures the user lands in the right place immediately.",
+          "codeDiff": {
+            "before": "// Focus can leak to background when user presses Tab\nAlertDialog(\n  title: const Text('Confirm Transfer'),\n  content: TransferSummary(),\n  actions: [\n    TextButton(\n      onPressed: () => Navigator.pop(context),\n      child: const Text('Cancel'),\n    ),\n    ElevatedButton(\n      onPressed: _confirmTransfer,\n      child: const Text('Confirm'),\n    ),\n  ],\n)",
+            "after": "// Focus is trapped within the dialog\nAlertDialog(\n  title: const Text('Confirm Transfer'),\n  content: FocusTraversalGroup(\n    child: TransferSummary(),\n  ),\n  actions: [\n    TextButton(\n      autofocus: true,\n      onPressed: () => Navigator.pop(context),\n      child: const Text('Cancel'),\n    ),\n    ElevatedButton(\n      onPressed: _confirmTransfer,\n      child: const Text('Confirm'),\n    ),\n  ],\n)",
+            "language": "dart",
+            "filePath": "lib/widgets/confirm_transfer_dialog.dart"
+          },
+          "whyItMatters": "Without focus management, keyboard users get lost behind dialogs and may unknowingly trigger actions on the obscured screen. Proper focus trapping is a WCAG 2.1 Level A requirement.",
+          "tryItPrompt": null,
+          "referenceLinks": []
+        },
+        {
+          "id": 4,
+          "title": "Skip Navigation",
+          "explanation": "When every screen starts with a navigation bar containing six tabs, a keyboard user must press Tab six times before reaching the main content — on every single screen. Skip links let users jump straight to the main content region.\n\nIn Flutter you implement this with a `Focus` node that jumps programmatically to the first element of the main content area when the user activates the skip link.",
+          "codeDiff": {
+            "before": "Scaffold(\n  appBar: MainAppBar(),\n  bottomNavigationBar: MainNavBar(),\n  body: content,\n)",
+            "after": "Scaffold(\n  appBar: MainAppBar(),\n  bottomNavigationBar: MainNavBar(),\n  body: Column(\n    children: [\n      // Skip link — visible only on keyboard focus\n      Semantics(\n        label: 'Skip to main content',\n        child: Focus(\n          onFocusChange: (focused) {\n            if (focused) setState(() => _skipVisible = true);\n            else setState(() => _skipVisible = false);\n          },\n          child: GestureDetector(\n            onTap: () => _mainContentFocus.requestFocus(),\n            child: _skipVisible\n                ? const SkipBanner()\n                : const SizedBox.shrink(),\n          ),\n        ),\n      ),\n      Expanded(\n        child: Focus(\n          focusNode: _mainContentFocus,\n          skipTraversal: true,\n          child: content,\n        ),\n      ),\n    ],\n  ),\n)",
+            "language": "dart",
+            "filePath": "lib/widgets/app_scaffold.dart"
+          },
+          "whyItMatters": null,
+          "tryItPrompt": null,
+          "referenceLinks": []
+        },
+        {
+          "id": 5,
+          "title": "Keyboard-Only Testing",
+          "explanation": "The ultimate validation of your focus order work is to navigate the entire app without touching the screen — using only a keyboard (physical or on-screen).\n\nOn **Android** you can connect a Bluetooth keyboard or enable Switch Access in Accessibility settings. On **iOS** use an external keyboard with VoiceOver. On **Flutter Web** any keyboard works — use Tab, Shift-Tab, Enter, and Space.\n\nWatch for: elements you can't reach, buttons that don't respond to Enter/Space, and focus that disappears after a dialog closes.",
+          "codeDiff": null,
+          "whyItMatters": null,
+          "tryItPrompt": "Plug in a keyboard (or enable switch access) and navigate the entire login flow without touching the screen. Can you get all the way to the Account Overview?",
+          "referenceLinks": []
+        }
+      ],
+      "quiz": {
+        "title": "Navigation & Focus Quiz",
+        "questions": [
+          {
+            "question": "What widget do you use to define an independent focus traversal group in Flutter?",
+            "options": [
+              "FocusScope",
+              "FocusTraversalGroup",
+              "Focus",
+              "FocusNode"
+            ],
+            "correctIndex": 1,
+            "explanation": "`FocusTraversalGroup` defines a region with its own traversal policy. Widgets inside the group are ordered relative to each other, independently of widgets outside the group."
+          },
+          {
+            "question": "Why is a focus trap important in modal dialogs?",
+            "options": [
+              "To prevent the user from closing the dialog accidentally",
+              "To stop keyboard users from interacting with content behind the dialog",
+              "To improve animation performance",
+              "To ensure the dialog is announced by the screen reader"
+            ],
+            "correctIndex": 1,
+            "explanation": "Without a focus trap, keyboard users can Tab past the dialog boundary and interact with (or accidentally trigger) elements in the obscured background. Trapping focus keeps interaction within the dialog until it is dismissed."
+          },
+          {
+            "question": "What is the purpose of a skip navigation link?",
+            "options": [
+              "To hide the navigation bar from sighted users",
+              "To let keyboard users jump past repetitive navigation to main content",
+              "To disable keyboard navigation on secondary screens",
+              "To announce the current page name when the screen loads"
+            ],
+            "correctIndex": 1,
+            "explanation": "Skip links let keyboard and switch-control users bypass repeated navigation elements (like app bars and tab bars) that would otherwise require many Tab presses on every screen."
+          }
+        ]
+      }
+    },
+    {
+      "id": 4,
+      "title": "See Clearly",
+      "branchName": "chapter-4-visual",
+      "description": "Visual accessibility goes far beyond screen readers. In this chapter you'll fix low-contrast text, ensure the UI scales gracefully when users increase their font size, tune dark mode contrast, and stop relying on colour alone to communicate meaning — making AccessBank readable for everyone from users with low vision to those reading in bright sunlight.",
+      "screenFocus": "Account Overview + theme",
+      "estimatedMinutes": 20,
+      "vibe": "My grandma could actually use this now",
+      "steps": [
+        {
+          "id": 1,
+          "title": "Contrast Matters",
+          "explanation": "WCAG 2.1 Success Criterion 1.4.3 requires a **4.5:1** contrast ratio between text and its background (3:1 for large text, defined as 18pt normal or 14pt bold). AccessBank's original account balance text uses `Colors.grey[400]` on white — a ratio of roughly 2.9:1, well below the threshold.\n\nThe fix is straightforward: swap the inaccessible colour for one that passes. Tools like the Accessible Colors website or the Flutter DevTools colour picker can check ratios instantly.",
+          "codeDiff": {
+            "before": "// Contrast ratio ~2.9:1 — fails WCAG AA\nText(\n  'Balance',\n  style: TextStyle(\n    color: Colors.grey[400],\n    fontSize: 12,\n  ),\n)",
+            "after": "// Contrast ratio ~5.9:1 — passes WCAG AA and AAA\nText(\n  'Balance',\n  style: TextStyle(\n    color: Colors.grey[700],\n    fontSize: 12,\n  ),\n)",
+            "language": "dart",
+            "filePath": "lib/screens/account_overview.dart"
+          },
+          "whyItMatters": "4.5:1 contrast ratio is not just a number — it is the threshold where most people with moderate vision loss (including many older adults) can still read text comfortably. One in three people over 65 have some form of vision impairment.",
+          "tryItPrompt": null,
+          "referenceLinks": []
+        },
+        {
+          "id": 2,
+          "title": "Text That Scales",
+          "explanation": "Users in iOS Settings or Android Display Settings can increase the system font size. Flutter respects this via `MediaQuery.textScalerOf`. The problem arises when layouts hardcode heights or use `textScaleFactor: 1.0` to override the user's preference.\n\nRemove any explicit scale overrides and test at 200% font size — this is the WCAG 1.4.4 success criterion (\"Resize text\").",
+          "codeDiff": {
+            "before": "// Bad: ignores the user's accessibility settings\nText(\n  accountName,\n  textScaleFactor: 1.0, // forces default size\n  style: const TextStyle(fontSize: 16),\n)",
+            "after": "// Good: respects the user's font-size preference\nText(\n  accountName,\n  style: const TextStyle(fontSize: 16),\n  // No textScaleFactor — Flutter uses MediaQuery automatically\n)",
+            "language": "dart",
+            "filePath": "lib/widgets/account_card.dart"
+          },
+          "whyItMatters": null,
+          "tryItPrompt": null,
+          "referenceLinks": [
+            "https://www.w3.org/WAI/WCAG21/Understanding/resize-text.html"
+          ]
+        },
+        {
+          "id": 3,
+          "title": "Layouts That Don't Break",
+          "explanation": "Respecting text scale is only half the battle — the layout must also handle the extra space. Fixed-height containers that worked at 100% scale will overflow at 200%.\n\nReplace fixed heights with flexible layouts:\n- Use `Flexible` or `Expanded` inside `Row`/`Column`\n- Replace `SizedBox(height: 48)` with `ConstrainedBox(minHeight: 48)`\n- Let `Card` size itself based on content\n\nTest by setting `MediaQuery.of(context).textScaler` to a scale factor of 2.0 in a test, or change the system font size on device.",
+          "codeDiff": {
+            "before": "// Overflows at large text sizes\nSizedBox(\n  height: 56,\n  child: Row(\n    children: [\n      const Icon(Icons.account_balance),\n      Text(accountName),\n      const Spacer(),\n      Text(balanceText),\n    ],\n  ),\n)",
+            "after": "// Grows with the text\nConstrainedBox(\n  constraints: const BoxConstraints(minHeight: 56),\n  child: Row(\n    crossAxisAlignment: CrossAxisAlignment.center,\n    children: [\n      const Icon(Icons.account_balance),\n      const SizedBox(width: 12),\n      Expanded(child: Text(accountName)),\n      Text(balanceText),\n    ],\n  ),\n)",
+            "language": "dart",
+            "filePath": "lib/widgets/account_card.dart"
+          },
+          "whyItMatters": null,
+          "tryItPrompt": null,
+          "referenceLinks": []
+        },
+        {
+          "id": 4,
+          "title": "Dark Mode Done Right",
+          "explanation": "The `Colors.grey[700]` we used in the light theme is too light on dark backgrounds. Each theme variant needs its own contrast-tested palette.\n\nDefine a separate `ColorScheme.dark()` with accessible equivalents, or use Material 3's dynamic colour system which handles contrast automatically when you provide a seed colour.",
+          "codeDiff": {
+            "before": "ThemeData darkTheme = ThemeData.dark().copyWith(\n  colorScheme: const ColorScheme.dark(\n    surface: Color(0xFF1E1E1E),\n    onSurface: Color(0xFF9E9E9E), // ~3.8:1 — fails AA\n  ),\n);",
+            "after": "ThemeData darkTheme = ThemeData.dark().copyWith(\n  colorScheme: const ColorScheme.dark(\n    surface: Color(0xFF1E1E1E),\n    onSurface: Color(0xFFD4D4D4), // ~9.2:1 — passes AAA\n  ),\n);",
+            "language": "dart",
+            "filePath": "lib/theme/app_theme.dart"
+          },
+          "whyItMatters": null,
+          "tryItPrompt": null,
+          "referenceLinks": []
+        },
+        {
+          "id": 5,
+          "title": "Beyond Color",
+          "explanation": "About 300 million people are colour blind — most commonly with red-green confusion. If your app uses colour alone to show \"this account is overdrawn\" (red) versus \"this account is healthy\" (green), colour-blind users miss that information entirely.\n\nAdd a secondary indicator — an icon, a text label, or a pattern — alongside every colour-coded element.",
+          "codeDiff": {
+            "before": "// Colour alone — invisible to users with red-green colour blindness\nContainer(\n  width: 8,\n  height: 8,\n  decoration: BoxDecoration(\n    color: isPositive ? Colors.green : Colors.red,\n    shape: BoxShape.circle,\n  ),\n)",
+            "after": "// Colour + icon — works for everyone\nRow(\n  mainAxisSize: MainAxisSize.min,\n  children: [\n    Icon(\n      isPositive ? Icons.arrow_upward : Icons.arrow_downward,\n      color: isPositive ? Colors.green[700] : Colors.red[700],\n      size: 14,\n      semanticLabel: isPositive ? 'Positive balance' : 'Overdrawn',\n    ),\n    const SizedBox(width: 4),\n    Container(\n      width: 8,\n      height: 8,\n      decoration: BoxDecoration(\n        color: isPositive ? Colors.green[700] : Colors.red[700],\n        shape: BoxShape.circle,\n      ),\n    ),\n  ],\n)",
+            "language": "dart",
+            "filePath": "lib/widgets/balance_indicator.dart"
+          },
+          "whyItMatters": "About 300 million people are colour blind. Colour alone never communicates meaning reliably — always pair it with shape, icon, or text. This is WCAG 1.4.1: \"Use of Color\".",
+          "tryItPrompt": null,
+          "referenceLinks": []
+        }
+      ],
+      "quiz": {
+        "title": "Visual Accessibility Quiz",
+        "questions": [
+          {
+            "question": "What is the WCAG AA minimum contrast ratio for normal-sized body text?",
+            "options": [
+              "3:1",
+              "4.5:1",
+              "7:1",
+              "2:1"
+            ],
+            "correctIndex": 1,
+            "explanation": "WCAG 2.1 Success Criterion 1.4.3 requires a 4.5:1 contrast ratio for normal text (under 18pt regular or 14pt bold). Large text requires a minimum of 3:1."
+          },
+          {
+            "question": "What happens when you set `textScaleFactor: 1.0` on a Text widget?",
+            "options": [
+              "The text becomes slightly larger",
+              "The user's system font-size preference is ignored",
+              "The text is hidden from screen readers",
+              "The text is rendered at the system default size"
+            ],
+            "correctIndex": 1,
+            "explanation": "Setting `textScaleFactor: 1.0` overrides the device's system font-size setting, forcing text to render at the default scale even when the user has requested larger text for accessibility reasons. This violates WCAG 1.4.4."
+          },
+          {
+            "question": "Which WCAG criterion requires that information is not conveyed by colour alone?",
+            "options": [
+              "1.3.1 Info and Relationships",
+              "1.4.1 Use of Color",
+              "1.4.3 Contrast (Minimum)",
+              "2.4.6 Headings and Labels"
+            ],
+            "correctIndex": 1,
+            "explanation": "WCAG 1.4.1 \"Use of Color\" states that colour must not be the only visual means of conveying information, indicating an action, prompting a response, or distinguishing a visual element."
+          }
+        ]
+      }
+    },
+    {
+      "id": 5,
+      "title": "Forms That Work for Everyone",
+      "branchName": "chapter-5-forms",
+      "description": "Forms are where accessibility failures hit hardest. An inaccessible login screen locks users out of their own account; an inaccessible transfer form can cost them real money. In this chapter you'll properly label every field, announce errors through assistive technology, move focus to problems, and use smart keyboard types to make data entry effortless.",
+      "screenFocus": "Login + Transfer",
+      "estimatedMinutes": 25,
+      "vibe": "Forms are where accessibility really saves people",
+      "steps": [
+        {
+          "id": 1,
+          "title": "Label Everything",
+          "explanation": "Every form field needs a visible label — not just a placeholder (which disappears when the user starts typing). Use `InputDecoration.labelText` for the persistent floating label and `InputDecoration.hintText` for the secondary placeholder hint.\n\nFlutter's `TextField` with a proper `labelText` automatically provides semantics to screen readers, so users hear \"Email, text field, double tap to edit\" rather than just \"text field\".",
+          "codeDiff": {
+            "before": "// Placeholder disappears on input; screen reader says \"text field\"\nTextField(\n  decoration: const InputDecoration(\n    hintText: 'Enter your email',\n  ),\n  controller: _emailController,\n)",
+            "after": "// Label floats above the field; screen reader says \"Email, text field\"\nTextField(\n  decoration: const InputDecoration(\n    labelText: 'Email address',\n    hintText: 'e.g. name@example.com',\n  ),\n  controller: _emailController,\n)",
+            "language": "dart",
+            "filePath": "lib/screens/login_screen.dart"
+          },
+          "whyItMatters": null,
+          "tryItPrompt": null,
+          "referenceLinks": []
+        },
+        {
+          "id": 2,
+          "title": "Announce Errors",
+          "explanation": "When form validation fails, sighted users can see red error text below the field. Screen reader users won't know anything went wrong unless you tell them.\n\n`SemanticsService.announce()` inserts a message into the platform's accessibility announcement queue — like a \"live region\" update that is spoken without requiring the user to move focus.\n\nCall it after validation so the user immediately hears what went wrong.",
+          "codeDiff": {
+            "before": "void _validateAndSubmit() {\n  if (_emailController.text.isEmpty) {\n    setState(() {\n      _emailError = 'Email is required';\n    });\n    return;\n  }\n  _signIn();\n}",
+            "after": "void _validateAndSubmit() {\n  if (_emailController.text.isEmpty) {\n    setState(() {\n      _emailError = 'Email is required';\n    });\n    // Announce the error for screen reader users\n    SemanticsService.announce(\n      'Error: Email is required',\n      TextDirection.ltr,\n    );\n    return;\n  }\n  _signIn();\n}",
+            "language": "dart",
+            "filePath": "lib/screens/login_screen.dart"
+          },
+          "whyItMatters": null,
+          "tryItPrompt": null,
+          "referenceLinks": [
+            "https://api.flutter.dev/flutter/semantics/SemanticsService-class.html"
+          ]
+        },
+        {
+          "id": 3,
+          "title": "Focus to Error",
+          "explanation": "Announcing an error is a good start, but the user still needs to find the problematic field. Move focus to the first field that has an error so the user is already in the right place to fix it.\n\nAttach a `FocusNode` to each field, keep a list of validators, then after showing errors call `requestFocus()` on the node corresponding to the first failure.",
+          "codeDiff": {
+            "before": "// User has to hunt for the error field\nvoid _validateAndSubmit() {\n  bool hasError = false;\n  if (_emailController.text.isEmpty) {\n    setState(() => _emailError = 'Required');\n    hasError = true;\n  }\n  if (_passwordController.text.isEmpty) {\n    setState(() => _passwordError = 'Required');\n    hasError = true;\n  }\n  if (!hasError) _signIn();\n}",
+            "after": "// Focus jumps to the first error field automatically\nfinal FocusNode _emailFocus = FocusNode();\nfinal FocusNode _passwordFocus = FocusNode();\n\nvoid _validateAndSubmit() {\n  FocusNode? firstError;\n\n  if (_emailController.text.isEmpty) {\n    setState(() => _emailError = 'Email is required');\n    firstError ??= _emailFocus;\n  }\n  if (_passwordController.text.isEmpty) {\n    setState(() => _passwordError = 'Password is required');\n    firstError ??= _passwordFocus;\n  }\n\n  if (firstError != null) {\n    firstError.requestFocus();\n    SemanticsService.announce(\n      'Form has errors. Please review the highlighted fields.',\n      TextDirection.ltr,\n    );\n    return;\n  }\n  _signIn();\n}",
+            "language": "dart",
+            "filePath": "lib/screens/login_screen.dart"
+          },
+          "whyItMatters": null,
+          "tryItPrompt": null,
+          "referenceLinks": []
+        },
+        {
+          "id": 4,
+          "title": "Live Validation",
+          "explanation": "The Transfer screen's amount field accepts a dollar value — but tells the user nothing is wrong until they hit Submit. Real-time validation with an accessible announcement on each change gives users immediate feedback as they type.\n\nUse `onChanged` to validate and `SemanticsService.announce()` with a short debounce so the announcement does not fire on every keystroke.",
+          "codeDiff": {
+            "before": "TextField(\n  decoration: const InputDecoration(\n    labelText: 'Amount',\n    prefixText: '$',\n  ),\n  controller: _amountController,\n  keyboardType: TextInputType.number,\n)",
+            "after": "TextField(\n  decoration: InputDecoration(\n    labelText: 'Transfer amount',\n    prefixText: '$',\n    errorText: _amountError,\n  ),\n  controller: _amountController,\n  keyboardType: const TextInputType.numberWithOptions(decimal: true),\n  onChanged: (value) {\n    final amount = double.tryParse(value);\n    if (amount == null && value.isNotEmpty) {\n      final error = 'Please enter a valid dollar amount';\n      setState(() => _amountError = error);\n      _debounce(() => SemanticsService.announce(error, TextDirection.ltr));\n    } else if (amount != null && amount > _selectedAccount.balance) {\n      final error = 'Amount exceeds available balance';\n      setState(() => _amountError = error);\n      _debounce(() => SemanticsService.announce(error, TextDirection.ltr));\n    } else {\n      setState(() => _amountError = null);\n    }\n  },\n)",
+            "language": "dart",
+            "filePath": "lib/screens/transfer_screen.dart"
+          },
+          "whyItMatters": null,
+          "tryItPrompt": null,
+          "referenceLinks": []
+        },
+        {
+          "id": 5,
+          "title": "Smart Input Types",
+          "explanation": "Setting the right `keyboardType` and `autofillHints` on each field does three things:\n\n1. Shows the most helpful on-screen keyboard (email keyboard for email, number pad for amounts)\n2. Enables AutoFill so password managers and iOS/Android autofill can populate fields\n3. Helps screen readers announce the field type correctly\n\nThese are small changes with a big usability impact — especially for users with motor impairments who find typing difficult.",
+          "codeDiff": {
+            "before": "// Generic keyboard; no autofill hints\nTextField(\n  decoration: const InputDecoration(labelText: 'Email address'),\n  controller: _emailController,\n)\n\nTextField(\n  decoration: const InputDecoration(labelText: 'Password'),\n  controller: _passwordController,\n  obscureText: true,\n)",
+            "after": "// Email keyboard + autofill support\nTextField(\n  decoration: const InputDecoration(labelText: 'Email address'),\n  controller: _emailController,\n  keyboardType: TextInputType.emailAddress,\n  textInputAction: TextInputAction.next,\n  autofillHints: const [AutofillHints.username, AutofillHints.email],\n)\n\n// Password keyboard + autofill support\nTextField(\n  decoration: const InputDecoration(labelText: 'Password'),\n  controller: _passwordController,\n  obscureText: true,\n  textInputAction: TextInputAction.done,\n  autofillHints: const [AutofillHints.password],\n  onSubmitted: (_) => _validateAndSubmit(),\n)",
+            "language": "dart",
+            "filePath": "lib/screens/login_screen.dart"
+          },
+          "whyItMatters": null,
+          "tryItPrompt": null,
+          "referenceLinks": []
+        }
+      ],
+      "quiz": {
+        "title": "Accessible Forms Quiz",
+        "questions": [
+          {
+            "question": "Why should you use `InputDecoration.labelText` instead of only `hintText` for form fields?",
+            "options": [
+              "labelText has better typography",
+              "hintText is not supported on all platforms",
+              "labelText stays visible as a floating label when the user types; hintText disappears",
+              "labelText is required by Flutter"
+            ],
+            "correctIndex": 2,
+            "explanation": "`hintText` disappears as soon as the user starts typing, leaving them with no label to refer back to. `labelText` floats above the field and remains visible, which benefits both sighted users and screen reader users who need context while editing."
+          },
+          {
+            "question": "What does `SemanticsService.announce()` do?",
+            "options": [
+              "Adds a tooltip to the nearest Semantics widget",
+              "Inserts a spoken message into the accessibility announcement queue without requiring focus change",
+              "Logs an accessibility event to the console",
+              "Sets the label of the currently focused widget"
+            ],
+            "correctIndex": 1,
+            "explanation": "`SemanticsService.announce()` sends a live-region announcement to the platform's accessibility service. The message is spoken by the screen reader without the user having to move focus — ideal for error messages and status updates."
+          },
+          {
+            "question": "Which combination of improvements makes the Transfer amount field most accessible?",
+            "options": [
+              "labelText + number keyboard + live error announcement",
+              "hintText only",
+              "Large font size + border colour change",
+              "Placeholder text + onSubmitted callback"
+            ],
+            "correctIndex": 0,
+            "explanation": "The accessible amount field combines: a visible `labelText`, a `numberWithOptions(decimal: true)` keyboard, and a `SemanticsService.announce()` call in `onChanged` for live error feedback — giving sighted, screen reader, and motor-impaired users the best experience."
+          }
+        ]
+      }
+    },
+    {
+      "id": 6,
+      "title": "Motion & Interaction",
+      "branchName": "chapter-6-motion",
+      "description": "Not every user can flick, swipe, or tap a tiny icon. In this chapter you'll respect system-wide motion preferences to avoid triggering vestibular disorders, enforce 48×48 dp minimum touch targets, and provide button alternatives to every swipe-based gesture so that motor-impaired users can perform every action in the app.",
+      "screenFocus": "Transaction List",
+      "estimatedMinutes": 20,
+      "vibe": "Not everyone can swipe precisely",
+      "steps": [
+        {
+          "id": 1,
+          "title": "Respect Motion Preferences",
+          "explanation": "Users with vestibular disorders can experience nausea, dizziness, or worse from excessive screen animation. Both iOS and Android provide a \"Reduce Motion\" setting that apps are expected to honour.\n\nIn Flutter, check `MediaQuery.disableAnimationsOf(context)` (or `MediaQuery.of(context).disableAnimations`) and reduce or eliminate animations when it returns `true`.",
+          "codeDiff": {
+            "before": "// Always animates — can trigger vestibular issues\nAnimatedSwitcher(\n  duration: const Duration(milliseconds: 400),\n  child: _buildFilteredList(selectedFilter),\n)",
+            "after": "// Skips animation when the user prefers reduced motion\nBuilder(\n  builder: (context) {\n    final reduceMotion =\n        MediaQuery.disableAnimationsOf(context);\n    return AnimatedSwitcher(\n      duration: reduceMotion\n          ? Duration.zero\n          : const Duration(milliseconds: 400),\n      child: _buildFilteredList(selectedFilter),\n    );\n  },\n)",
+            "language": "dart",
+            "filePath": "lib/screens/transaction_list.dart"
+          },
+          "whyItMatters": null,
+          "tryItPrompt": null,
+          "referenceLinks": []
+        },
+        {
+          "id": 2,
+          "title": "Touch Target Sizing",
+          "explanation": "Apple's Human Interface Guidelines and Google's Material Design both require a minimum **44pt / 48dp** touch target for interactive elements. The Transaction List uses 24dp icon buttons which are half the required size — difficult for users with tremors or limited dexterity.\n\nWrap small icons in `SizedBox` or use `IconButton` with `constraints: BoxConstraints(minWidth: 48, minHeight: 48)` to expand the tappable area without changing the visual size.",
+          "codeDiff": {
+            "before": "// 24dp touch target — too small!\nGestureDetector(\n  onTap: () => _openDetails(transaction),\n  child: const Icon(Icons.chevron_right, size: 24),\n)",
+            "after": "// 48dp touch target — meets guidelines\nIconButton(\n  constraints: const BoxConstraints(minWidth: 48, minHeight: 48),\n  icon: const Icon(Icons.chevron_right, size: 24),\n  tooltip: 'View transaction details',\n  onPressed: () => _openDetails(transaction),\n)",
+            "language": "dart",
+            "filePath": "lib/screens/transaction_list.dart"
+          },
+          "whyItMatters": "Small touch targets are one of the most common mobile accessibility failures. For users with Parkinson's, arthritis, or essential tremor, a 24dp button is essentially unusable. The 48dp minimum is the point where most users can tap reliably.",
+          "tryItPrompt": null,
+          "referenceLinks": []
+        },
+        {
+          "id": 3,
+          "title": "Swipe Alternatives",
+          "explanation": "The `Dismissible` widget lets sighted users swipe to delete a transaction — a great gesture shortcut, but inaccessible for:\n\n- Screen reader users (no swipe-to-delete action is announced)\n- Switch Access / Switch Control users\n- Users who cannot perform the precise left-swipe gesture\n\nAdd an explicit \"Delete\" button inside the tile as the primary accessible action. The swipe gesture can remain as a shortcut, but must not be the *only* way to delete.",
+          "codeDiff": {
+            "before": "// Swipe-only delete — inaccessible\nDismissible(\n  key: Key(transaction.id),\n  direction: DismissDirection.endToStart,\n  onDismissed: (_) => _deleteTransaction(transaction),\n  child: TransactionTile(transaction: transaction),\n)",
+            "after": "// Swipe still works AND there is an accessible button alternative\nDismissible(\n  key: Key(transaction.id),\n  direction: DismissDirection.endToStart,\n  background: const DeleteBackground(),\n  onDismissed: (_) => _deleteTransaction(transaction),\n  child: TransactionTile(\n    transaction: transaction,\n    trailing: Semantics(\n      label: 'Delete transaction',\n      button: true,\n      child: IconButton(\n        icon: const Icon(Icons.delete_outline),\n        onPressed: () => _confirmDelete(transaction),\n      ),\n    ),\n  ),\n)",
+            "language": "dart",
+            "filePath": "lib/screens/transaction_list.dart"
+          },
+          "whyItMatters": null,
+          "tryItPrompt": null,
+          "referenceLinks": []
+        },
+        {
+          "id": 4,
+          "title": "Long-Press Alternatives",
+          "explanation": "Long-press actions are invisible to screen reader users, keyboard users, and anyone who cannot hold their finger steady on the screen for the required duration.\n\nAdd a context menu — either a `PopupMenuButton` or a visible \"More options\" button — that exposes the same actions available via long press.",
+          "codeDiff": {
+            "before": "// Long press only — inaccessible\nGestureDetector(\n  onLongPress: () => _showTransactionMenu(transaction),\n  child: TransactionTile(transaction: transaction),\n)",
+            "after": "// Long press still works AND there is an accessible menu button\nGestureDetector(\n  onLongPress: () => _showTransactionMenu(transaction),\n  child: TransactionTile(\n    transaction: transaction,\n    trailing: PopupMenuButton<String>(\n      tooltip: 'More options for this transaction',\n      icon: const Icon(Icons.more_vert),\n      onSelected: (action) => _handleAction(action, transaction),\n      itemBuilder: (_) => const [\n        PopupMenuItem(value: 'copy', child: Text('Copy reference')),\n        PopupMenuItem(value: 'report', child: Text('Report an issue')),\n      ],\n    ),\n  ),\n)",
+            "language": "dart",
+            "filePath": "lib/screens/transaction_list.dart"
+          },
+          "whyItMatters": null,
+          "tryItPrompt": null,
+          "referenceLinks": []
+        },
+        {
+          "id": 5,
+          "title": "Motor Accessibility Testing",
+          "explanation": "The most thorough way to test motor accessibility is to use Switch Access (Android) or Switch Control (iOS) — assistive technology designed for users who can operate only one or two switches.\n\nOn **Android**: Settings > Accessibility > Switch Access. Configure your volume button as a switch.\n\nOn **iOS**: Settings > Accessibility > Switch Control. Configure a switch and use the scanning mode.\n\nTry to complete a real task: delete a transaction you didn't authorise. If you can't, fix the interface before moving on.",
+          "codeDiff": null,
+          "whyItMatters": null,
+          "tryItPrompt": "Enable Switch Access (Android) or Switch Control (iOS) and try to delete a transaction. If it is not reachable with a single switch, come back and add the button alternative from Step 3.",
+          "referenceLinks": []
+        }
+      ],
+      "quiz": {
+        "title": "Motion & Interaction Quiz",
+        "questions": [
+          {
+            "question": "Which Flutter API do you use to check whether the user has enabled \"Reduce Motion\" on their device?",
+            "options": [
+              "MediaQuery.accessibilityFeaturesOf(context).reduceMotion",
+              "MediaQuery.disableAnimationsOf(context)",
+              "Theme.of(context).animationTheme.reduceMotion",
+              "WidgetsBinding.instance.window.semanticsEnabled"
+            ],
+            "correctIndex": 1,
+            "explanation": "`MediaQuery.disableAnimationsOf(context)` returns `true` when the user has enabled Reduce Motion (iOS) or Remove animations (Android). Respond by setting animation durations to zero."
+          },
+          {
+            "question": "What is the recommended minimum touch target size according to Material Design and Apple's HIG?",
+            "options": [
+              "24×24 dp",
+              "36×36 dp",
+              "48×48 dp",
+              "56×56 dp"
+            ],
+            "correctIndex": 2,
+            "explanation": "Both Material Design (48×48 dp) and Apple HIG (44×44 pt) specify this as the minimum for reliable interaction. Smaller targets are frequently missed by users with motor impairments or those using the device while in motion."
+          },
+          {
+            "question": "If a feature is only accessible via a long press gesture, which users are excluded?",
+            "options": [
+              "Only users with very large fingers",
+              "Screen reader users, keyboard users, and switch-control users",
+              "Users on Android (long press is iOS-only)",
+              "Nobody — all users can long-press"
+            ],
+            "correctIndex": 1,
+            "explanation": "Long press gestures are not announced or accessible to screen reader users, keyboard users, or switch-control users. Any action only reachable via long press must also have an equivalent button or menu option."
+          }
+        ]
+      }
+    },
+    {
+      "id": 7,
+      "title": "Dynamic Content & Live Regions",
+      "branchName": "chapter-7-live",
+      "description": "When content changes dynamically — filters apply, balances update, data loads, toasts pop up — sighted users see the change instantly. Screen reader users miss it entirely unless the app announces it. In this chapter you'll use live regions and `SemanticsService` to keep users informed of every meaningful change, without being noisy.",
+      "screenFocus": "Transactions + Overview",
+      "estimatedMinutes": 20,
+      "vibe": "The app talks to you now, in a good way",
+      "steps": [
+        {
+          "id": 1,
+          "title": "Announcing Filter Changes",
+          "explanation": "When the user taps a filter chip on the Transaction List, the list content changes — but screen reader users only hear \"All, selected\" for the chip itself and then silence. They don't know how many transactions matched or what changed.\n\nCall `SemanticsService.announce()` after applying the filter to give a useful summary of the new state.",
+          "codeDiff": {
+            "before": "void _applyFilter(String filter) {\n  setState(() {\n    _selectedFilter = filter;\n    _filteredTransactions = _getFiltered(filter);\n  });\n}",
+            "after": "void _applyFilter(String filter) {\n  setState(() {\n    _selectedFilter = filter;\n    _filteredTransactions = _getFiltered(filter);\n  });\n  final count = _filteredTransactions.length;\n  final label = filter == 'All' ? 'all' : filter.toLowerCase();\n  SemanticsService.announce(\n    'Showing $count $label transaction${count == 1 ? '' : 's'}',\n    TextDirection.ltr,\n  );\n}",
+            "language": "dart",
+            "filePath": "lib/screens/transaction_list.dart"
+          },
+          "whyItMatters": null,
+          "tryItPrompt": null,
+          "referenceLinks": []
+        },
+        {
+          "id": 2,
+          "title": "Live Regions for Updates",
+          "explanation": "A **live region** is a widget whose content changes automatically and whose changes should be announced proactively. Flutter implements this via `Semantics(liveRegion: true)`.\n\nThe account balance on the Overview screen is a perfect candidate: when a transfer completes, the balance updates and the live region ensures the screen reader announces the new value automatically, without the user having to navigate to that element.",
+          "codeDiff": {
+            "before": "// Balance updates silently — screen reader users miss the change\nText(\n  formattedBalance,\n  style: Theme.of(context).textTheme.headlineMedium,\n)",
+            "after": "// Balance change is automatically announced\nSemantics(\n  liveRegion: true,\n  label: 'Account balance: $formattedBalance',\n  child: Text(\n    formattedBalance,\n    style: Theme.of(context).textTheme.headlineMedium,\n  ),\n)",
+            "language": "dart",
+            "filePath": "lib/screens/account_overview.dart"
+          },
+          "whyItMatters": null,
+          "tryItPrompt": null,
+          "referenceLinks": [
+            "https://www.w3.org/WAI/WCAG21/Understanding/status-messages.html"
+          ]
+        },
+        {
+          "id": 3,
+          "title": "Loading States",
+          "explanation": "When the app is fetching transaction data, sighted users see a spinner. Screen reader users hear nothing — the list just seems to disappear and then reappear.\n\nAdd a `Semantics(liveRegion: true)` wrapper around your loading indicator and announce the loaded state when data arrives.",
+          "codeDiff": {
+            "before": "if (_isLoading) {\n  return const Center(child: CircularProgressIndicator());\n}\nreturn TransactionListView(transactions: _transactions);",
+            "after": "if (_isLoading) {\n  return Semantics(\n    liveRegion: true,\n    label: 'Loading transactions, please wait',\n    child: const Center(child: CircularProgressIndicator()),\n  );\n}\n// Announce when loading completes (called once in setState)\n// SemanticsService.announce('Transactions loaded', TextDirection.ltr);\nreturn TransactionListView(transactions: _transactions);",
+            "language": "dart",
+            "filePath": "lib/screens/transaction_list.dart"
+          },
+          "whyItMatters": null,
+          "tryItPrompt": null,
+          "referenceLinks": []
+        },
+        {
+          "id": 4,
+          "title": "Accessible Snackbars",
+          "explanation": "Flutter's default `SnackBar` is announced by screen readers on most platforms — but the announcement can be missed if it fires while the user is in the middle of navigating.\n\nMake snackbars more accessible by:\n1. Giving the action button an explicit semantic label\n2. Calling `SemanticsService.announce()` alongside the snackbar for platforms where auto-announcement is unreliable\n3. Keeping the message short and specific",
+          "codeDiff": {
+            "before": "ScaffoldMessenger.of(context).showSnackBar(\n  const SnackBar(\n    content: Text('Transfer sent'),\n  ),\n);",
+            "after": "ScaffoldMessenger.of(context).showSnackBar(\n  SnackBar(\n    content: const Text('Transfer of $amount sent successfully'),\n    action: SnackBarAction(\n      label: 'View receipt',\n      onPressed: _openReceipt,\n    ),\n  ),\n);\n// Belt-and-suspenders: announce directly for screen readers\nSemanticsService.announce(\n  'Transfer of $amount sent successfully',\n  TextDirection.ltr,\n);",
+            "language": "dart",
+            "filePath": "lib/screens/transfer_screen.dart"
+          },
+          "whyItMatters": null,
+          "tryItPrompt": null,
+          "referenceLinks": []
+        },
+        {
+          "id": 5,
+          "title": "Route Announcements",
+          "explanation": "When the user navigates to a new screen in a native app, the OS usually announces the new screen's title. In Flutter, this happens automatically if you set `RouteSettings.name` or use named routes.\n\nFor more control — or to announce something richer than just the route name — implement a `NavigatorObserver` that calls `SemanticsService.announce()` on `didPush`.",
+          "codeDiff": {
+            "before": "// No announcement — screen reader users don't know a new page loaded\nNavigator.of(context).push(\n  MaterialPageRoute(builder: (_) => const TransferScreen()),\n)",
+            "after": "// NavigatorObserver announces each route change\nclass AccessibilityObserver extends NavigatorObserver {\n  @override\n  void didPush(Route<dynamic> route, Route<dynamic>? previousRoute) {\n    final name = route.settings.name ?? 'New screen';\n    SemanticsService.announce(name, TextDirection.ltr);\n    super.didPush(route, previousRoute);\n  }\n}\n\n// Register once in MaterialApp:\n// navigatorObservers: [AccessibilityObserver()]",
+            "language": "dart",
+            "filePath": "lib/navigation/accessibility_observer.dart"
+          },
+          "whyItMatters": null,
+          "tryItPrompt": null,
+          "referenceLinks": []
+        }
+      ],
+      "quiz": {
+        "title": "Dynamic Content Quiz",
+        "questions": [
+          {
+            "question": "What does `Semantics(liveRegion: true)` do?",
+            "options": [
+              "Plays a sound when the widget updates",
+              "Automatically announces content changes to screen reader users",
+              "Prevents the widget from being re-rendered",
+              "Marks the widget as interactive"
+            ],
+            "correctIndex": 1,
+            "explanation": "A live region tells the accessibility service to proactively announce any content change within that node — similar to an ARIA live region on the web. The user hears the update automatically without needing to navigate to the element."
+          },
+          {
+            "question": "When is it appropriate to call `SemanticsService.announce()`?",
+            "options": [
+              "On every state change in the app",
+              "Only when a dialog opens",
+              "For meaningful status changes the user needs to know about but did not initiate by moving focus",
+              "Only on iOS, not Android"
+            ],
+            "correctIndex": 2,
+            "explanation": "`SemanticsService.announce()` is appropriate for status changes that users need to know about but that do not cause a focus change: errors, completion messages, filter results, and similar. Overusing it creates accessibility noise — use it for genuinely meaningful events."
+          },
+          {
+            "question": "What is the most reliable way to ensure screen reader users are aware of route changes?",
+            "options": [
+              "Put the route name in every widget's label",
+              "Use a NavigatorObserver that calls SemanticsService.announce() on push",
+              "Add a live region to the AppBar title",
+              "Route changes are always announced automatically"
+            ],
+            "correctIndex": 1,
+            "explanation": "A `NavigatorObserver` gives you explicit control over route announcements. Flutter's default announcement may be present on some platforms but is not consistent — a custom observer guarantees your message is spoken on every navigation event."
+          }
+        ]
+      }
+    },
+    {
+      "id": 8,
+      "title": "Testing Your Work",
+      "branchName": "chapter-8-testing",
+      "description": "Accessibility improvements only stay fixed if you test them. In this chapter you'll write widget tests that assert on the semantics tree, use the `matchesSemantics` matcher, build a manual testing checklist, add accessibility assertions to integration tests, and wire it all into CI so regressions are caught automatically.",
+      "screenFocus": "All screens",
+      "estimatedMinutes": 25,
+      "vibe": "I can prove this works, not just hope",
+      "steps": [
+        {
+          "id": 1,
+          "title": "Widget Tests with Semantics",
+          "explanation": "Flutter widget tests can inspect the live semantics tree using `SemanticsController`, accessible via `tester.semantics`. First enable semantics in the test, then use the controller to find nodes by label, check properties, and assert actions.\n\nAlways call `semantics.dispose()` at the end of the test to clean up the semantics system.",
+          "codeDiff": {
+            "before": "testWidgets('account card shows balance', (tester) async {\n  await tester.pumpWidget(\n    const MaterialApp(home: AccountCard(account: testAccount)),\n  );\n  expect(find.text('$4,285.50'), findsOneWidget);\n});",
+            "after": "testWidgets('account card has accessible label', (tester) async {\n  final semantics = tester.ensureSemantics();\n\n  await tester.pumpWidget(\n    const MaterialApp(home: AccountCard(account: testAccount)),\n  );\n\n  expect(\n    tester.getSemantics(find.byType(AccountCard)),\n    matchesSemantics(\n      label: 'Everyday Checking account, '\n             'balance four thousand two hundred '\n             'eighty-five dollars and fifty cents',\n    ),\n  );\n\n  semantics.dispose();\n});",
+            "language": "dart",
+            "filePath": "test/account_card_test.dart"
+          },
+          "whyItMatters": null,
+          "tryItPrompt": null,
+          "referenceLinks": []
+        },
+        {
+          "id": 2,
+          "title": "Matching Semantics",
+          "explanation": "`matchesSemantics` is a rich matcher that lets you assert on many properties of a `SemanticsNode` in one call:\n\n- `label` / `hint` / `value` — text content\n- `isButton` / `isHeader` / `isImage` — role flags\n- `isEnabled` / `isFocused` / `isChecked` — state flags\n- `actions` — list of `SemanticsAction`s the node supports\n\nUse it to write precise, readable assertions that will catch regressions immediately.",
+          "codeDiff": {
+            "before": "// Vague — only checks visual content\nexpect(find.text('Delete'), findsOneWidget);",
+            "after": "// Precise — checks semantic role, label, and available actions\nexpect(\n  tester.getSemantics(find.byTooltip('Delete transaction')),\n  matchesSemantics(\n    label: 'Delete transaction',\n    isButton: true,\n    isEnabled: true,\n    hasTapAction: true,\n  ),\n);",
+            "language": "dart",
+            "filePath": "test/transaction_tile_test.dart"
+          },
+          "whyItMatters": null,
+          "tryItPrompt": null,
+          "referenceLinks": [
+            "https://api.flutter.dev/flutter/flutter_test/matchesSemantics.html",
+            "https://docs.flutter.dev/testing/accessibility"
+          ]
+        },
+        {
+          "id": 3,
+          "title": "Manual Testing Checklist",
+          "explanation": "Automated tests catch missing labels, but only manual testing catches confusing or misleading ones. Run this checklist on each screen before calling it done:\n\n**TalkBack / VoiceOver checklist**\n- [ ] Every interactive element announces its purpose\n- [ ] Focus order is logical (left-to-right, top-to-bottom)\n- [ ] No unlabelled interactive elements (red nodes in inspector)\n- [ ] Decorative images are hidden from the tree\n- [ ] Form errors are announced when they appear\n- [ ] Dialogs trap focus until dismissed\n- [ ] Route changes are announced\n- [ ] Loading states are announced\n\nTest on a real device — simulators sometimes behave differently from physical hardware for accessibility features.",
+          "codeDiff": null,
+          "whyItMatters": "Automated tests catch missing labels, but only manual testing catches confusing experiences. An element can have a label and still describe the wrong thing — only a human ear catches that.",
+          "tryItPrompt": null,
+          "referenceLinks": []
+        },
+        {
+          "id": 4,
+          "title": "The Inspector in Action",
+          "explanation": "The AccessGuide inspector overlay is not just for exploration — it is a structured audit tool. Work through the Transfer screen systematically:\n\n1. Toggle the inspector on\n2. Count red-bordered nodes (unlabelled interactive elements)\n3. Tap each to see the full label in the panel\n4. Toggle between \"Before\" and \"After\" to confirm fixes\n\nThe inspector catches issues that `showSemanticsDebugger` misses because it specifically flags interactive elements with no label — the most impactful category of accessibility failure.",
+          "codeDiff": null,
+          "whyItMatters": null,
+          "tryItPrompt": "Use the inspector to audit the Transfer screen. How many red nodes do you find? Toggle to the \"After\" version and check again.",
+          "referenceLinks": []
+        },
+        {
+          "id": 5,
+          "title": "Integration Tests",
+          "explanation": "Integration tests run on a real device or emulator, making them ideal for end-to-end accessibility checks. Use `flutter_test` with `IntegrationTestWidgetsFlutterBinding` and the same `tester.ensureSemantics()` + `matchesSemantics` API.\n\nIntegration tests can also drive the app through complete user journeys and assert on semantics at each step.",
+          "codeDiff": {
+            "before": "// No accessibility assertions\ntestWidgets('user can log in', (tester) async {\n  await tester.pumpAndSettle();\n  await tester.enterText(find.byType(TextField).first, 'user@test.com');\n  await tester.enterText(find.byType(TextField).last, 'password');\n  await tester.tap(find.text('Sign In'));\n  await tester.pumpAndSettle();\n  expect(find.text('Account Overview'), findsOneWidget);\n});",
+            "after": "testWidgets('login screen is accessible', (tester) async {\n  final semantics = tester.ensureSemantics();\n  await tester.pumpAndSettle();\n\n  // Email field has correct label\n  expect(\n    tester.getSemantics(find.byKey(const Key('emailField'))),\n    matchesSemantics(label: 'Email address'),\n  );\n\n  // Sign In button is reachable and labelled\n  expect(\n    tester.getSemantics(find.byKey(const Key('signInButton'))),\n    matchesSemantics(label: 'Sign In', isButton: true),\n  );\n\n  semantics.dispose();\n});",
+            "language": "dart",
+            "filePath": "integration_test/login_accessibility_test.dart"
+          },
+          "whyItMatters": null,
+          "tryItPrompt": null,
+          "referenceLinks": []
+        },
+        {
+          "id": 6,
+          "title": "CI Integration",
+          "explanation": "Run accessibility tests on every pull request so regressions are caught before merging. Add a dedicated test step to your CI pipeline that runs the integration tests on a headless emulator.\n\nThe script below runs all tests tagged `accessibility` so you can keep fast unit tests and slower accessibility tests separate.",
+          "codeDiff": {
+            "before": "# No accessibility step in CI\n- name: Run tests\n  run: flutter test",
+            "after": "# Dedicated accessibility test step\n- name: Run widget accessibility tests\n  run: flutter test --tags accessibility\n\n- name: Run integration accessibility tests\n  run: |\n    flutter emulator --launch flutter_emulator\n    flutter drive \\\n      --driver=test_driver/integration_test.dart \\\n      --target=integration_test/login_accessibility_test.dart",
+            "language": "yaml",
+            "filePath": ".github/workflows/accessibility.yml"
+          },
+          "whyItMatters": null,
+          "tryItPrompt": null,
+          "referenceLinks": []
+        }
+      ],
+      "quiz": {
+        "title": "Testing Accessibility Quiz",
+        "questions": [
+          {
+            "question": "What does `tester.ensureSemantics()` do in a Flutter widget test?",
+            "options": [
+              "Enables TalkBack in the test environment",
+              "Activates the semantics system and returns a handle for cleanup",
+              "Asserts that all widgets have semantic labels",
+              "Generates a semantics audit report"
+            ],
+            "correctIndex": 1,
+            "explanation": "`tester.ensureSemantics()` activates Flutter's semantics system for the duration of the test and returns a `SemanticsHandle`. Call `.dispose()` at the end of the test to clean up. Without it, semantics are not built and `getSemantics` will fail."
+          },
+          {
+            "question": "What is the key advantage of the `matchesSemantics` matcher over checking widget text with `find.text()`?",
+            "options": [
+              "matchesSemantics is faster",
+              "matchesSemantics checks accessibility roles, states, and actions — not just visible text",
+              "find.text() is deprecated",
+              "matchesSemantics works on all Flutter versions"
+            ],
+            "correctIndex": 1,
+            "explanation": "`find.text()` only checks visible text content. `matchesSemantics` checks the full semantic node including role (`isButton`), state (`isEnabled`, `isChecked`), available actions (`hasTapAction`), and semantic label — giving you much more thorough accessibility coverage."
+          },
+          {
+            "question": "Why should you run accessibility tests in CI?",
+            "options": [
+              "CI environments have better screen readers than local machines",
+              "So regressions are caught automatically before merging",
+              "Flutter accessibility tests only work in CI",
+              "To generate WCAG compliance certificates"
+            ],
+            "correctIndex": 1,
+            "explanation": "Manual audits are valuable but not enough — developers forget, reviewers miss details, and fixes get accidentally reverted. Running accessibility tests in CI makes them a required part of the development workflow, so regressions are caught automatically on every pull request."
+          }
+        ]
+      }
+    },
+    {
+      "id": 9,
+      "title": "The Polished App",
+      "branchName": "chapter-9-polish",
+      "description": "This is the final chapter — and the beginning of a habit. You'll walk through every screen with a screen reader, learn the platform quirks that trip up even experienced developers, add custom semantics actions for complex interactions, and discover resources to carry this work forward. By the end, AccessBank is genuinely usable by everyone.",
+      "screenFocus": "All screens",
+      "estimatedMinutes": 25,
+      "vibe": "I actually understand accessibility now",
+      "steps": [
+        {
+          "id": 1,
+          "title": "Full Audit",
+          "explanation": "Before you can call the app accessible, you need to walk through the complete user journey end-to-end with a screen reader — not just individual screens in isolation.\n\nThe full banking workflow:\n1. Log in with email and password\n2. Check the balance on your Everyday Checking account\n3. Transfer $50 to Savings\n4. View the transaction history and confirm the transfer appears\n5. Check Settings to find the notification preference toggle\n\nEvery step should be completable using only swipe-right and double-tap. If you get stuck anywhere, that is a bug to fix.",
+          "codeDiff": null,
+          "whyItMatters": null,
+          "tryItPrompt": "Complete the full banking workflow: log in, check your balance, make a transfer, view the history, find the notifications toggle. Time yourself — how long does it take with the screen reader?",
+          "referenceLinks": []
+        },
+        {
+          "id": 2,
+          "title": "Platform Differences",
+          "explanation": "Each platform's screen reader has its own quirks — things that work perfectly on Android may behave differently on iOS or web.\n\n**TalkBack (Android)**\n- Uses \"explore by touch\" by default; swipe navigation is opt-in\n- Long-swipe gestures can be configured by the user\n- `liveRegion: true` is well supported\n\n**VoiceOver (iOS)**\n- Triple-click the side button to toggle — great for testing\n- `hint` text is read after a brief pause, or on demand via a rotor gesture\n- Announcements from `SemanticsService` are sometimes delayed\n\n**Flutter Web (Chrome + NVDA / JAWS / VoiceOver)**\n- Semantics are exposed as ARIA attributes — check DevTools Accessibility pane\n- Route announcements are less reliable; use `SemanticsService` explicitly\n- Keyboard navigation with Tab/Shift-Tab is the primary modality",
+          "codeDiff": null,
+          "whyItMatters": "Each platform has quirks. Test on all three — Android, iOS, and Flutter Web — before shipping. An issue invisible on one platform may be a showstopper on another.",
+          "tryItPrompt": null,
+          "referenceLinks": []
+        },
+        {
+          "id": 3,
+          "title": "Custom Semantics Actions",
+          "explanation": "Beyond the standard tap and long-press, `SemanticsAction` lets you expose custom actions that screen readers can trigger via their action menu (VoiceOver Rotor, TalkBack local context menu).\n\nThis is perfect for features like \"mark transaction as reviewed\" or \"copy account number\" — actions that have no obvious button in the visual layout.",
+          "codeDiff": {
+            "before": "// Only tap and long-press available\nGestureDetector(\n  onTap: () => _openDetails(transaction),\n  onLongPress: () => _showMenu(transaction),\n  child: TransactionTileContent(transaction: transaction),\n)",
+            "after": "// Custom actions appear in the screen reader action menu\nSemantics(\n  label: '${transaction.description}, '\n         '${transaction.formattedAmount}',\n  customSemanticsActions: {\n    const CustomSemanticsAction(label: 'Copy reference number'):\n        () => _copyReference(transaction),\n    const CustomSemanticsAction(label: 'Report an issue'):\n        () => _reportIssue(transaction),\n  },\n  child: GestureDetector(\n    onTap: () => _openDetails(transaction),\n    child: TransactionTileContent(transaction: transaction),\n  ),\n)",
+            "language": "dart",
+            "filePath": "lib/widgets/transaction_tile.dart"
+          },
+          "whyItMatters": null,
+          "tryItPrompt": null,
+          "referenceLinks": []
+        },
+        {
+          "id": 4,
+          "title": "Performance",
+          "explanation": "A large semantics tree has a performance cost — Flutter must diff and sync it on every frame that changes. Keep the tree lean by removing unnecessary nesting:\n\n- Use `ExcludeSemantics` on decorative subtrees\n- Use `MergeSemantics` to collapse related nodes\n- Avoid wrapping every `Text` in its own `Semantics` widget when `MergeSemantics` on the parent achieves the same result\n- Profile with `showSemanticsDebugger` — if you see more nodes than you expect, look for unnecessary wrappers",
+          "codeDiff": {
+            "before": "// 5 separate semantics nodes for one account row\nSemantics(\n  child: Row(\n    children: [\n      Semantics(child: Icon(Icons.account_balance)),\n      Semantics(child: Text(account.name)),\n      Semantics(child: Text(account.formattedBalance)),\n      Semantics(child: Icon(Icons.chevron_right)),\n    ],\n  ),\n)",
+            "after": "// 1 merged semantics node for the whole account row\nMergeSemantics(\n  child: Row(\n    children: [\n      ExcludeSemantics(child: Icon(Icons.account_balance)),\n      Text(account.name),\n      Text(account.formattedBalance),\n      ExcludeSemantics(child: Icon(Icons.chevron_right)),\n    ],\n  ),\n)",
+            "language": "dart",
+            "filePath": "lib/screens/account_overview.dart"
+          },
+          "whyItMatters": null,
+          "tryItPrompt": null,
+          "referenceLinks": [
+            "https://docs.flutter.dev/perf/rendering-performance"
+          ]
+        },
+        {
+          "id": 5,
+          "title": "Resources for the Journey",
+          "explanation": "Accessibility is not a destination — it is a continuous practice. Here are the resources that will serve you best as you go deeper:\n\n**Flutter-specific**\n- Flutter Accessibility docs: comprehensive API coverage\n- Flutter DevTools Inspector: in-app auditing\n\n**Standards**\n- WCAG 2.1: the web/app accessibility standard, Level AA is the legal baseline in most jurisdictions\n- W3C Mobile Accessibility Guidelines: mobile-specific patterns\n\n**Testing tools**\n- Google Accessibility Scanner (Android)\n- Xcode Accessibility Inspector (iOS/macOS)\n- Colour Contrast Analyser (desktop app)\n\nKeep learning, keep testing, keep shipping accessible software.",
+          "codeDiff": null,
+          "whyItMatters": null,
+          "tryItPrompt": null,
+          "referenceLinks": [
+            "https://docs.flutter.dev/accessibility",
+            "https://www.w3.org/TR/WCAG21/",
+            "https://www.w3.org/TR/mobile-accessibility-mapping/",
+            "https://developer.android.com/guide/topics/ui/accessibility",
+            "https://developer.apple.com/accessibility/"
+          ]
+        },
+        {
+          "id": 6,
+          "title": "Celebration!",
+          "explanation": "You did it!\n\nLook back at Chapter 1 — the app that announced \"Image\", \"Button\", and random numbers. Now look at what you have built: a banking app where every account announces its name and balance clearly, forms guide users through errors, focus moves logically through every screen, and the whole experience works equally well on Android, iOS, and the web.\n\nHere is what you learned:\n- **Chapter 0** — The tools: TalkBack, VoiceOver, semantics debugger\n- **Chapter 1** — The problem: how the inaccessible app felt\n- **Chapter 2** — Semantics: labels, hints, values, merge, exclude\n- **Chapter 3** — Navigation: tab order, focus traps, skip links\n- **Chapter 4** — Visual: contrast, text scaling, colour blindness\n- **Chapter 5** — Forms: labels, error announcements, smart inputs\n- **Chapter 6** — Motion: reduced motion, touch targets, alternatives\n- **Chapter 7** — Live regions: announcements, loading, routes\n- **Chapter 8** — Testing: widget tests, CI, manual checklists\n- **Chapter 9** — Polish: full audit, platform quirks, custom actions\n\nThat is a complete accessibility toolkit. Now go use it.",
+          "codeDiff": null,
+          "whyItMatters": "You have made this app usable for millions more people. A person with a vision impairment can now check their balance independently. A person with a motor impairment can now make a transfer without help. An older user with reduced contrast sensitivity can now read every number clearly. That is not just good engineering — it is the right thing to do.",
+          "tryItPrompt": null,
+          "referenceLinks": []
+        }
+      ],
+      "quiz": {
+        "title": "Final Assessment",
+        "questions": [
+          {
+            "question": "You discover that a button works perfectly with TalkBack on Android but is not focusable with VoiceOver on iOS. What is the most likely cause?",
+            "options": [
+              "The button is using the wrong widget type",
+              "A platform-specific behaviour difference — possibly a missing semantic role or an interaction that works differently on each platform",
+              "TalkBack is more advanced than VoiceOver",
+              "Flutter does not support VoiceOver"
+            ],
+            "correctIndex": 1,
+            "explanation": "TalkBack and VoiceOver have different implementations and occasionally behave differently for the same semantics tree. Platform-specific issues are common for custom components, complex interactions, and live region announcements. Always test on both platforms."
+          },
+          {
+            "question": "Which of these is the most important single change you can make to an app's accessibility?",
+            "options": [
+              "Adding semantic labels to every unlabelled interactive element",
+              "Increasing all font sizes by 20%",
+              "Adding a dark mode",
+              "Removing all animations"
+            ],
+            "correctIndex": 0,
+            "explanation": "Unlabelled interactive elements (buttons, links, icons) are completely invisible to screen reader users. Adding labels to these elements is the highest-impact single change because it determines whether the app is *usable at all* — not just slightly more comfortable."
+          },
+          {
+            "question": "A colleague says \"we don't need to worry about accessibility because only 1% of our users have disabilities.\" What is the best response?",
+            "options": [
+              "They are right — focus on the 99%",
+              "Accessibility also benefits: users in bright sunlight, users with temporary injuries, older users, and improves SEO and app-store ratings for everyone",
+              "Accessibility should be a separate app",
+              "Accessibility is only legally required for government apps"
+            ],
+            "correctIndex": 1,
+            "explanation": "The \"1%\" argument misses the breadth of accessibility. Improvements for users with disabilities typically improve the experience for everyone: better contrast helps in sunlight, larger touch targets help users in motion, semantic labels improve search indexing, and accessible forms reduce error rates for all users. Accessibility is not a zero-sum trade-off."
+          }
+        ]
+      }
+    }
+  ]
+}
