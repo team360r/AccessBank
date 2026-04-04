@@ -1,0 +1,42 @@
+<idea-plugin>
+  <id>com.accessguide.plugin</id>
+  <name>AccessGuide Tutorial</name>
+  <version>1.0.0</version>
+  <vendor>AccessGuide</vendor>
+
+  <description>
+    Interactive accessibility tutorial panel for the AccessBank Flutter project.
+    Controls the tethered phone and displays chapter content alongside the code editor.
+  </description>
+
+  <depends>com.intellij.modules.platform</depends>
+  <depends>com.intellij.modules.java</depends>
+
+  <extensions defaultExtensionNs="com.intellij">
+    <toolWindow
+        id="AccessGuide"
+        displayName="Tutorial"
+        anchor="right"
+        factoryClass="com.accessguide.plugin.TutorialToolWindowFactory"
+        icon="/icons/accessguide.svg"
+    />
+    <postStartupActivity
+        implementation="com.accessguide.plugin.TutorialStartupActivity"
+    />
+  </extensions>
+
+  <actions>
+    <action
+        id="AccessGuide.NextStep"
+        class="com.accessguide.plugin.actions.NextStepAction"
+        text="Next Tutorial Step"
+        description="Advance to the next tutorial step"
+    />
+    <action
+        id="AccessGuide.PrevStep"
+        class="com.accessguide.plugin.actions.PrevStepAction"
+        text="Previous Tutorial Step"
+        description="Go back to the previous tutorial step"
+    />
+  </actions>
+</idea-plugin>
