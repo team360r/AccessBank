@@ -19,7 +19,6 @@ dependencies {
         // Target Android Studio Ladybug (2024.2.1) or newer
         androidStudio("2024.2.1.11")
         bundledPlugins("com.intellij.java")
-        instrumentationTools()
     }
 }
 
@@ -48,9 +47,9 @@ tasks {
     }
 
     compileKotlin {
-        kotlinOptions.jvmTarget = "17"
+        kotlinOptions.jvmTarget = "21"
     }
     compileTestKotlin {
-        kotlinOptions.jvmTarget = "17"
+        kotlinOptions.jvmTarget = "21"
     }
 }

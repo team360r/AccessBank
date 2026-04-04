@@ -25,7 +25,7 @@ class DeviceManager(
     }
 
     private suspend fun pollLoop() {
-        while (isActive) {
+        while (scope.isActive) {
             try {
                 pollDevices()
             } catch (e: Exception) {
