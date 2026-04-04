@@ -109,20 +109,13 @@ export class TutorialPanelProvider implements vscode.WebviewViewProvider {
     const htmlPath = path.join(this.extensionUri.fsPath, 'media', 'tutorial_panel.html');
     let html = fs.readFileSync(htmlPath, 'utf8');
 
-    // Inline ide-bridge.js directly to avoid external resource loading issues.
+    // Inline ide-bridge.js so no external resource fetch is needed.
     const bridgePath = path.join(this.extensionUri.fsPath, 'media', 'ide-bridge.js');
     const bridgeJs = fs.readFileSync(bridgePath, 'utf8');
     html = html.replace(
       '<script src="ide-bridge.js"></script>',
       `<script>\n${bridgeJs}\n</script>`
     );
-
-    // Inject nonce on all scripts and a permissive-enough CSP.
-    const nonce = getNonce();
-    html = html.replace(/<script/g, `<script nonce="${nonce}"`);
-    html = html.replace('<head>', `<head>
-      <meta http-equiv="Content-Security-Policy"
-            content="default-src 'none'; script-src 'nonce-${nonce}' 'unsafe-inline'; style-src 'unsafe-inline';">`);
 
     return html;
   }
@@ -138,7 +131,3 @@ export class TutorialPanelProvider implements vscode.WebviewViewProvider {
   dispose(): void { this.fileWatcher.dispose(); }
 }
 
-function getNonce(): string {
-  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-  return Array.from({ length: 32 }, () => chars[Math.floor(Math.random() * chars.length)]).join('');
-}
