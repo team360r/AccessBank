@@ -1,10 +1,314 @@
 ---
 sidebar_position: 10
-title: "Chapter 9: Polishing for Production"
+title: "Chapter 9: The Polished App"
+description: "Full audit, platform differences, custom semantics actions, lean semantics tree, resources, and a celebration of everything you've built."
 ---
 
-# Chapter 9: Polishing for Production
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
 
-_Coming soon_
+# The Polished App
 
-This chapter covers the finishing touches: auditing your whole app with a checklist, integrating accessibility linting into CI, and preparing for App Store / Play Store accessibility statements.
+> *"I actually understand accessibility now."*
+
+**Estimated time:** ~25 minutes | **Focus:** All screens | **Branch:** `chapter-9-polish`
+
+---
+
+This is the final chapter — and the beginning of a habit. You'll walk through every screen with a screen reader, learn the platform quirks that trip up even experienced developers, add custom semantics actions for complex interactions, keep the semantics tree lean for performance, and gather the resources that will carry this work forward. By the end, AccessBank is genuinely usable by everyone.
+
+---
+
+## Section 1: The Full End-to-End Audit
+
+Before you can call the app accessible, you need to complete the full user journey from start to finish using only the screen reader — not individual screens in isolation.
+
+<div className="ab-step">
+  <div className="ab-step__badge">1</div>
+  <div className="ab-step__content">
+
+The complete AccessBank banking workflow:
+
+1. Log in with email and password
+2. Check the balance on the Everyday Checking account
+3. Transfer £50 to Savings
+4. View the transaction history and confirm the transfer appears
+5. Find the Notifications toggle in Settings
+
+Every step should be completable using only swipe-right and double-tap. If you get stuck anywhere, that is a bug to fix — not a feature to leave until later.
+
+  </div>
+</div>
+
+<div className="ab-callout ab-callout--blue">
+  <div className="ab-callout__header">💡 Try it yourself</div>
+  <p>Complete the full workflow with TalkBack or VoiceOver active and time yourself. How long does it take? Compare with how long it takes without the screen reader. The ratio tells you how much friction remains. A well-built accessible app should feel only slightly slower with the screen reader — not ten times slower.</p>
+</div>
+
+---
+
+## Section 2: Platform Differences
+
+Each platform's screen reader has its own quirks. Something that works perfectly on Android may behave differently on iOS. Both platforms need explicit testing before shipping.
+
+<div className="ab-step">
+  <div className="ab-step__badge">1</div>
+  <div className="ab-step__content">
+
+**TalkBack (Android)**
+- Uses "explore by touch" by default — swiping to navigate is the primary modality
+- `liveRegion: true` is well supported and reliable
+- Long-swipe gestures can be configured by the user in TalkBack settings
+- Toggle: press both volume buttons simultaneously, or triple-press the side button on some devices
+
+**VoiceOver (iOS)**
+- Toggle: triple-press the side button (iPhone X and later) or home button
+- `hint` text is read after a brief pause following the label, or on demand via the Rotor gesture
+- Announcements from `SemanticsService` can sometimes be delayed by a few hundred milliseconds — test on device, not simulator
+- The Rotor (rotate two fingers on screen) provides quick navigation by headings, links, and custom actions
+
+  </div>
+</div>
+
+<div className="ab-callout ab-callout--amber">
+  <div className="ab-callout__header">Why this matters</div>
+  <p>An issue invisible on Android may be a showstopper on iOS, and vice versa. TalkBack's "explore by touch" and VoiceOver's swipe navigation feel similar but have different timing and gesture sensitivity. Always test on both physical devices — simulators are insufficient for audio-based accessibility testing.</p>
+</div>
+
+---
+
+## Section 3: Custom Semantics Actions
+
+Beyond tap and long-press, `CustomSemanticsAction` lets you expose custom actions that screen readers can trigger via their action menus — VoiceOver's Rotor, TalkBack's local context menu.
+
+<div className="ab-step">
+  <div className="ab-step__badge">1</div>
+  <div className="ab-step__content">
+
+This is perfect for features like "Copy reference number" or "Report an issue" — actions that have no obvious button in the visual layout but that screen reader users should still be able to reach without hunting through a context menu.
+
+  </div>
+</div>
+
+<Tabs>
+  <TabItem value="before" label="Before — tap and long-press only">
+
+```dart title="lib/screens/transactions/widgets/transaction_tile.dart"
+// Only tap and long-press available — hidden features for screen reader users
+GestureDetector(
+  onTap: () => _openDetails(transaction),
+  onLongPress: () => _showMenu(transaction),
+  child: TransactionTileContent(transaction: transaction),
+)
+```
+
+  </TabItem>
+  <TabItem value="after" label="After — custom actions in screen reader menu" default>
+
+```dart title="lib/screens/transactions/widgets/transaction_tile.dart"
+// Custom actions appear in TalkBack's local context menu
+// and VoiceOver's Rotor actions
+Semantics(
+  label: '${transaction.description}, '
+         '${transaction.formattedAmount}',
+  customSemanticsActions: {
+    const CustomSemanticsAction(label: 'Copy reference number'):
+        () => _copyReference(transaction),
+    const CustomSemanticsAction(label: 'Report an issue'):
+        () => _reportIssue(transaction),
+  },
+  child: GestureDetector(
+    onTap: () => _openDetails(transaction),
+    child: TransactionTileContent(transaction: transaction),
+  ),
+)
+```
+
+  </TabItem>
+</Tabs>
+
+<div className="ab-callout ab-callout--blue">
+  <div className="ab-callout__header">💡 Try it yourself</div>
+  <p>With TalkBack active, navigate to a transaction tile and open the local context menu (swipe up then right, or use the TalkBack menu button). You should see "Copy reference number" and "Report an issue" listed as actions alongside the default Tap and Long-press options.</p>
+</div>
+
+---
+
+## Section 4: Keeping the Semantics Tree Lean
+
+A large semantics tree has a performance cost — Flutter must diff and synchronise it on every frame that changes. Keep the tree lean by removing unnecessary nesting.
+
+<div className="ab-step">
+  <div className="ab-step__badge">1</div>
+  <div className="ab-step__content">
+
+Guidelines for a lean semantics tree:
+
+- Use `ExcludeSemantics` on decorative subtrees (icons, separators, background images)
+- Use `MergeSemantics` to collapse related nodes into a single announcement
+- Avoid wrapping every `Text` in its own `Semantics` widget when `MergeSemantics` on the parent achieves the same result
+- Profile with `showSemanticsDebugger: true` in `MaterialApp` — if you see more nodes than you expect, look for unnecessary wrappers
+
+  </div>
+</div>
+
+<Tabs>
+  <TabItem value="before" label="Before — 5 separate semantics nodes">
+
+```dart title="lib/screens/account_overview/widgets/account_card.dart"
+// Every child widget generates its own semantics node
+Semantics(
+  child: Row(
+    children: [
+      Semantics(child: Icon(Icons.account_balance)),
+      Semantics(child: Text(account.name)),
+      Semantics(child: Text(account.formattedBalance)),
+      Semantics(child: Icon(Icons.chevron_right)),
+    ],
+  ),
+)
+```
+
+  </TabItem>
+  <TabItem value="after" label="After — 1 merged semantics node" default>
+
+```dart title="lib/screens/account_overview/widgets/account_card.dart"
+// One clean node per card — decorative icons excluded
+MergeSemantics(
+  child: Row(
+    children: [
+      ExcludeSemantics(child: Icon(Icons.account_balance)),
+      Text(account.name),
+      Text(account.formattedBalance),
+      ExcludeSemantics(child: Icon(Icons.chevron_right)),
+    ],
+  ),
+)
+```
+
+  </TabItem>
+</Tabs>
+
+<div className="ab-callout ab-callout--amber">
+  <div className="ab-callout__header">Why this matters</div>
+  <p>On the Account Overview with three account cards, the difference is between 15+ semantics nodes versus 3. Every unnecessary node adds overhead to the semantics diff on each frame, and adds unnecessary swipe stops for screen reader users. Lean trees are both faster and more pleasant to use.</p>
+</div>
+
+---
+
+## Section 5: Resources for the Journey
+
+Accessibility is not a destination — it is a continuous practice.
+
+<div className="ab-step">
+  <div className="ab-step__badge">1</div>
+  <div className="ab-step__content">
+
+**Flutter-specific**
+- [Flutter Accessibility documentation](https://docs.flutter.dev/accessibility) — comprehensive API coverage and best practices
+- [Flutter DevTools](https://docs.flutter.dev/tools/devtools) — inspector, semantics overlay, and performance tooling
+
+**Standards**
+- [WCAG 2.1](https://www.w3.org/TR/WCAG21/) — the web/app accessibility standard; Level AA is the legal baseline in most jurisdictions
+- [W3C Mobile Accessibility Guidelines](https://www.w3.org/TR/mobile-accessibility-mapping/) — mobile-specific patterns and considerations
+
+**Platform testing tools**
+- [Google Accessibility Scanner](https://play.google.com/store/apps/details?id=com.google.android.apps.accessibility.auditor) — Android automated audit tool
+- [Xcode Accessibility Inspector](https://developer.apple.com/videos/play/wwdc2019/257/) — iOS and macOS inspection and testing
+- [Colour Contrast Analyser](https://www.tpgi.com/color-contrast-checker/) — desktop app for checking contrast ratios
+
+  </div>
+</div>
+
+---
+
+## Section 6: You Did It
+
+<div className="ab-step">
+  <div className="ab-step__badge">🎉</div>
+  <div className="ab-step__content">
+
+Look back at Chapter 1 — the app that announced "Image", "Button", and random numbers. Now look at what you have built.
+
+AccessBank now has:
+- Every account card announcing its name and balance as a single coherent unit
+- Forms that guide users through errors with spoken announcements and focus movement
+- Logical focus order through every screen
+- 48 dp minimum touch targets on every interactive element
+- Button alternatives to every swipe gesture
+- Live regions keeping users informed of balance changes, filter results, and loading states
+- Widget tests asserting on the semantics tree
+- CI catching regressions before they reach users
+
+Here is what you learned chapter by chapter:
+- **Chapter 0** — The tools: TalkBack, VoiceOver, semantics debugger
+- **Chapter 1** — The problem: how the inaccessible app felt to a screen reader user
+- **Chapter 2** — Semantics: labels, hints, values, merge, exclude
+- **Chapter 3** — Navigation: tab order, focus traps, skip links
+- **Chapter 4** — Visual: contrast, text scaling, colour blindness
+- **Chapter 5** — Forms: labels, error announcements, smart inputs
+- **Chapter 6** — Motion: reduced motion, touch targets, swipe alternatives
+- **Chapter 7** — Live regions: announcements, loading states, route changes
+- **Chapter 8** — Testing: widget tests, manual checklists, CI integration
+- **Chapter 9** — Polish: full audit, platform quirks, custom actions, lean trees
+
+That is a complete accessibility toolkit. Now go use it.
+
+  </div>
+</div>
+
+<div className="ab-callout ab-callout--green">
+  <div className="ab-callout__header">✓ Final Checkpoint</div>
+  <p>A person with a vision impairment can now check their balance independently. A person with a motor impairment can now make a transfer without help. An older user with reduced contrast sensitivity can now read every number clearly. That is not just good engineering — it is the right thing to do.</p>
+</div>
+
+---
+
+## Final Assessment
+
+<details>
+<summary>Question 1: You discover that a button works perfectly with TalkBack on Android but is not focusable with VoiceOver on iOS. What is the most likely cause?</summary>
+
+**A) The button is using the wrong widget type**
+**B) A platform-specific behaviour difference — possibly a missing semantic role or an interaction that works differently on each platform** ✅
+**C) TalkBack is more advanced than VoiceOver**
+**D) Flutter does not support VoiceOver**
+
+TalkBack and VoiceOver have different implementations and occasionally behave differently for the same semantics tree. Platform-specific issues are common for custom components, complex interactions, and live region announcements. Always test on both platforms using real devices.
+
+</details>
+
+<details>
+<summary>Question 2: Which of these is the most important single change you can make to an app's accessibility?</summary>
+
+**A) Adding semantic labels to every unlabelled interactive element** ✅
+**B) Increasing all font sizes by 20%**
+**C) Adding a dark mode**
+**D) Removing all animations**
+
+Unlabelled interactive elements (buttons, links, icon buttons) are completely invisible to screen reader users. Adding labels to these elements is the highest-impact single change because it determines whether the app is *usable at all* — not just slightly more comfortable.
+
+</details>
+
+<details>
+<summary>Question 3: A colleague says "we don't need to worry about accessibility because only 1% of our users have disabilities." What is the best response?</summary>
+
+**A) They are right — focus on the 99%**
+**B) Accessibility also benefits users in bright sunlight, users with temporary injuries, older users, and improves overall UX quality for everyone** ✅
+**C) Accessibility should be a separate app**
+**D) Accessibility is only legally required for government apps**
+
+The "1% argument" misses the breadth of accessibility. Improvements for users with disabilities typically improve the experience for everyone: better contrast helps in sunlight, larger touch targets help users in motion, semantic labels improve search indexing, and accessible forms reduce error rates for all users. Accessibility is not a zero-sum trade-off.
+
+</details>
+
+---
+
+## Deep Dive
+
+- [Flutter Accessibility documentation](https://docs.flutter.dev/accessibility)
+- [VoiceOver — Apple Developer documentation](https://developer.apple.com/accessibility/ios/)
+- [TalkBack — Android Developer documentation](https://developer.android.com/guide/topics/ui/accessibility/testing)
+- [WCAG 2.1 — Web Content Accessibility Guidelines](https://www.w3.org/TR/WCAG21/)
+- [W3C Mobile Accessibility Guidelines](https://www.w3.org/TR/mobile-accessibility-mapping/)
+- [CustomSemanticsAction — Flutter API documentation](https://api.flutter.dev/flutter/semantics/CustomSemanticsAction-class.html)

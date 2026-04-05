@@ -1,10 +1,355 @@
 ---
 sidebar_position: 9
-title: "Chapter 8: Accessibility Testing"
+title: "Chapter 8: Testing Your Work"
+description: "Write widget tests that assert on the semantics tree, use matchesSemantics to catch regressions, and wire accessibility tests into CI."
 ---
 
-# Chapter 8: Accessibility Testing
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
 
-_Coming soon_
+# Testing Your Work
 
-This chapter covers testing accessibility: using Flutter's `SemanticsController` in widget tests, `AccessibilityGuideline` checks, manual testing with TalkBack and VoiceOver, and the Accessibility Scanner app.
+> *"I can prove this works, not just hope."*
+
+**Estimated time:** ~25 minutes | **Focus:** All screens | **Branch:** `chapter-8-testing`
+
+---
+
+Accessibility improvements only stay fixed if you test them. A label you added in Chapter 2 can be silently deleted in a future refactor, and nobody will notice until a real user hits the broken version. In this chapter you'll write widget tests that assert on the semantics tree, use `matchesSemantics` to catch regressions the moment they appear, build a manual testing checklist, and wire it all into CI.
+
+---
+
+## Section 1: Widget Tests with Semantics
+
+Flutter widget tests can inspect the live semantics tree using `tester.ensureSemantics()`. This activates the semantics system and returns a handle — call `.dispose()` at the end of the test to clean up.
+
+<div className="ab-step">
+  <div className="ab-step__badge">1</div>
+  <div className="ab-step__content">
+
+Once semantics are enabled, use `tester.getSemantics(finder)` to retrieve the `SemanticsNode` for any widget, then assert on it with `matchesSemantics`.
+
+  </div>
+</div>
+
+<Tabs>
+  <TabItem value="before" label="Before — visual-only test">
+
+```dart title="test/account_card_test.dart"
+// Only checks what's on screen — not what the screen reader hears
+testWidgets('account card shows balance', (tester) async {
+  await tester.pumpWidget(
+    const MaterialApp(home: AccountCard(account: testAccount)),
+  );
+  expect(find.text('\$4,285.50'), findsOneWidget);
+});
+```
+
+  </TabItem>
+  <TabItem value="after" label="After — semantics-aware test" default>
+
+```dart title="test/account_card_test.dart"
+// Asserts exactly what a screen reader user will hear
+testWidgets('account card has accessible label', (tester) async {
+  final semantics = tester.ensureSemantics();
+
+  await tester.pumpWidget(
+    const MaterialApp(home: AccountCard(account: testAccount)),
+  );
+
+  expect(
+    tester.getSemantics(find.byType(AccountCard)),
+    matchesSemantics(
+      label: 'Everyday Checking account, '
+             'balance four thousand two hundred '
+             'eighty-five dollars and fifty cents',
+    ),
+  );
+
+  semantics.dispose();
+});
+```
+
+  </TabItem>
+</Tabs>
+
+<div className="ab-callout ab-callout--amber">
+  <div className="ab-callout__header">Why this matters</div>
+  <p>Visual regression tests check what the screen looks like. Semantics tests check what the screen <em>sounds like</em> — which is the entire experience for screen reader users. A refactor that keeps the visual appearance identical but quietly breaks the semantic label will only be caught by a semantics test.</p>
+</div>
+
+---
+
+## Section 2: The matchesSemantics Matcher
+
+`matchesSemantics` is a rich matcher that lets you assert on many properties of a `SemanticsNode` in a single call. It is far more precise than checking visible text with `find.text()`.
+
+<div className="ab-step">
+  <div className="ab-step__badge">1</div>
+  <div className="ab-step__content">
+
+The key properties you can assert on:
+
+| Property | Checks |
+|---|---|
+| `label` | The spoken label text |
+| `hint` | The spoken hint text |
+| `value` | The current value (for toggles, sliders) |
+| `isButton` | Whether the node has a button role |
+| `isHeader` | Whether the node is a heading |
+| `isEnabled` | Whether the element is interactive |
+| `isChecked` | Current checked state |
+| `hasTapAction` | Whether a tap action is available |
+
+  </div>
+</div>
+
+<Tabs>
+  <TabItem value="before" label="Before — vague assertion">
+
+```dart title="test/transaction_tile_test.dart"
+// Only checks visual content — not role, state, or actions
+expect(find.text('Delete'), findsOneWidget);
+```
+
+  </TabItem>
+  <TabItem value="after" label="After — precise semantics assertion" default>
+
+```dart title="test/transaction_tile_test.dart"
+// Checks semantic role, label, enabled state, and available actions
+expect(
+  tester.getSemantics(find.byTooltip('Delete transaction')),
+  matchesSemantics(
+    label: 'Delete transaction: Coffee Shop',
+    isButton: true,
+    isEnabled: true,
+    hasTapAction: true,
+  ),
+);
+```
+
+  </TabItem>
+</Tabs>
+
+<div className="ab-callout ab-callout--blue">
+  <div className="ab-callout__header">💡 Try it yourself</div>
+  <p>Write a test for the Login form that asserts the email field has the label "Email" and the Sign In button has the label "Sign In" with <code>isButton: true</code>. Then delete the <code>labelText</code> from the email field and run the test — it should fail immediately, before a human reviewer ever sees the regression.</p>
+</div>
+
+---
+
+## Section 3: Manual Testing Checklist
+
+Automated tests catch missing labels, but only manual testing catches confusing or misleading ones. An element can have a label and still describe the wrong thing — only a human ear catches that.
+
+<div className="ab-step">
+  <div className="ab-step__badge">1</div>
+  <div className="ab-step__content">
+
+Run this checklist on each screen before calling it done. Test on a real device — simulators sometimes behave differently from physical hardware for accessibility features.
+
+**TalkBack (Android) / VoiceOver (iOS) checklist:**
+- Every interactive element announces its purpose
+- Focus order is logical (left-to-right, top-to-bottom)
+- No unlabelled interactive elements (red nodes in the inspector)
+- Decorative images are hidden from the tree
+- Form errors are announced immediately when they appear
+- Focus moves to the first error field after failed validation
+- Dialogs trap focus until dismissed
+- Route changes are announced when navigating between screens
+- Loading states are announced ("Loading transactions, please wait")
+- Filter and sort changes include a result count announcement
+
+  </div>
+</div>
+
+<div className="ab-callout ab-callout--amber">
+  <div className="ab-callout__header">Why this matters</div>
+  <p>TalkBack and VoiceOver are activated and deactivated with a single shortcut: triple-press the side button on iOS, or press the volume keys together on Android. There is no excuse for not spending five minutes with each screen reader before shipping a new feature. Make it a habit.</p>
+</div>
+
+---
+
+## Section 4: The AccessGuide Inspector
+
+<div className="ab-step">
+  <div className="ab-step__badge">1</div>
+  <div className="ab-step__content">
+
+The AccessGuide inspector overlay is a structured audit tool. Work through each screen systematically:
+
+1. Toggle the inspector on
+2. Count red-bordered nodes (unlabelled interactive elements — the highest-impact failures)
+3. Tap each node to see the full label in the panel
+4. Toggle between "Before" and "After" to confirm fixes
+
+The inspector catches issues that `showSemanticsDebugger` misses because it specifically flags interactive elements with no label.
+
+  </div>
+</div>
+
+<div className="ab-callout ab-callout--blue">
+  <div className="ab-callout__header">💡 Try it yourself</div>
+  <p>Use the AccessGuide inspector to audit the Transfer screen. Count the red nodes in the "before" version. Switch to the "after" version and count again. The difference is the number of interactive elements that were invisible to screen reader users.</p>
+</div>
+
+---
+
+## Section 5: Integration Tests
+
+Integration tests run on a real device or emulator, making them ideal for end-to-end accessibility checks. Use `flutter_test` with the same `tester.ensureSemantics()` and `matchesSemantics` API you used in widget tests.
+
+<div className="ab-step">
+  <div className="ab-step__badge">1</div>
+  <div className="ab-step__content">
+
+Integration tests can drive the app through complete user journeys and assert on semantics at each step — verifying that the login form is labelled correctly, the Sign In button is reachable, and the Account Overview announces the balance.
+
+  </div>
+</div>
+
+<Tabs>
+  <TabItem value="before" label="Before — no accessibility assertions">
+
+```dart title="integration_test/login_accessibility_test.dart"
+// Exercises the happy path but checks nothing about accessibility
+testWidgets('user can log in', (tester) async {
+  await tester.pumpAndSettle();
+  await tester.enterText(find.byType(TextField).first, 'user@test.com');
+  await tester.enterText(find.byType(TextField).last, 'password');
+  await tester.tap(find.text('Sign In'));
+  await tester.pumpAndSettle();
+  expect(find.text('Account Overview'), findsOneWidget);
+});
+```
+
+  </TabItem>
+  <TabItem value="after" label="After — accessibility assertions included" default>
+
+```dart title="integration_test/login_accessibility_test.dart"
+testWidgets('login screen is accessible', (tester) async {
+  final semantics = tester.ensureSemantics();
+  await tester.pumpAndSettle();
+
+  // Email field has correct persistent label
+  expect(
+    tester.getSemantics(find.byKey(const Key('emailField'))),
+    matchesSemantics(label: 'Email'),
+  );
+
+  // Sign In button is reachable and correctly labelled
+  expect(
+    tester.getSemantics(find.byKey(const Key('signInButton'))),
+    matchesSemantics(label: 'Sign In', isButton: true, isEnabled: true),
+  );
+
+  semantics.dispose();
+});
+```
+
+  </TabItem>
+</Tabs>
+
+---
+
+## Section 6: CI Integration
+
+Run accessibility tests on every pull request so regressions are caught before merging. Add a dedicated test step to your CI pipeline that runs tests tagged `accessibility` — keeping them separate from faster unit tests.
+
+<div className="ab-step">
+  <div className="ab-step__badge">1</div>
+  <div className="ab-step__content">
+
+Tag your accessibility widget tests with `@Tags(['accessibility'])` and your integration tests similarly. Then add a dedicated step in your CI workflow that runs only those tests.
+
+  </div>
+</div>
+
+<Tabs>
+  <TabItem value="before" label="Before — no accessibility CI step">
+
+```yaml title=".github/workflows/test.yml"
+# No accessibility step — regressions go undetected until a real user reports them
+- name: Run tests
+  run: flutter test
+```
+
+  </TabItem>
+  <TabItem value="after" label="After — dedicated accessibility CI step" default>
+
+```yaml title=".github/workflows/test.yml"
+# Widget accessibility tests run on every PR
+- name: Run widget accessibility tests
+  run: flutter test --tags accessibility
+
+# Integration accessibility tests run on a headless emulator
+- name: Run integration accessibility tests
+  run: |
+    flutter emulator --launch flutter_emulator
+    flutter drive \
+      --driver=test_driver/integration_test.dart \
+      --target=integration_test/login_accessibility_test.dart
+```
+
+  </TabItem>
+</Tabs>
+
+<div className="ab-callout ab-callout--green">
+  <div className="ab-callout__header">✓ Checkpoint</div>
+  <p>You have three layers of accessibility verification: automated widget tests (fast, catches regressions), manual screen-reader testing (catches confusing labels), and CI integration (prevents regressions from merging). Any single layer alone is insufficient — together they form a robust safety net.</p>
+</div>
+
+---
+
+## Check Your Understanding
+
+<details>
+<summary>Question 1: What does <code>tester.ensureSemantics()</code> do in a Flutter widget test?</summary>
+
+**A) Enables TalkBack in the test environment**
+**B) Activates the semantics system and returns a handle for cleanup** ✅
+**C) Asserts that all widgets have semantic labels**
+**D) Generates a semantics audit report**
+
+`tester.ensureSemantics()` activates Flutter's semantics system for the duration of the test and returns a `SemanticsHandle`. Call `.dispose()` at the end of the test to clean up. Without it, semantics are not built and `getSemantics` will fail.
+
+</details>
+
+<details>
+<summary>Question 2: What is the key advantage of <code>matchesSemantics</code> over checking widget text with <code>find.text()</code>?</summary>
+
+**A) matchesSemantics is faster**
+**B) matchesSemantics checks accessibility roles, states, and actions — not just visible text** ✅
+**C) find.text() is deprecated**
+**D) matchesSemantics works on all Flutter versions**
+
+`find.text()` only checks visible text content. `matchesSemantics` checks the full semantic node including role (`isButton`), state (`isEnabled`, `isChecked`), available actions (`hasTapAction`), and semantic label — giving you much more thorough accessibility coverage.
+
+</details>
+
+<details>
+<summary>Question 3: Why should you run accessibility tests in CI?</summary>
+
+**A) CI environments have better screen readers than local machines**
+**B) So regressions are caught automatically before merging** ✅
+**C) Flutter accessibility tests only work in CI**
+**D) To generate WCAG compliance certificates**
+
+Manual audits are valuable but not enough — developers forget, reviewers miss details, and fixes get accidentally reverted. Running accessibility tests in CI makes them a required part of the development workflow, so regressions are caught automatically on every pull request.
+
+</details>
+
+---
+
+## Deep Dive
+
+- [Flutter accessibility testing documentation](https://docs.flutter.dev/testing/accessibility)
+- [matchesSemantics — Flutter API documentation](https://api.flutter.dev/flutter/flutter_test/matchesSemantics.html)
+- [SemanticsController — Flutter API documentation](https://api.flutter.dev/flutter/flutter_test/SemanticsController-class.html)
+- [Integration testing — Flutter documentation](https://docs.flutter.dev/testing/integration-tests)
+
+---
+
+## What's Next
+
+Tests are in place. Now it's time to put the finishing touches on a genuinely polished, accessible app. In **Chapter 9: The Polished App**, you'll walk every screen with a screen reader, explore platform quirks between TalkBack and VoiceOver, add custom semantics actions for complex interactions, and celebrate everything you've built.

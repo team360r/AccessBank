@@ -1,10 +1,356 @@
 ---
 sidebar_position: 8
-title: "Chapter 7: Live Regions & Announcements"
+title: "Chapter 7: Dynamic Content & Live Regions"
+description: "Announce filter changes, balance updates, loading states, snackbars, and route changes so screen reader users are informed of every meaningful change."
 ---
 
-# Chapter 7: Live Regions & Announcements
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
 
-_Coming soon_
+# Dynamic Content & Live Regions
 
-This chapter covers dynamic content announcements: using `SemanticsService.announce`, `liveRegion` semantics, and ensuring transient messages like toasts and loading states are communicated to screen reader users.
+> *"The app talks to you now, in a good way."*
+
+**Estimated time:** ~20 minutes | **Focus:** Transactions + Overview | **Branch:** `chapter-7-live`
+
+---
+
+When content changes dynamically — filters apply, balances update, data loads, toasts appear — sighted users see the change instantly. Screen reader users miss it entirely unless the app announces it. In this chapter you'll use live regions and `SemanticsService` to keep users informed of every meaningful change, without being noisy.
+
+---
+
+## Section 1: Announcing Filter Changes
+
+When a user taps a category filter on the Transaction List, the list content changes — but screen reader users only hear the chip label and then silence. They have no idea how many transactions matched or what changed.
+
+<div className="ab-step">
+  <div className="ab-step__badge">1</div>
+  <div className="ab-step__content">
+
+Call `SemanticsService.sendAnnouncement()` after applying the filter to give a useful summary of the new state. The Filter Bar already demonstrates this pattern: when the user selects a category, the accessible version announces the result count immediately.
+
+  </div>
+</div>
+
+<Tabs>
+  <TabItem value="before" label="Before — silent filter change">
+
+```dart title="lib/screens/transactions/widgets/filter_bar.dart"
+// Filter changes — screen reader hears nothing about the new results
+DropdownButton<String>(
+  value: selectedCategory,
+  isExpanded: true,
+  hint: const Text('All'),
+  items: [...],
+  onChanged: onCategoryChanged,
+),
+```
+
+  </TabItem>
+  <TabItem value="after" label="After — filter result announced" default>
+
+```dart title="lib/screens/transactions/widgets/filter_bar.dart"
+// Announces result count when category changes
+DropdownButtonFormField<String>(
+  initialValue: selectedCategory,
+  decoration: const InputDecoration(
+    labelText: 'Category',
+    border: OutlineInputBorder(),
+  ),
+  items: [...],
+  onChanged: (val) {
+    onCategoryChanged(val);
+    final categoryLabel = val ?? 'all categories';
+    final message =
+        'Showing $visibleCount transactions in $categoryLabel';
+    SemanticsService.sendAnnouncement(
+      View.of(context),
+      message,
+      TextDirection.ltr,
+    );
+  },
+),
+```
+
+  </TabItem>
+</Tabs>
+
+<div className="ab-callout ab-callout--amber">
+  <div className="ab-callout__header">Why this matters</div>
+  <p>WCAG 4.1.3 (Status Messages) requires that status messages — including changes to data counts and filter results — be conveyed to assistive technology without requiring a focus change. Without this announcement, a screen reader user has no feedback that their action did anything at all.</p>
+</div>
+
+---
+
+## Section 2: Live Regions for Balance Updates
+
+A **live region** is a widget whose content changes automatically and whose changes should be announced proactively. Flutter implements this via `Semantics(liveRegion: true)`.
+
+<div className="ab-step">
+  <div className="ab-step__badge">1</div>
+  <div className="ab-step__content">
+
+The account balance on the Overview screen is a perfect candidate. When a transfer completes, the balance updates. The live region ensures the screen reader announces the new value automatically — without the user having to navigate back to that element.
+
+  </div>
+</div>
+
+<Tabs>
+  <TabItem value="before" label="Before — silent balance update">
+
+```dart title="lib/screens/account_overview/widgets/account_card.dart"
+// Balance updates silently — screen reader users miss the change
+Text(
+  formattedBalance,
+  style: Theme.of(context).textTheme.headlineMedium,
+)
+```
+
+  </TabItem>
+  <TabItem value="after" label="After — balance change announced" default>
+
+```dart title="lib/screens/account_overview/widgets/account_card.dart"
+// Balance change is automatically announced by the screen reader
+Semantics(
+  liveRegion: true,
+  label: 'Account balance: $formattedBalance',
+  child: Text(
+    formattedBalance,
+    style: Theme.of(context).textTheme.headlineMedium,
+  ),
+)
+```
+
+  </TabItem>
+</Tabs>
+
+<div className="ab-callout ab-callout--blue">
+  <div className="ab-callout__header">💡 Try it yourself</div>
+  <p>Complete a transfer on the accessible version of the app with TalkBack or VoiceOver active. After the transfer completes, the updated balance on the Overview screen should be announced automatically — even if focus is elsewhere on the screen.</p>
+</div>
+
+---
+
+## Section 3: Loading States
+
+When the app fetches transaction data, sighted users see a spinner. Screen reader users hear nothing — the list just seems to vanish and then reappear. This is disorienting and makes the app feel broken.
+
+<div className="ab-step">
+  <div className="ab-step__badge">1</div>
+  <div className="ab-step__content">
+
+Wrap your loading indicator in `Semantics(liveRegion: true)` and give it a descriptive `label`. When loading completes, call `SemanticsService.sendAnnouncement()` to tell the user the data is ready.
+
+  </div>
+</div>
+
+<Tabs>
+  <TabItem value="before" label="Before — silent loading">
+
+```dart title="lib/screens/transactions/transactions_screen.dart"
+// Spinner is visible but completely silent to screen readers
+if (_isLoading) {
+  return const Center(child: CircularProgressIndicator());
+}
+return TransactionListView(transactions: _transactions);
+```
+
+  </TabItem>
+  <TabItem value="after" label="After — loading state announced" default>
+
+```dart title="lib/screens/transactions/transactions_screen.dart"
+if (_isLoading) {
+  return Semantics(
+    liveRegion: true,
+    label: 'Loading transactions, please wait',
+    child: const Center(child: CircularProgressIndicator()),
+  );
+}
+// Announce when loading completes (call once inside setState):
+// SemanticsService.sendAnnouncement(
+//   View.of(context),
+//   'Transactions loaded',
+//   TextDirection.ltr,
+// );
+return TransactionListView(transactions: _transactions);
+```
+
+  </TabItem>
+</Tabs>
+
+<div className="ab-callout ab-callout--green">
+  <div className="ab-callout__header">✓ Checkpoint</div>
+  <p>With TalkBack or VoiceOver active, navigate to the Transaction List and trigger a refresh. You should hear "Loading transactions, please wait" while data loads, and then "Transactions loaded" when the data arrives. No visual-only feedback.</p>
+</div>
+
+---
+
+## Section 4: Accessible Snackbars
+
+Flutter's `SnackBar` is announced by screen readers on most platforms — but the announcement can be missed if it fires while the user is mid-navigation. Make snackbars more reliable by combining the default behaviour with an explicit `sendAnnouncement` call.
+
+<div className="ab-step">
+  <div className="ab-step__badge">1</div>
+  <div className="ab-step__content">
+
+Three rules for accessible snackbars:
+
+1. Keep the message short and specific — users cannot pause a snackbar
+2. Give any action button a clear, descriptive label
+3. Call `SemanticsService.sendAnnouncement()` alongside the snackbar for platforms where auto-announcement is unreliable
+
+  </div>
+</div>
+
+<Tabs>
+  <TabItem value="before" label="Before — vague, potentially unannounced">
+
+```dart title="lib/screens/transfer/transfer_screen.dart"
+// Short vague message; no explicit announcement
+ScaffoldMessenger.of(context).showSnackBar(
+  const SnackBar(
+    content: Text('Transfer sent'),
+  ),
+);
+```
+
+  </TabItem>
+  <TabItem value="after" label="After — specific + belt-and-suspenders announcement" default>
+
+```dart title="lib/screens/transfer/transfer_screen.dart"
+ScaffoldMessenger.of(context).showSnackBar(
+  SnackBar(
+    content: Text('Transfer of $amount sent successfully'),
+    action: SnackBarAction(
+      label: 'View receipt',
+      onPressed: _openReceipt,
+    ),
+  ),
+);
+// Belt-and-suspenders: also announce directly for screen readers
+SemanticsService.sendAnnouncement(
+  View.of(context),
+  'Transfer of $amount sent successfully',
+  TextDirection.ltr,
+);
+```
+
+  </TabItem>
+</Tabs>
+
+<div className="ab-callout ab-callout--amber">
+  <div className="ab-callout__header">Why this matters</div>
+  <p>SnackBar announcements on Android (TalkBack) and iOS (VoiceOver) are not always reliable — especially when the user is actively navigating at the moment the snackbar appears. The belt-and-suspenders approach ensures the user hears the confirmation regardless of what they are doing.</p>
+</div>
+
+---
+
+## Section 5: Route Announcements
+
+When the user navigates to a new screen, the OS usually announces the title. In Flutter, this happens if you use named routes or set `RouteSettings.name`. For more control — or to announce something richer — use a custom `NavigatorObserver`.
+
+<div className="ab-step">
+  <div className="ab-step__badge">1</div>
+  <div className="ab-step__content">
+
+A `NavigatorObserver` gives you explicit control over route announcements. Implement `didPush` and call `SemanticsService.sendAnnouncement()` with a human-readable name for each screen. Register it once in `MaterialApp.navigatorObservers`.
+
+  </div>
+</div>
+
+<Tabs>
+  <TabItem value="before" label="Before — no route announcement">
+
+```dart title="lib/main.dart"
+// No announcement — screen reader users don't know a new screen loaded
+Navigator.of(context).push(
+  MaterialPageRoute(builder: (_) => const TransferScreen()),
+);
+```
+
+  </TabItem>
+  <TabItem value="after" label="After — NavigatorObserver announces route" default>
+
+```dart title="lib/navigation/accessibility_observer.dart"
+class AccessibilityObserver extends NavigatorObserver {
+  @override
+  void didPush(Route<dynamic> route, Route<dynamic>? previousRoute) {
+    final name = route.settings.name ?? 'New screen';
+    SemanticsService.sendAnnouncement(
+      navigator!.context,
+      name,
+      TextDirection.ltr,
+    );
+    super.didPush(route, previousRoute);
+  }
+}
+
+// Register once in MaterialApp:
+MaterialApp(
+  navigatorObservers: [AccessibilityObserver()],
+  // ...
+)
+```
+
+  </TabItem>
+</Tabs>
+
+<div className="ab-callout ab-callout--blue">
+  <div className="ab-callout__header">💡 Try it yourself</div>
+  <p>With TalkBack or VoiceOver active, tap through the app: Login → Account Overview → Transfer → Transaction List. In the "after" version with the observer, you should hear a screen name announced on each navigation. In the "before" version, navigation is completely silent.</p>
+</div>
+
+---
+
+## Check Your Understanding
+
+<details>
+<summary>Question 1: What does <code>Semantics(liveRegion: true)</code> do?</summary>
+
+**A) Plays a sound when the widget updates**
+**B) Automatically announces content changes to screen reader users** ✅
+**C) Prevents the widget from being re-rendered**
+**D) Marks the widget as interactive**
+
+A live region tells the accessibility service to proactively announce any content change within that node — similar to an ARIA live region on the web. The user hears the update automatically without needing to navigate to the element.
+
+</details>
+
+<details>
+<summary>Question 2: When is it appropriate to call <code>SemanticsService.sendAnnouncement()</code>?</summary>
+
+**A) On every state change in the app**
+**B) Only when a dialog opens**
+**C) For meaningful status changes the user needs to know about but did not initiate by moving focus** ✅
+**D) Only on iOS, not Android**
+
+`SemanticsService.sendAnnouncement()` is appropriate for status changes that users need to know about but that do not cause a focus change: errors, completion messages, filter results, loading state changes, and similar. Overusing it creates accessibility noise — use it for genuinely meaningful events.
+
+</details>
+
+<details>
+<summary>Question 3: What is the most reliable way to ensure screen reader users are aware of route changes?</summary>
+
+**A) Put the route name in every widget's label**
+**B) Use a NavigatorObserver that calls SemanticsService.sendAnnouncement() on push** ✅
+**C) Add a live region to the AppBar title**
+**D) Route changes are always announced automatically**
+
+A `NavigatorObserver` gives you explicit control over route announcements. Flutter's default announcement behaviour may be present on some platforms but is not consistent — a custom observer guarantees your message is spoken on every navigation event.
+
+</details>
+
+---
+
+## Deep Dive
+
+- [WCAG 4.1.3 — Status Messages](https://www.w3.org/WAI/WCAG21/Understanding/status-messages.html)
+- [SemanticsFlag.isLiveRegion — Flutter API documentation](https://api.flutter.dev/flutter/semantics/SemanticsFlag.html)
+- [SemanticsService — Flutter API documentation](https://api.flutter.dev/flutter/semantics/SemanticsService-class.html)
+- [NavigatorObserver — Flutter API documentation](https://api.flutter.dev/flutter/widgets/NavigatorObserver-class.html)
+
+---
+
+## What's Next
+
+The app now talks to its users. But how do you make sure it keeps doing so as the codebase grows? In **Chapter 8: Testing Your Work**, you'll write widget tests that assert on the semantics tree, use `matchesSemantics` to catch regressions automatically, and wire accessibility tests into CI — so improvements never quietly break.

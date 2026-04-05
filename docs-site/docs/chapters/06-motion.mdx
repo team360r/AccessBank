@@ -1,10 +1,356 @@
 ---
 sidebar_position: 7
-title: "Chapter 6: Reducing Motion"
+title: "Chapter 6: Motion & Interaction"
+description: "Respect reduced-motion preferences, enforce 48 dp touch targets, and provide button alternatives to every swipe gesture."
 ---
 
-# Chapter 6: Reducing Motion
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
 
-_Coming soon_
+# Motion & Interaction
 
-This chapter covers motion accessibility: respecting the "Reduce Motion" system preference, replacing or disabling animations, and using `MediaQuery.disableAnimations` in Flutter.
+> *"Not everyone can swipe precisely."*
+
+**Estimated time:** ~20 minutes | **Focus:** Transaction List | **Branch:** `chapter-6-motion`
+
+---
+
+Not every user can flick, swipe, or tap a tiny icon. Some have tremors. Some use Switch Control with a single button. Some get nauseous from screen animations. In this chapter you'll respect system-wide motion preferences, enforce 48×48 dp minimum touch targets, and provide button alternatives to every swipe-based gesture — so every user can do everything in the app.
+
+---
+
+## Section 1: Respect Motion Preferences
+
+Users with vestibular disorders — a group that includes many people with migraines, Ménière's disease, and inner-ear conditions — can experience nausea, dizziness, or disorientation from excessive screen animation. Both iOS and Android provide a "Reduce Motion" setting that apps are expected to honour.
+
+<div className="ab-step">
+  <div className="ab-step__badge">1</div>
+  <div className="ab-step__content">
+
+In Flutter, check `MediaQuery.disableAnimationsOf(context)`. When it returns `true`, the user has enabled Reduce Motion (iOS) or Remove Animations (Android). Respond by setting animation durations to `Duration.zero`.
+
+  </div>
+</div>
+
+<Tabs>
+  <TabItem value="before" label="Before — always animates">
+
+```dart title="lib/screens/transactions/transactions_screen.dart"
+// Always animates — can trigger vestibular issues
+AnimatedSwitcher(
+  duration: const Duration(milliseconds: 400),
+  child: _buildFilteredList(selectedFilter),
+)
+```
+
+  </TabItem>
+  <TabItem value="after" label="After — respects user preference" default>
+
+```dart title="lib/screens/transactions/transactions_screen.dart"
+// Skips animation when the user prefers reduced motion
+Builder(
+  builder: (context) {
+    final reduceMotion = MediaQuery.disableAnimationsOf(context);
+    return AnimatedSwitcher(
+      duration: reduceMotion
+          ? Duration.zero
+          : const Duration(milliseconds: 400),
+      child: _buildFilteredList(selectedFilter),
+    );
+  },
+)
+```
+
+  </TabItem>
+</Tabs>
+
+<div className="ab-callout ab-callout--amber">
+  <div className="ab-callout__header">Why this matters</div>
+  <p>WCAG 2.3.3 (Motion from Animations) requires that animation triggered by interaction can be disabled. This is not just about comfort — for some users, triggering animations can cause genuine physical symptoms. A banking app that makes people feel ill is not a banking app people will use.</p>
+</div>
+
+---
+
+## Section 2: Touch Target Sizing
+
+Apple's Human Interface Guidelines and Google's Material Design both specify a minimum touch target size of **44 pt on iOS** and **48 dp on Android**. The Transaction List currently uses 24 dp icon buttons — half the required size, and genuinely difficult for users with tremors or limited dexterity.
+
+<div className="ab-step">
+  <div className="ab-step__badge">1</div>
+  <div className="ab-step__content">
+
+The fix is straightforward: wrap small icons in an `IconButton` with `constraints: BoxConstraints(minWidth: 48, minHeight: 48)`. The visual icon stays small, but the tappable area expands to the safe minimum. Adding a `tooltip` also provides a free semantic label for screen readers.
+
+  </div>
+</div>
+
+<Tabs>
+  <TabItem value="before" label="Before — 24 dp target">
+
+```dart title="lib/screens/transactions/widgets/transaction_tile.dart"
+// 24 dp touch target — too small for reliable interaction
+GestureDetector(
+  onTap: () => _openDetails(transaction),
+  child: const Icon(Icons.chevron_right, size: 24),
+)
+```
+
+  </TabItem>
+  <TabItem value="after" label="After — 48 dp target" default>
+
+```dart title="lib/screens/transactions/widgets/transaction_tile.dart"
+// 48 dp touch target — meets both Material and HIG guidelines
+IconButton(
+  constraints: const BoxConstraints(minWidth: 48, minHeight: 48),
+  icon: const Icon(Icons.chevron_right, size: 24),
+  tooltip: 'View transaction details',
+  onPressed: () => _openDetails(transaction),
+)
+```
+
+  </TabItem>
+</Tabs>
+
+<div className="ab-callout ab-callout--amber">
+  <div className="ab-callout__header">Why this matters</div>
+  <p>Small touch targets are one of the most common mobile accessibility failures. For users with Parkinson's disease, arthritis, or essential tremor, a 24 dp button is essentially unusable. The 48 dp minimum is the point where most users can tap reliably — even while walking or using the device one-handed.</p>
+</div>
+
+<div className="ab-callout ab-callout--blue">
+  <div className="ab-callout__header">💡 Try it yourself</div>
+  <p>Enable Switch Access (Android) or Switch Control (iOS) using your volume button as a switch. Try to tap the delete button on a transaction tile in both the "before" and "after" versions. The difference in reachability will be immediately obvious.</p>
+</div>
+
+---
+
+## Section 3: Swipe Alternatives
+
+The `Dismissible` widget lets sighted users swipe to delete a transaction — a satisfying gesture shortcut. But it is completely inaccessible for screen reader users (TalkBack and VoiceOver cannot trigger swipe-to-delete), Switch Control users, and anyone who cannot perform the precise horizontal swipe gesture reliably.
+
+<div className="ab-step">
+  <div className="ab-step__badge">1</div>
+  <div className="ab-step__content">
+
+The rule is simple: any action reachable only via a gesture must also have an explicit button. Keep the `Dismissible` as a shortcut for sighted users — but add a visible delete `IconButton` inside the tile as the primary accessible action.
+
+  </div>
+</div>
+
+<Tabs>
+  <TabItem value="before" label="Before — swipe only">
+
+```dart title="lib/screens/transactions/widgets/transaction_tile.dart"
+// Swipe-to-delete only — completely inaccessible
+Dismissible(
+  key: Key(transaction.id),
+  direction: DismissDirection.endToStart,
+  background: Container(
+    color: Colors.red,
+    alignment: Alignment.centerRight,
+    padding: const EdgeInsets.only(right: 16),
+    child: const Icon(Icons.delete, color: Colors.white),
+  ),
+  onDismissed: (_) => onDismissed(),
+  child: ListTile(
+    title: Text(transaction.merchant),
+    // Inaccessible: colour-only distinction between credit and debit
+    trailing: Text(
+      '\$${transaction.amount.abs().toStringAsFixed(2)}',
+      style: TextStyle(color: amountColor),
+    ),
+  ),
+)
+```
+
+  </TabItem>
+  <TabItem value="after" label="After — swipe + button alternative" default>
+
+```dart title="lib/screens/transactions/widgets/transaction_tile.dart"
+// Swipe still works AND there is an explicit accessible button
+Dismissible(
+  key: Key(transaction.id),
+  direction: DismissDirection.endToStart,
+  background: Container(
+    color: Colors.red,
+    alignment: Alignment.centerRight,
+    padding: const EdgeInsets.only(right: 16),
+    child: const Icon(Icons.delete, color: Colors.white),
+  ),
+  onDismissed: (_) => onDismissed(),
+  child: MergeSemantics(
+    child: Semantics(
+      label: semanticLabel, // Full spoken description of the transaction
+      child: ListTile(
+        leading: ExcludeSemantics(
+          child: Icon(_categoryIcon(transaction.category)),
+        ),
+        title: Text(transaction.merchant),
+        trailing: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // +/- prefix for screen readers — not colour-only
+            ExcludeSemantics(
+              child: Text('${isCredit ? '+' : '-'}$amountStr'),
+            ),
+            // Accessible: explicit delete button as alternative to swipe
+            Semantics(
+              label: 'Delete transaction: ${transaction.merchant}',
+              button: true,
+              excludeSemantics: true,
+              child: IconButton(
+                icon: const Icon(Icons.delete_outline),
+                onPressed: onDismissed,
+                tooltip: 'Delete transaction',
+              ),
+            ),
+          ],
+        ),
+      ),
+    ),
+  ),
+)
+```
+
+  </TabItem>
+</Tabs>
+
+<div className="ab-callout ab-callout--green">
+  <div className="ab-callout__header">✓ Checkpoint</div>
+  <p>With TalkBack or VoiceOver active, navigate to a transaction tile. You should hear the full transaction description as a single announcement — type, amount, merchant, and date. You should also be able to reach and activate "Delete transaction" without performing a swipe gesture.</p>
+</div>
+
+---
+
+## Section 4: Long-Press Alternatives
+
+Long-press actions are invisible to screen reader users, keyboard users, and anyone who cannot hold their finger still on screen for the required duration. Any feature only reachable via long press is a hidden feature for a significant portion of your users.
+
+<div className="ab-step">
+  <div className="ab-step__badge">1</div>
+  <div className="ab-step__content">
+
+Add a `PopupMenuButton` — or a visible "More options" button — that exposes the same actions available via long press. The long press can remain as a shortcut, but must never be the only route to an action.
+
+  </div>
+</div>
+
+<Tabs>
+  <TabItem value="before" label="Before — long press only">
+
+```dart title="lib/screens/transactions/widgets/transaction_tile.dart"
+// Long press only — invisible to screen readers and switch users
+GestureDetector(
+  onLongPress: () => _showTransactionMenu(transaction),
+  child: TransactionTile(transaction: transaction),
+)
+```
+
+  </TabItem>
+  <TabItem value="after" label="After — menu button alternative" default>
+
+```dart title="lib/screens/transactions/widgets/transaction_tile.dart"
+// Long press still works AND there is a reachable menu button
+GestureDetector(
+  onLongPress: () => _showTransactionMenu(transaction),
+  child: TransactionTile(
+    transaction: transaction,
+    trailing: PopupMenuButton<String>(
+      tooltip: 'More options for this transaction',
+      icon: const Icon(Icons.more_vert),
+      onSelected: (action) => _handleAction(action, transaction),
+      itemBuilder: (_) => const [
+        PopupMenuItem(value: 'copy', child: Text('Copy reference')),
+        PopupMenuItem(value: 'report', child: Text('Report an issue')),
+      ],
+    ),
+  ),
+)
+```
+
+  </TabItem>
+</Tabs>
+
+<div className="ab-callout ab-callout--amber">
+  <div className="ab-callout__header">Why this matters</div>
+  <p>Long-press gestures are not announced by TalkBack or VoiceOver — users simply never know the option exists. Switch Control users cannot perform a long press at all. A "More options" button costs almost nothing to add and makes the feature available to everyone.</p>
+</div>
+
+---
+
+## Section 5: Motor Accessibility Testing
+
+<div className="ab-step">
+  <div className="ab-step__badge">1</div>
+  <div className="ab-step__content">
+
+The most thorough way to test motor accessibility is Switch Access (Android) or Switch Control (iOS) — assistive technology for users who can operate only one or two hardware buttons.
+
+**On Android:** Settings → Accessibility → Switch Access. Configure your volume-up button as the "Select" switch.
+
+**On iOS:** Settings → Accessibility → Switch Control. Configure a switch and use the auto-scanning mode.
+
+Try to complete a realistic task: delete a transaction you did not authorise. If you cannot do it with a single switch, fix the interface before moving on.
+
+  </div>
+</div>
+
+<div className="ab-callout ab-callout--blue">
+  <div className="ab-callout__header">💡 Try it yourself</div>
+  <p>Enable Switch Access (Android) or Switch Control (iOS) and navigate to the Transaction List. Can you delete a transaction using only the volume button? Can you access the "More options" menu? Time yourself — if a task takes more than 30 seconds with a single switch, it needs improvement.</p>
+</div>
+
+---
+
+## Check Your Understanding
+
+<details>
+<summary>Question 1: Which Flutter API do you use to check whether the user has enabled "Reduce Motion" on their device?</summary>
+
+**A) MediaQuery.accessibilityFeaturesOf(context).reduceMotion**
+**B) MediaQuery.disableAnimationsOf(context)** ✅
+**C) Theme.of(context).animationTheme.reduceMotion**
+**D) WidgetsBinding.instance.window.semanticsEnabled**
+
+`MediaQuery.disableAnimationsOf(context)` returns `true` when the user has enabled Reduce Motion (iOS) or Remove Animations (Android). Respond by setting animation durations to `Duration.zero`.
+
+</details>
+
+<details>
+<summary>Question 2: What is the recommended minimum touch target size according to Material Design and Apple's HIG?</summary>
+
+**A) 24×24 dp**
+**B) 36×36 dp**
+**C) 48×48 dp** ✅
+**D) 56×56 dp**
+
+Both Material Design (48×48 dp) and Apple HIG (44×44 pt) specify this as the minimum for reliable interaction. Smaller targets are frequently missed by users with motor impairments or those using the device while in motion.
+
+</details>
+
+<details>
+<summary>Question 3: If a feature is only accessible via a long press gesture, which users are excluded?</summary>
+
+**A) Only users with very large fingers**
+**B) Screen reader users, Switch Control/Switch Access users, and anyone who cannot hold a long press** ✅
+**C) Users on Android only**
+**D) Nobody — all users can long-press**
+
+Long-press gestures are not announced or accessible to screen reader users, keyboard users, or switch-control users. Any action only reachable via long press must also have an equivalent button or menu option.
+
+</details>
+
+---
+
+## Deep Dive
+
+- [MediaQuery.disableAnimationsOf — Flutter API documentation](https://api.flutter.dev/flutter/widgets/MediaQuery/disableAnimationsOf.html)
+- [WCAG 2.3.3 — Animation from Interactions](https://www.w3.org/WAI/WCAG21/Understanding/animation-from-interactions.html)
+- [WCAG 2.5.5 — Target Size](https://www.w3.org/WAI/WCAG22/Understanding/target-size-enhanced.html)
+- [Switch Access — Android Accessibility Help](https://support.google.com/accessibility/android/answer/6122836)
+- [Switch Control — Apple Accessibility](https://support.apple.com/en-gb/guide/iphone/iph400b2f114/ios)
+
+---
+
+## What's Next
+
+Touch targets are bigger and gestures have alternatives. Now let's keep users informed when content changes dynamically. In **Chapter 7: Dynamic Content & Live Regions**, you'll make filter changes, balance updates, loading states, snackbars, and route changes audible to screen reader users — so the app talks to them, in a good way.
