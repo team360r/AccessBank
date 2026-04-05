@@ -31,9 +31,9 @@ This tutorial uses a **three-panel workflow**:
 
 ```mermaid
 graph LR
-    B["🌐 Browser\nlocalhost:3000\nTutorial guide"]
-    IDE["💻 IDE\nVS Code / Android Studio\nEdit Flutter code"]
-    D["📱 Device\niPhone / Android\nSee & hear changes"]
+    B["🌐 Browser<br/>localhost:3000<br/>Tutorial guide"]
+    IDE["💻 IDE<br/>VS Code / Android Studio<br/>Edit Flutter code"]
+    D["📱 Device<br/>iPhone / Android<br/>See & hear changes"]
     B --> IDE --> D --> B
 ```
 
@@ -42,7 +42,7 @@ Read the guide in your browser, make code changes in your IDE, and immediately h
 ## Chapter Learning Path
 
 ```mermaid
-graph LR
+graph TD
     C0["Ch 0\nToolkit"] --> C1["Ch 1\nWelcome"]
     C1 --> C2["Ch 2\nSemantics"]
     C2 --> C3["Ch 3\nNavigation"]
