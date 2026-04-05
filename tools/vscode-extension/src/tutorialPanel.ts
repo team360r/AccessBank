@@ -9,11 +9,13 @@ export class TutorialPanelProvider implements vscode.WebviewViewProvider {
   private view?: vscode.WebviewView;
   private fileWatcher: FileWatcher;
   private currentStepFilePath: string | null = null;
+  private readonly log: vscode.OutputChannel;
 
   constructor(
     private readonly extensionUri: vscode.Uri,
     private readonly relay: RelayClient,
   ) {
+    this.log = vscode.window.createOutputChannel('AccessGuide');
     this.fileWatcher = new FileWatcher((passed) => {
       this.view?.webview.postMessage({ action: 'code_check', payload: { passed } });
       // For Chapter 8, run flutter test instead.
@@ -94,7 +96,7 @@ export class TutorialPanelProvider implements vscode.WebviewViewProvider {
   private sendContent(): void {
     const content = this.loadContent();
     if (content && this.view) {
-      this.view.webview.postMessage({ action: 'load_content', payload: content });
+      void this.view.webview.postMessage({ action: 'load_content', payload: content });
     }
   }
 
@@ -102,7 +104,10 @@ export class TutorialPanelProvider implements vscode.WebviewViewProvider {
     const jsonPath = path.join(this.extensionUri.fsPath, 'media', 'tutorial_content.json');
     try {
       return JSON.parse(fs.readFileSync(jsonPath, 'utf8')) as Record<string, unknown>;
-    } catch { return null; }
+    } catch (e) {
+      this.log.appendLine(`[AccessGuide] loadContent error: ${e}`);
+      return null;
+    }
   }
 
   private getHtml(_webview: vscode.Webview): string {

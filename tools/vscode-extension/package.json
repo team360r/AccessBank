@@ -1,47 +1,66 @@
 {
   "name": "accessguide",
-  "displayName": "AccessGuide — Flutter Accessibility Tutorial",
+  "displayName": "AccessGuide \u2014 Flutter Accessibility Tutorial",
   "description": "Interactive Flutter accessibility tutorial panel with phone sync",
   "version": "0.1.0",
   "publisher": "accessguide",
-  "engines": { "vscode": "^1.85.0" },
-  "categories": ["Education"],
-  "activationEvents": ["workspaceContains:pubspec.yaml"],
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "Education"
+  ],
+  "activationEvents": [
+    "workspaceContains:pubspec.yaml"
+  ],
   "main": "./out/extension.js",
   "contributes": {
     "viewsContainers": {
-      "activitybar": [{
-        "id": "accessguide",
-        "title": "AccessGuide",
-        "icon": "media/icon.svg"
-      }]
+      "activitybar": [
+        {
+          "id": "accessguide",
+          "title": "AccessGuide",
+          "icon": "media/icon.svg"
+        }
+      ]
     },
     "views": {
-      "accessguide": [{
-        "type": "webview",
-        "id": "accessguide.tutorialPanel",
-        "name": "Tutorial"
-      }]
+      "accessguide": [
+        {
+          "type": "webview",
+          "id": "accessguide.tutorialPanel",
+          "name": "Tutorial"
+        }
+      ]
     },
     "commands": [
-      { "command": "accessguide.startServer", "title": "AccessGuide: Start Server" },
-      { "command": "accessguide.nextStep",    "title": "AccessGuide: Next Step" },
-      { "command": "accessguide.prevStep",    "title": "AccessGuide: Previous Step" }
+      {
+        "command": "accessguide.startServer",
+        "title": "AccessGuide: Start Server"
+      },
+      {
+        "command": "accessguide.nextStep",
+        "title": "AccessGuide: Next Step"
+      },
+      {
+        "command": "accessguide.prevStep",
+        "title": "AccessGuide: Previous Step"
+      }
     ]
   },
   "scripts": {
     "compile": "tsc -p ./",
-    "watch":   "tsc -watch -p ./",
+    "watch": "tsc -watch -p ./",
     "package": "vsce package --no-dependencies"
   },
   "dependencies": {
     "ws": "^8.16.0"
   },
   "devDependencies": {
-    "@types/node":   "^20.0.0",
+    "@types/node": "^20.0.0",
     "@types/vscode": "^1.85.0",
-    "@types/ws":     "^8.5.10",
-    "@vscode/vsce":  "^2.24.0",
-    "typescript":    "^5.3.0"
+    "@types/ws": "^8.5.10",
+    "@vscode/vsce": "^2.24.0",
+    "typescript": "^5.3.0"
   }
 }

@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "generatedAt": "2026-04-04T14:15:56.971450",
+  "generatedAt": "2026-04-04T16:47:34.260230",
   "chapters": [
     {
       "id": 0,
@@ -14,7 +14,7 @@
         {
           "id": 1,
           "title": "Enable Your Screen Reader",
-          "explanation": "Every platform ships with a built-in screen reader. On **Android** it is called **TalkBack** — enable it under Settings > Accessibility > TalkBack. On **iOS** it is called **VoiceOver** — enable it under Settings > Accessibility > VoiceOver (or triple-click the side button if you have set up the Accessibility Shortcut). On **Flutter Web** you can use the browser's built-in screen reader: NVDA or JAWS on Windows, or VoiceOver in Safari/Chrome on macOS.\n\nOnce enabled, the screen reader takes over all touch and keyboard input — every tap now *focuses* an element and reads its label aloud instead of activating it immediately.",
+          "explanation": "Every platform ships with a built-in screen reader. On **Android** it is called **TalkBack** — enable it under Settings > Accessibility > TalkBack. On **iOS** it is called **VoiceOver** — enable it under Settings > Accessibility > VoiceOver (or triple-click the side button if you have set up the Accessibility Shortcut).\n\nOnce enabled, the screen reader takes over all touch and keyboard input — every tap now *focuses* an element and reads its label aloud instead of activating it immediately.",
           "codeDiff": null,
           "whyItMatters": null,
           "tryItPrompt": "Enable your platform's screen reader now.",
