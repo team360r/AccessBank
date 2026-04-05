@@ -1,0 +1,70 @@
+---
+sidebar_position: 3
+slug: /chapters/navigation/part-3
+title: "Finding Your Way — Part 3"
+description: "Keyboard-only testing workflow."
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+## Section 7: Keyboard-Only Testing
+
+The ultimate validation of your focus-order work is to navigate the entire app without touching the screen — keyboard only.
+
+<div className="ab-step">
+  <div className="ab-step__badge">1</div>
+  <div className="ab-step__content">
+
+**On Android:** Connect a Bluetooth keyboard, or enable Switch Access in Settings → Accessibility → Switch Access. Tab moves focus; Space or Enter activates.
+
+  </div>
+</div>
+
+<div className="ab-step">
+  <div className="ab-step__badge">2</div>
+  <div className="ab-step__content">
+
+**On iOS:** Connect an external keyboard and enable VoiceOver. Use Tab/Shift-Tab to move between elements, Space or Return to activate.
+
+  </div>
+</div>
+
+<div className="ab-step">
+  <div className="ab-step__badge">3</div>
+  <div className="ab-step__content">
+
+While testing, watch for:
+- Elements you can't reach (they're excluded from the focus order)
+- Buttons that don't respond to Space or Enter
+- Focus that disappears when a dialog closes (it should return to the element that opened the dialog)
+- Focus order that doesn't match the visual reading order
+
+</div>
+</div>
+
+<div className="ab-callout ab-callout--blue">
+  <div className="ab-callout__header">💡 Try it yourself</div>
+  <p>Connect a keyboard (or enable switch access) and navigate the entire Login flow without touching the screen. Can you complete the sign-in — filling in email, password, and tapping Sign In — using only Tab and Enter? If yes, you've done it right.</p>
+</div>
+
+<div className="ab-callout ab-callout--green">
+  <div className="ab-callout__header">✓ Checkpoint</div>
+  <p>In the accessible Login screen: (1) focus order is Email → Password → Sign In → Biometric, (2) pressing Return on the email field moves focus to the password field, (3) failed validation is announced via <code>SemanticsService.sendAnnouncement()</code>, and (4) focus moves to the first empty field after a failed submission. Verify each of these with your screen reader active.</p>
+</div>
+
+---
+
+## Deep Dive
+
+- [Flutter FocusTraversalGroup — API documentation](https://api.flutter.dev/flutter/widgets/FocusTraversalGroup-class.html)
+- [Flutter FocusTraversalOrder — API documentation](https://api.flutter.dev/flutter/widgets/FocusTraversalOrder-class.html)
+- [SemanticsService.sendAnnouncement](https://api.flutter.dev/flutter/semantics/SemanticsService/sendAnnouncement.html)
+- [WCAG 2.1.1 — Keyboard](https://www.w3.org/WAI/WCAG21/Understanding/keyboard.html)
+- [WCAG 2.4.3 — Focus Order](https://www.w3.org/WAI/WCAG21/Understanding/focus-order.html)
+
+---
+
+## What's Next
+
+The app now makes sense by ear and navigates logically by keyboard. But there are users who can see the screen — just not as well as you might assume. In **Chapter 4: See Clearly**, you'll fix the contrast failures, ensure the UI survives large font sizes, tune the dark-mode palette, and stop relying on colour alone to communicate meaning.

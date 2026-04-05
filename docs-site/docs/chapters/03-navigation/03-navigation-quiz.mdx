@@ -1,0 +1,46 @@
+---
+sidebar_position: 4
+slug: /chapters/navigation/quiz
+title: "Quiz"
+description: "Check your understanding of Chapter 3."
+---
+
+import { Quiz, QuizQuestion } from '@site/src/components/Quiz';
+
+# Check Your Understanding
+
+<Quiz chapterId="ch03">
+  <QuizQuestion
+    question="What widget do you use to define an independent focus traversal group in Flutter?"
+    options={[
+      "FocusScope",
+      "FocusTraversalGroup",
+      "Focus",
+      "FocusNode",
+    ]}
+    correctIndex={1}
+    explanation="FocusTraversalGroup defines a region with its own traversal policy. Widgets inside the group are ordered relative to each other, independently of widgets outside the group. This is the key tool for fixing focus order problems caused by widget-tree ordering."
+  />
+  <QuizQuestion
+    question="Why is a focus trap important in modal dialogs?"
+    options={[
+      "To prevent the user from closing the dialog accidentally",
+      "To stop keyboard users from interacting with content behind the dialog",
+      "To improve animation performance",
+      "To ensure the dialog is announced by the screen reader",
+    ]}
+    correctIndex={1}
+    explanation="Without a focus trap, keyboard users can Tab past the dialog boundary and interact with (or accidentally trigger) elements in the obscured background. Trapping focus keeps interaction within the dialog until it is deliberately dismissed."
+  />
+  <QuizQuestion
+    question="What is the purpose of a skip navigation link?"
+    options={[
+      "To hide the navigation bar from sighted users",
+      "To let keyboard users jump past repetitive navigation to main content",
+      "To disable keyboard navigation on secondary screens",
+      "To announce the current page name when the screen loads",
+    ]}
+    correctIndex={1}
+    explanation="Skip links let keyboard and switch-control users bypass repeated navigation elements (like app bars and tab bars) that would otherwise require many Tab presses to navigate through on every screen."
+  />
+</Quiz>

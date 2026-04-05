@@ -1,0 +1,230 @@
+---
+sidebar_position: 2
+slug: /chapters/navigation/part-2
+title: "Finding Your Way — Part 2"
+description: "Error announcements, focus traps in dialogs, and skip navigation."
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+## Section 4: Accessible Error Announcements
+
+One more critical Login screen fix: what happens when login fails? In the "before" version, the error message appears silently — the screen reader doesn't announce it because no live region is set.
+
+<div className="ab-step">
+  <div className="ab-step__badge">1</div>
+  <div className="ab-step__content">
+
+`SemanticsService.sendAnnouncement()` lets you push an announcement to the screen reader at any time — not just when focus changes. Use it for validation errors, success confirmations, and any dynamic content change that the user needs to know about.
+
+Pair this with a `Semantics(liveRegion: true)` wrapper on the error text widget for users who do encounter the text visually and navigate to it.
+
+  </div>
+</div>
+
+<Tabs>
+  <TabItem value="before" label="Before — silent failure" default>
+
+```dart title="lib/screens/login/widgets/login_form.dart"
+void _submitInaccessible() {
+  // Inaccessible: validation error appears visually but
+  // is never announced to screen readers.
+  if (_emailController.text.isEmpty || _passwordController.text.isEmpty) {
+    setState(() => _errorText = 'Invalid credentials');
+    return; // Screen reader user has no idea what happened
+  }
+  widget.onSubmit();
+}
+```
+
+  </TabItem>
+  <TabItem value="after" label="After — error announced and focus moved">
+
+```dart title="lib/screens/login/widgets/login_form.dart"
+void _submitAccessible() {
+  if (_emailController.text.isEmpty || _passwordController.text.isEmpty) {
+    const message = 'Sign in failed. Please enter your email and password.';
+    setState(() => _errorText = message);
+
+    // Announce the error immediately to screen readers
+    SemanticsService.sendAnnouncement(
+      View.of(context),
+      message,
+      TextDirection.ltr,
+    );
+
+    // Move focus to the first empty field so the user knows where to go
+    if (_emailController.text.isEmpty) {
+      _emailFocusNode.requestFocus();
+    } else {
+      _passwordFocusNode.requestFocus();
+    }
+    return;
+  }
+  widget.onSubmit();
+}
+
+// In the widget tree, wrap the error text in a liveRegion:
+if (_errorText != null) ...[
+  const SizedBox(height: 8),
+  Semantics(
+    liveRegion: true, // Announces changes to screen readers automatically
+    child: Text(
+      _errorText!,
+      style: TextStyle(
+        color: Theme.of(context).colorScheme.error,
+        fontSize: 13,
+      ),
+    ),
+  ),
+],
+```
+
+  </TabItem>
+</Tabs>
+
+<div className="ab-callout ab-callout--amber">
+  <div className="ab-callout__header">Why this matters</div>
+  <p>A screen reader user who taps "Sign In" and hears nothing — no error, no confirmation — is completely lost. They don't know if the button worked, if they need to try again, or if the app has crashed. Always announce state changes that the user needs to know about.</p>
+</div>
+
+---
+
+## Section 5: Focus Traps in Modal Dialogs
+
+When a modal dialog or bottom sheet opens, focus must stay inside it until the user dismisses it. Otherwise a keyboard user can Tab behind the dialog and interact with the obscured UI — potentially triggering actions they can't see.
+
+<div className="ab-step">
+  <div className="ab-step__badge">1</div>
+  <div className="ab-step__content">
+
+Flutter's `Dialog` widget automatically requests focus when it opens, but you still need to wrap the content in a `FocusTraversalGroup` so that Tab cycles within the dialog and doesn't escape. Set `autofocus: true` on the first interactive element so the user lands in the right place immediately.
+
+  </div>
+</div>
+
+<Tabs>
+  <TabItem value="before" label="Before — focus can escape" default>
+
+```dart title="lib/widgets/confirm_transfer_dialog.dart"
+// Focus can leak to the background when the user presses Tab.
+// A keyboard user might accidentally tap buttons behind the dialog.
+AlertDialog(
+  title: const Text('Confirm Transfer'),
+  content: TransferSummary(),
+  actions: [
+    TextButton(
+      onPressed: () => Navigator.pop(context),
+      child: const Text('Cancel'),
+    ),
+    ElevatedButton(
+      onPressed: _confirmTransfer,
+      child: const Text('Confirm'),
+    ),
+  ],
+)
+```
+
+  </TabItem>
+  <TabItem value="after" label="After — focus trapped within dialog">
+
+```dart title="lib/widgets/confirm_transfer_dialog.dart"
+// Focus is completely trapped within the dialog.
+// Tab cycles: Cancel → Confirm → Cancel → ...
+AlertDialog(
+  title: const Text('Confirm Transfer'),
+  content: FocusTraversalGroup(
+    child: TransferSummary(),
+  ),
+  actions: [
+    TextButton(
+      autofocus: true, // First focusable element gets focus on open
+      onPressed: () => Navigator.pop(context),
+      child: const Text('Cancel'),
+    ),
+    ElevatedButton(
+      onPressed: _confirmTransfer,
+      child: const Text('Confirm'),
+    ),
+  ],
+)
+```
+
+  </TabItem>
+</Tabs>
+
+<div className="ab-callout ab-callout--amber">
+  <div className="ab-callout__header">Why this matters</div>
+  <p>Without focus trapping, keyboard users get lost behind dialogs and may unknowingly trigger actions on the obscured screen. Proper focus trapping is a WCAG 2.1 Level A requirement (Success Criterion 2.1.2, "No Keyboard Trap" — which in this context means focus must be <em>within</em> the dialog, not able to escape without using the dialog's own controls).</p>
+</div>
+
+---
+
+## Section 6: Skip Navigation
+
+When every screen starts with a navigation bar containing five tabs, a keyboard user must press Tab five times before reaching the main content — on every single screen. That's exhausting and unnecessary.
+
+<div className="ab-step">
+  <div className="ab-step__badge">1</div>
+  <div className="ab-step__content">
+
+Skip links let users jump straight to the main content region. In Flutter, you implement this with a `Focus` node that moves focus programmatically to the first element of the main content area when the user activates the skip link. The link itself is only visible when it has keyboard focus (so it doesn't clutter the visual design).
+
+  </div>
+</div>
+
+<Tabs>
+  <TabItem value="before" label="Before — must tab through everything" default>
+
+```dart title="lib/widgets/app_scaffold.dart"
+// Every screen forces keyboard users to tab through AppBar + BottomNav
+// before reaching any useful content.
+Scaffold(
+  appBar: MainAppBar(),
+  bottomNavigationBar: MainNavBar(),
+  body: content,
+)
+```
+
+  </TabItem>
+  <TabItem value="after" label="After — skip link available">
+
+```dart title="lib/widgets/app_scaffold.dart"
+// Skip link appears on keyboard focus and jumps to main content.
+Scaffold(
+  appBar: MainAppBar(),
+  bottomNavigationBar: MainNavBar(),
+  body: Column(
+    children: [
+      // Skip link — only visible when keyboard-focused
+      Semantics(
+        label: 'Skip to main content',
+        child: Focus(
+          onFocusChange: (focused) {
+            setState(() => _skipVisible = focused);
+          },
+          child: GestureDetector(
+            onTap: () => _mainContentFocus.requestFocus(),
+            child: _skipVisible
+                ? const SkipBanner()
+                : const SizedBox.shrink(),
+          ),
+        ),
+      ),
+      Expanded(
+        child: Focus(
+          focusNode: _mainContentFocus,
+          skipTraversal: true, // Not in the normal Tab order
+          child: content,
+        ),
+      ),
+    ],
+  ),
+)
+```
+
+  </TabItem>
+</Tabs>
+
+---
