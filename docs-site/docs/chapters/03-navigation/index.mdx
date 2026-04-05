@@ -24,6 +24,16 @@ In this chapter you'll fix it.
 
 ## Section 1: What is Focus Order?
 
+```mermaid
+graph LR
+    subgraph broken["❌ Broken order"]
+        E1[Email] --> B1[Login button] --> P1[Password]
+    end
+    subgraph fixed["✅ Fixed order"]
+        E2[Email] --> P2[Password] --> B2[Login button]
+    end
+```
+
 <div className="ab-step">
   <div className="ab-step__badge">1</div>
   <div className="ab-step__content">

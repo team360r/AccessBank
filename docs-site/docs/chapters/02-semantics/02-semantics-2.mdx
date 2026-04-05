@@ -10,6 +10,19 @@ import TabItem from '@theme/TabItem';
 
 ## Section 4: MergeSemantics — One Card, One Announcement
 
+```mermaid
+graph TD
+    subgraph WT["Widget Tree"]
+        A[Row] --> B[Icon]
+        A --> C["Text '£4,285.50'"]
+        A --> D[Text 'Current account']
+    end
+    subgraph ST["Semantics Tree (after MergeSemantics)"]
+        E["Single node\nlabel: 'Current account,\nfour thousand two hundred\neighty-five pounds'"]
+    end
+    A -. "MergeSemantics" .-> E
+```
+
 Without `MergeSemantics`, a screen reader visits each child of a widget separately. On the Account Overview, that means: icon → account name → balance → three more elements. Six focus stops per account card. Exhausting.
 
 <div className="ab-step">
