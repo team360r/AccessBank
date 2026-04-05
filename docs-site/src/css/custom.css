@@ -197,3 +197,14 @@ body {
 .footer--dark {
   background-color: #0D1117;
 }
+
+/* Visited sidebar items */
+.sidebar-item--visited > a,
+.sidebar-item--visited > .menu__link {
+  color: #2e7d32;
+}
+
+[data-theme='dark'] .sidebar-item--visited > a,
+[data-theme='dark'] .sidebar-item--visited > .menu__link {
+  color: #66bb6a;
+}
