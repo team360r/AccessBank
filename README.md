@@ -9,17 +9,18 @@
 
 ## What is this?
 
-AccessBank is a hands-on Flutter tutorial where you fix accessibility issues in a realistic banking app — one chapter at a time. You will learn how screen readers work, how Flutter's semantics tree is structured, and how to write and test accessible code across iOS, Android, and the web.
+AccessBank is a hands-on Flutter tutorial where you fix accessibility issues in a realistic banking app — one chapter at a time. You will learn how screen readers work, how Flutter's semantics tree is structured, and how to write and test accessible code across iOS and Android.
 
-The tutorial is delivered through **AccessGuide**, an in-app panel that guides you through 10 progressive chapters with explanations, before/after code diffs, and interactive exercises. A **before/after toggle** lets you compare the inaccessible original with each accessible improvement as you build it. No prior accessibility knowledge is needed — that's what we're here for!
+The tutorial is delivered through a **browser-based guide** (Docusaurus site) that runs alongside the app. Open the guide in your browser, edit code in your IDE, and see the results instantly on your connected device or simulator. A **before/after toggle** lets you compare the inaccessible original with each accessible improvement as you build it. No prior accessibility knowledge is needed — that's what we're here for!
 
 ---
 
 ## Prerequisites
 
 - [ ] Flutter SDK 3.x+ — [Install Flutter](https://docs.flutter.dev/get-started/install)
-- [ ] A code editor (VS Code recommended) — [Set up VS Code for Flutter](https://docs.flutter.dev/tools/vs-code)
-- [ ] An iOS simulator, Android emulator, or Chrome
+- [ ] Node.js 18+ — [nodejs.org](https://nodejs.org) — for the tutorial guide
+- [ ] VS Code — [Set up VS Code for Flutter](https://docs.flutter.dev/tools/vs-code) OR Android Studio — [Set up Android Studio](https://docs.flutter.dev/tools/android-studio)
+- [ ] An iOS device/simulator or Android device/emulator
 - [ ] Basic Flutter knowledge (built at least one app)
 - [ ] No accessibility experience needed!
 
@@ -28,54 +29,56 @@ The tutorial is delivered through **AccessGuide**, an in-app panel that guides y
 ## Quick Start
 
 ```bash
-# 1. Clone the repo
 git clone <repo-url>
-
-# 2. Enter the project directory
 cd accessible
-
-# 3. Install dependencies
-flutter pub get
-
-# 4. Run the app
-flutter run
-
-# 5. Tap the guide icon (📖) to open the tutorial panel
+./setup.sh
 ```
 
-Also run this once to enable branch protection hooks:
+Then start the tutorial with two terminals:
 
+**Terminal 1 — Tutorial Guide:**
 ```bash
-git config core.hooksPath .githooks
+cd docs-site && npm start
+# Opens at http://localhost:3000
 ```
+
+**Terminal 2 — Banking App:**
+```bash
+flutter run
+# Launches on your connected device/simulator
+```
+
+Then open the project in your IDE (`code .` for VS Code, or open the `accessible/` folder in Android Studio).
 
 ---
 
 ## How This Tutorial Works
 
-### The In-App Tutorial Panel (AccessGuide)
+This tutorial uses a three-panel workflow inspired by Apple's SwiftUI tutorials:
 
-The tutorial lives inside the app itself. On desktop it opens as a side panel; on mobile it opens as a bottom sheet. Tap the guide icon (📖) in the top-right corner of any screen to open it.
-
-Each chapter walks you through concepts with written explanations, runnable code diffs, and a short quiz to confirm your understanding.
+| Panel | What's Here |
+|-------|-------------|
+| **Browser** | Tutorial guide at `localhost:3000` — step-by-step instructions, explanations, and code diffs |
+| **IDE** | VS Code or Android Studio — where you edit the Flutter code |
+| **Device** | Your connected iPhone/simulator or Android phone/emulator with hot reload |
 
 ### Chapter Branches
 
-Each chapter has a corresponding Git branch that contains the completed, accessible version of that chapter's code. Use them as reference material:
+Each chapter has a corresponding Git branch containing the completed, accessible version of that chapter's code. Use them as reference material:
 
 ```bash
 git checkout chapter-2-semantics
 ```
 
-> **WARNING:** Chapter branches are read-only reference material. Create your own branch to experiment.
-
-```bash
-git checkout -b my-accessibility-work
-```
+> **WARNING:** Chapter branches are read-only reference material. Do not commit to them. Create your own branch to experiment:
+>
+> ```bash
+> git checkout -b my-accessibility-work
+> ```
 
 ### Before/After Toggle
 
-Every screen in AccessBank has two modes — the original inaccessible version and the accessible version you build chapter by chapter. The toggle at the top of the tutorial panel switches between them so you can compare with a screen reader running.
+Every screen in AccessBank has two modes — the original inaccessible version and the accessible version you build chapter by chapter. The toggle in the app lets you switch between them with a screen reader running to hear the difference.
 
 ---
 
@@ -125,17 +128,17 @@ Every screen in AccessBank has two modes — the original inaccessible version a
 
 ## Troubleshooting
 
+**"Tutorial site won't start"**
+Check that Node.js 18+ is installed (`node --version`). Then run `cd docs-site && npm install` and try `npm start` again.
+
+**"Hot reload not working"**
+Make sure `flutter run` is active in a terminal and your device/simulator is connected. Save a file in your IDE to trigger hot reload.
+
 **"Screen reader isn't reading anything"**
 Add `showSemanticsDebugger: true` to your `MaterialApp` to check whether semantics nodes are being built at all.
 
 **"App looks different from the chapter branch"**
-Make sure you have checked out the correct branch (`git branch` to confirm) and run `flutter pub get` after switching.
-
-**"Tutorial progress reset"**
-Progress is stored in `shared_preferences`. Clearing app data (or reinstalling the app) resets it — this is expected behaviour.
-
-**"Tests failing"**
-Run `flutter clean` then `flutter pub get` and try again. If tests still fail, check that you are on the right branch.
+Check which branch you are on (`git branch`) and run `flutter pub get` after switching branches.
 
 ---
 
