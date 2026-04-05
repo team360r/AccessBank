@@ -43,15 +43,15 @@ Read the guide in your browser, make code changes in your IDE, and immediately h
 
 ```mermaid
 graph TD
-    C0["Ch 0\nToolkit"] --> C1["Ch 1\nWelcome"]
-    C1 --> C2["Ch 2\nSemantics"]
-    C2 --> C3["Ch 3\nNavigation"]
-    C3 --> C4["Ch 4\nVisual"]
-    C4 --> C5["Ch 5\nForms"]
-    C5 --> C6["Ch 6\nMotion"]
-    C6 --> C7["Ch 7\nLive Regions"]
-    C7 --> C8["Ch 8\nTesting"]
-    C8 --> C9["Ch 9\nPolish"]
+    C0["Ch 0: Toolkit"] --> C1["Ch 1: Welcome"]
+    C1 --> C2["Ch 2: Semantics"]
+    C2 --> C3["Ch 3: Navigation"]
+    C3 --> C4["Ch 4: Visual"]
+    C4 --> C5["Ch 5: Forms"]
+    C5 --> C6["Ch 6: Motion"]
+    C6 --> C7["Ch 7: Live Regions"]
+    C7 --> C8["Ch 8: Testing"]
+    C8 --> C9["Ch 9: Polish"]
 ```
 
 ## Prerequisites
