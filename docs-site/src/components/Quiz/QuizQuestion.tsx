@@ -26,6 +26,8 @@ export function QuizQuestion({
   revealed = false,
   onAnswer,
 }: QuizQuestionProps) {
+  const qId = `quiz-q-${questionIndex}`;
+
   function cardClass(i: number): string {
     if (!revealed) {
       return i === selectedIndex ? styles.cardSelected : styles.card;
@@ -37,15 +39,15 @@ export function QuizQuestion({
 
   return (
     <div className={styles.question}>
-      <p className={styles.questionText}>{question}</p>
-      <div className={styles.options}>
+      <p id={qId} className={styles.questionText}>{question}</p>
+      <div role="group" aria-labelledby={qId} className={styles.options}>
         {options.map((opt, i) => (
           <button
             key={i}
             className={cardClass(i)}
             onClick={() => !revealed && onAnswer?.(questionIndex, i)}
             disabled={revealed}
-            aria-pressed={selectedIndex === i}
+            aria-pressed={!revealed ? selectedIndex === i : undefined}
           >
             <span className={styles.label}>{LABELS[i]}</span>
             <span className={styles.optionText}>{opt}</span>
@@ -53,18 +55,20 @@ export function QuizQuestion({
               <span className={styles.yourAnswer}>(your answer)</span>
             )}
             {revealed && i === correctIndex && (
-              <span className={styles.correctMark}>✓</span>
+              <span className={styles.correctMark} aria-hidden="true">✓</span>
             )}
           </button>
         ))}
       </div>
       {revealed && (
         <div className={styles.explanation}>
-          <strong>
-            {selectedIndex === correctIndex
-              ? '✅ Correct!'
-              : `✗ The correct answer was ${LABELS[correctIndex]}.`}
-          </strong>{' '}
+          {selectedIndex === correctIndex ? (
+            <strong>✅ Correct!</strong>
+          ) : (
+            <strong aria-label={`Incorrect. The correct answer was ${LABELS[correctIndex]}.`}>
+              ✗ The correct answer was {LABELS[correctIndex]}.
+            </strong>
+          )}{' '}
           {explanation}
         </div>
       )}
