@@ -175,7 +175,7 @@ function QuickStartSection(): ReactNode {
       <div className={styles.container}>
         <h2 className={styles.sectionTitle}>Quick Start</h2>
         <p className={styles.sectionSubtitle}>
-          One command sets everything up. Then open two terminals and go.
+          Two commands and you're up — app on device, guide in your browser.
         </p>
         <div className={styles.quickstartGrid}>
           <div className={styles.codeBlock}>
@@ -187,17 +187,17 @@ cd accessible
             </pre>
           </div>
           <div className={styles.codeBlock}>
-            <p className={styles.codeLabel}>2. Terminal 1 — Tutorial Guide</p>
+            <p className={styles.codeLabel}>2. Start everything</p>
             <pre className={styles.pre}>
-              <code>{`cd docs-site && npm start
-# → http://localhost:3000`}</code>
+              <code>{`./start.sh
+# → Opens browser + launches app`}</code>
             </pre>
           </div>
           <div className={styles.codeBlock}>
-            <p className={styles.codeLabel}>3. Terminal 2 — Banking App</p>
+            <p className={styles.codeLabel}>3. Open in your IDE</p>
             <pre className={styles.pre}>
-              <code>{`flutter run
-# → Launches on your device`}</code>
+              <code>{`code .
+# VS Code — or open accessible/ in Android Studio`}</code>
             </pre>
           </div>
         </div>

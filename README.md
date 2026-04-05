@@ -34,21 +34,22 @@ cd accessible
 ./setup.sh
 ```
 
-Then start the tutorial with two terminals:
+`setup.sh` installs all dependencies and configures iOS signing (you'll be prompted for your Apple Developer Team ID if you're running on a physical iPhone).
 
-**Terminal 1 — Tutorial Guide:**
+Then start everything with one command:
+
 ```bash
-cd docs-site && npm start
-# Opens at http://localhost:3000
+./start.sh
 ```
 
-**Terminal 2 — Banking App:**
-```bash
-flutter run
-# Launches on your connected device/simulator
-```
+This opens the tutorial guide at `http://localhost:3000` and launches the app on your connected device or simulator.
 
-Then open the project in your IDE (`code .` for VS Code, or open the `accessible/` folder in Android Studio).
+Finally, open the project in your IDE:
+
+```bash
+code .              # VS Code
+# or open the accessible/ folder in Android Studio
+```
 
 ---
 
@@ -129,10 +130,13 @@ Every screen in AccessBank has two modes — the original inaccessible version a
 ## Troubleshooting
 
 **"Tutorial site won't start"**
-Check that Node.js 18+ is installed (`node --version`). Then run `cd docs-site && npm install` and try `npm start` again.
+Check that Node.js 18+ is installed (`node --version`). Then run `cd docs-site && npm install` and try `./start.sh` again.
+
+**"App won't install on my iPhone"**
+Run `./setup.sh` again and enter your Apple Developer Team ID when prompted. If you don't have one, use a simulator instead (`flutter run -d "iPhone 16"`).
 
 **"Hot reload not working"**
-Make sure `flutter run` is active in a terminal and your device/simulator is connected. Save a file in your IDE to trigger hot reload.
+Make sure `./start.sh` is running and your device/simulator is connected. Save a file in your IDE to trigger hot reload.
 
 **"Screen reader isn't reading anything"**
 Add `showSemanticsDebugger: true` to your `MaterialApp` to check whether semantics nodes are being built at all.

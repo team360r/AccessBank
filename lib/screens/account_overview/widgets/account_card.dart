@@ -27,22 +27,22 @@ String _typeLabel(AccountType type) {
 
 /// Spells out a currency amount for screen readers.
 ///
-/// E.g. 4285.50 → "four thousand two hundred eighty-five dollars and fifty cents"
+/// E.g. 4285.50 → "four thousand two hundred eighty-five pounds and fifty pence"
 /// This is a simplified implementation for tutorial demonstration purposes.
 String _spellOutAmount(double amount) {
   final isNegative = amount < 0;
   final abs = amount.abs();
-  final dollars = abs.floor();
-  final cents = ((abs - dollars) * 100).round();
+  final pounds = abs.floor();
+  final pence = ((abs - pounds) * 100).round();
 
-  final dollarsText = _spellOutInteger(dollars);
+  final poundsText = _spellOutInteger(pounds);
   final sign = isNegative ? 'negative ' : '';
 
-  if (cents == 0) {
-    return '$sign$dollarsText dollars';
+  if (pence == 0) {
+    return '$sign$poundsText pounds';
   }
-  final centsText = _spellOutInteger(cents);
-  return '$sign$dollarsText dollars and $centsText cents';
+  final penceText = _spellOutInteger(pence);
+  return '$sign$poundsText pounds and $penceText pence';
 }
 
 String _spellOutInteger(int n) {
@@ -133,7 +133,7 @@ class AccountCard extends StatelessWidget {
                   const SizedBox(height: 4),
                   // Inaccessible: raw number, no currency label, low contrast
                   Text(
-                    '\$${account.balance.toStringAsFixed(2)}',
+                    '£${account.balance.toStringAsFixed(2)}',
                     style: TextStyle(
                       color: inaccessible.lightBlueOnWhite,
                       fontSize: 18,
@@ -187,7 +187,7 @@ class AccountCard extends StatelessWidget {
                       const SizedBox(height: 4),
                       // Accessible: high-contrast balance text
                       Text(
-                        '\$${account.balance.toStringAsFixed(2)}',
+                        '£${account.balance.toStringAsFixed(2)}',
                         style: const TextStyle(
                           color: AppColors.textPrimary,
                           fontSize: 18,

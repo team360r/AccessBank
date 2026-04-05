@@ -106,7 +106,7 @@ class TransactionTile extends StatelessWidget {
         title: Text(transaction.merchant),
         subtitle: Text(formattedDate),
         trailing: Text(
-          '\$${transaction.amount.abs().toStringAsFixed(2)}',
+          '£${transaction.amount.abs().toStringAsFixed(2)}',
           // Inaccessible: colour-only indicator — screen readers won't say debit/credit
           style: TextStyle(
             color: amountColor,
@@ -120,11 +120,11 @@ class TransactionTile extends StatelessWidget {
   Widget _buildAccessibleVersion(BuildContext context) {
     final isCredit = transaction.type == TransactionType.credit;
     final typeStr = _typeLabel(transaction.type);
-    final amountStr = '\$${transaction.amount.abs().toStringAsFixed(2)}';
+    final amountStr = '£${transaction.amount.abs().toStringAsFixed(2)}';
     final monthName = _monthNames[transaction.date.month];
     final spokenDate = '$monthName ${transaction.date.day}';
 
-    // Full semantic label: "Debit, twenty-three dollars, Grocery Store, April first"
+    // Full semantic label: "Debit, twenty-three pounds, Grocery Store, April first"
     final semanticLabel =
         '$typeStr, $amountStr, ${transaction.merchant}, $spokenDate';
 

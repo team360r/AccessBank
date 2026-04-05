@@ -7,7 +7,7 @@ class MockAccounts {
     name: 'Everyday Checking',
     type: AccountType.checking,
     balance: 4285.50,
-    currency: 'USD',
+    currency: 'GBP',
   );
 
   static const Account savingsGoal = Account(
@@ -15,7 +15,7 @@ class MockAccounts {
     name: 'Savings Goal',
     type: AccountType.savings,
     balance: 12750.00,
-    currency: 'USD',
+    currency: 'GBP',
   );
 
   static const Account creditCard = Account(
@@ -23,7 +23,7 @@ class MockAccounts {
     name: 'Credit Card',
     type: AccountType.credit,
     balance: -1430.22,
-    currency: 'USD',
+    currency: 'GBP',
   );
 
   static const List<Account> all = [everydayChecking, savingsGoal, creditCard];

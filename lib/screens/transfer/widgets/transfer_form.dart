@@ -223,7 +223,7 @@ class _Step4Summary extends StatelessWidget {
         _SummaryRow(label: 'To', value: recipient.isEmpty ? '—' : recipient),
         _SummaryRow(
             label: 'Amount',
-            value: amount.isEmpty ? '—' : '\$$amount'),
+            value: amount.isEmpty ? '—' : '£$amount'),
         if (note.isNotEmpty) _SummaryRow(label: 'Note', value: note),
       ],
     );
@@ -395,7 +395,7 @@ class _AccessibleStep3AmountState extends State<_AccessibleStep3Amount> {
           decoration: InputDecoration(
             labelText: 'Amount',
             hintText: '0.00',
-            prefixText: '\$',
+            prefixText: '£',
             border: const OutlineInputBorder(),
             errorText: _amountError,
           ),
@@ -457,7 +457,7 @@ class _AccessibleStep4Summary extends StatelessWidget {
         ),
         _AccessibleSummaryRow(
           label: 'Amount',
-          value: amount.isEmpty ? 'Not entered' : '\$$amount',
+          value: amount.isEmpty ? 'Not entered' : '£$amount',
         ),
         if (note.isNotEmpty)
           _AccessibleSummaryRow(label: 'Note', value: note),

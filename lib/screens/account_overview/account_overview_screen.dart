@@ -185,7 +185,7 @@ class _RecentTransactionTile extends StatelessWidget {
     if (accessible) {
       // Accessible: prefix amount with +/- and use accessible colour
       final amountPrefix = isCredit ? '+' : '-';
-      final amountLabel = '$amountPrefix\$${transaction.amount.abs().toStringAsFixed(2)}';
+      final amountLabel = '$amountPrefix£${transaction.amount.abs().toStringAsFixed(2)}';
       final typeLabel = isCredit ? 'Credit' : 'Debit';
 
       return MergeSemantics(
@@ -218,7 +218,7 @@ class _RecentTransactionTile extends StatelessWidget {
       ),
       // Inaccessible: colour-only indicator — no +/- prefix for screen readers
       trailing: Text(
-        '\$${transaction.amount.abs().toStringAsFixed(2)}',
+        '£${transaction.amount.abs().toStringAsFixed(2)}',
         style: TextStyle(color: amountColor),
       ),
     );
