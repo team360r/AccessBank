@@ -60,6 +60,11 @@ const config: Config = {
           position: 'left',
           label: 'Tutorial',
         },
+        {
+          to: '/chapters/toolkit',
+          label: 'Get Started',
+          position: 'right',
+        },
       ],
       style: 'dark',
     },
@@ -70,8 +75,8 @@ const config: Config = {
           title: 'Tutorial',
           items: [
             {
-              label: 'Welcome',
-              to: '/',
+              label: 'Introduction',
+              to: '/intro',
             },
             {
               label: 'Chapter 0: Toolkit',
