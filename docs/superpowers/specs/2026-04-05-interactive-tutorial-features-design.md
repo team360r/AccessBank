@@ -210,7 +210,55 @@ docs-site/src/
 
 ---
 
-## 5. Constraints & Non-Goals
+## 5. Mermaid Diagrams
+
+Docusaurus 3 supports Mermaid natively via `@docusaurus/theme-mermaid`. Enable it in `docusaurus.config.ts` with `themes: ['@docusaurus/theme-mermaid']` and `markdown: { mermaid: true }`.
+
+### Diagrams to add
+
+**`docs/intro.md` — Three-panel workflow** (replaces ASCII art):
+```mermaid
+graph LR
+    B[🌐 Browser<br/>localhost:3000<br/>Tutorial guide] --> IDE[💻 IDE<br/>VS Code / Android Studio<br/>Edit Flutter code]
+    IDE --> D[📱 Device<br/>iPhone / Android<br/>See & hear changes]
+    D --> B
+```
+
+**`docs/chapters/02-semantics/index.mdx` — Widget tree vs Semantics tree:**
+```mermaid
+graph TD
+    subgraph Widget Tree
+        A[MaterialApp] --> B[Scaffold]
+        B --> C[Row]
+        C --> D[Icon]
+        C --> E[Text '$4,285.50']
+    end
+    subgraph Semantics Tree
+        F[Account card<br/>label: 'Current account,<br/>four thousand...pounds']
+    end
+    C -.->|MergeSemantics| F
+```
+
+**`docs/chapters/03-navigation/index.mdx` — Broken vs fixed focus order:**
+```mermaid
+graph LR
+    subgraph Broken order
+        E1[Email] --> B1[Login button] --> P1[Password]
+    end
+    subgraph Fixed order
+        E2[Email] --> P2[Password] --> B2[Login button]
+    end
+```
+
+**`docs/chapters/00-toolkit/index.mdx` — Chapter learning path** (optional overview diagram showing ch 0→9 as a flow with topic labels).
+
+### Non-goals
+- No diagrams in every chapter — only where a visual genuinely aids understanding over prose
+- Diagrams use Mermaid's default theming (respects Docusaurus light/dark mode automatically)
+
+---
+
+## 6. Constraints & Non-Goals
 
 - No server, no login — localStorage only
 - No analytics or cross-device sync
