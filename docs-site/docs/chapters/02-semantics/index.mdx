@@ -1,0 +1,249 @@
+---
+sidebar_position: 1
+slug: /chapters/semantics
+title: "Chapter 2: Speaking the Language"
+description: "Add semantic labels, hints, and values to the Account Overview screen, merge related nodes, and silence decorative widgets."
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# Speaking the Language
+
+> *"That was easier than I thought!"*
+
+**Estimated time:** ~25 minutes | **Focus:** Account Overview | **Branch:** `chapter-2-semantics`
+
+---
+
+Labels are the words your app speaks to users who can't see it. Right now, AccessBank's Account Overview mutters nonsense — raw numbers, generic "Button" announcements, and decorative icons announced as "Image". In this chapter you'll fix all of it.
+
+By the end, navigating the Account Overview by screen reader will feel *good*. Each account card will announce itself as a single, coherent unit. The icon buttons will tell users exactly what they do. And the decorative chrome will stay silent.
+
+---
+
+## Section 1: Adding Semantic Labels
+
+The `label` property on the `Semantics` widget provides the text that a screen reader announces when it focuses on a node. This is the single most important thing you can add.
+
+<div className="ab-step">
+  <div className="ab-step__badge">1</div>
+  <div className="ab-step__content">
+
+For account cards, a good label combines the account type and balance in natural spoken language — not the formatted number that appears on screen.
+
+Notice how the accessible version spells out the pound amount in words. Screen readers read "£4,285.50" as *"four comma two eight five point five zero"* — not what you want your users to hear when they're trying to check their savings.
+
+  </div>
+</div>
+
+<Tabs>
+  <TabItem value="before" label="Before — inaccessible" default>
+
+```dart title="lib/screens/account_overview/widgets/account_card.dart"
+// TalkBack announces: "Image" ... "Everyday Checking" ... "4285.50"
+// Three separate elements, no relationship between them.
+Card(
+  child: Row(
+    children: [
+      Icon(Icons.account_balance_wallet_outlined),
+      Column(
+        children: [
+          Text('Everyday Checking'),
+          Text('\£4,285.50'),
+        ],
+      ),
+    ],
+  ),
+)
+```
+
+  </TabItem>
+  <TabItem value="after" label="After — accessible">
+
+```dart title="lib/screens/account_overview/widgets/account_card.dart"
+// TalkBack announces: "Everyday Checking, checking account,
+// balance four thousand two hundred eighty-five pounds and fifty pence"
+// One complete, human-readable announcement.
+Semantics(
+  label: 'Everyday Checking, checking account, '
+         'balance four thousand two hundred '
+         'eighty-five pounds and fifty pence',
+  child: Card(
+    child: Row(
+      children: [
+        Icon(Icons.account_balance_wallet_outlined),
+        Column(
+          children: [
+            Text('Everyday Checking'),
+            Text('\£4,285.50'),
+          ],
+        ),
+      ],
+    ),
+  ),
+)
+```
+
+  </TabItem>
+</Tabs>
+
+<div className="ab-callout ab-callout--amber">
+  <div className="ab-callout__header">Why this matters</div>
+  <p>Screen readers announce numbers differently than you might expect. "£4,285.50" becomes "four comma two eight five point five zero" — completely ambiguous. Spelling amounts out in words ("four thousand two hundred eighty-five pounds and fifty pence") removes all ambiguity. This is what the <code>_spellOutAmount()</code> helper in the real code does.</p>
+</div>
+
+---
+
+## Section 2: Hints and Values
+
+Beyond `label`, the `Semantics` widget gives you two more powerful tools for communication.
+
+<div className="ab-step">
+  <div className="ab-step__badge">1</div>
+  <div className="ab-step__content">
+
+**`hint`** — Extra guidance about what will happen when the user activates the element. VoiceOver announces hints after a brief pause following the label: *"Transfer money. Double tap to start a transfer."*
+
+**`value`** — The current state of an element. Used for toggles ("on"/"off"), sliders ("75%"), or any element whose content changes dynamically.
+
+  </div>
+</div>
+
+<div className="ab-step">
+  <div className="ab-step__badge">2</div>
+  <div className="ab-step__content">
+
+The quick-action buttons on the Account Overview are the perfect example. Right now, all four are announced as "Button". With a `label` and `hint`, each one becomes self-documenting.
+
+  </div>
+</div>
+
+<Tabs>
+  <TabItem value="before" label="Before — inaccessible" default>
+
+```dart title="lib/screens/account_overview/widgets/quick_actions.dart"
+// TalkBack announces: "Button" — four times in a row.
+// Users have no idea what any of these buttons do.
+Row(
+  mainAxisAlignment: MainAxisAlignment.spaceAround,
+  children: [
+    IconButton(
+      iconSize: 32,
+      padding: EdgeInsets.zero,
+      constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
+      icon: const Icon(Icons.swap_horiz),
+      onPressed: () {},
+    ),
+    IconButton(
+      iconSize: 32,
+      padding: EdgeInsets.zero,
+      constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
+      icon: const Icon(Icons.payment),
+      onPressed: () {},
+    ),
+    // ... two more identical-looking buttons
+  ],
+)
+```
+
+  </TabItem>
+  <TabItem value="after" label="After — accessible">
+
+```dart title="lib/screens/account_overview/widgets/quick_actions.dart"
+// TalkBack announces: "Transfer money. Double tap to start a transfer."
+// Each button now clearly communicates its purpose and action.
+Row(
+  mainAxisAlignment: MainAxisAlignment.spaceAround,
+  children: [
+    Semantics(
+      label: 'Transfer money',
+      hint: 'Double tap to start a transfer',
+      button: true,
+      child: Tooltip(
+        message: 'Transfer money',
+        child: SizedBox(
+          width: 48,
+          height: 48,
+          child: IconButton(
+            iconSize: 28,
+            padding: EdgeInsets.zero,
+            icon: const Icon(Icons.swap_horiz),
+            onPressed: () {},
+          ),
+        ),
+      ),
+    ),
+    Semantics(
+      label: 'Pay a bill',
+      hint: 'Double tap to pay a bill',
+      button: true,
+      child: Tooltip(
+        message: 'Pay a bill',
+        child: SizedBox(
+          width: 48,
+          height: 48,
+          child: IconButton(
+            iconSize: 28,
+            padding: EdgeInsets.zero,
+            icon: const Icon(Icons.payment),
+            onPressed: () {},
+          ),
+        ),
+      ),
+    ),
+    // More actions follow the same pattern...
+  ],
+)
+```
+
+  </TabItem>
+</Tabs>
+
+<div className="ab-callout ab-callout--blue">
+  <div className="ab-callout__header">💡 Try it yourself</div>
+  <p>Use the toggle in the tutorial panel to switch between the "before" and "after" versions. Enable your screen reader and swipe through the quick-action buttons in both states. Count how many swipes you need to understand all four actions in each version.</p>
+</div>
+
+---
+
+## Section 3: The Semantics Widget — All the Properties You Need
+
+The `Semantics` widget has over 30 properties. Here are the ones you'll reach for most often:
+
+<div className="ab-step">
+  <div className="ab-step__badge">1</div>
+  <div className="ab-step__content">
+
+| Property | Purpose | Example |
+|---|---|---|
+| `label` | What the element *is* | `'Everyday Checking account'` |
+| `hint` | What will happen when activated | `'Double tap to view transactions'` |
+| `value` | Current state or content | `'£1,250.00'` or `'on'` |
+| `button` | Marks the node as a button role | `button: true` |
+| `header` | Marks the node as a heading | `header: true` |
+| `image` | Marks the node as an image | `image: true` |
+| `liveRegion` | Announces changes automatically | `liveRegion: true` |
+| `enabled` | Whether the element is interactive | `enabled: false` |
+| `onTap` | Custom semantic tap action | For non-standard interactive widgets |
+
+  </div>
+</div>
+
+<div className="ab-step">
+  <div className="ab-step__badge">2</div>
+  <div className="ab-step__content">
+
+You don't always need to set all of these manually. Flutter's built-in widgets set role properties automatically:
+
+- `ElevatedButton`, `TextButton`, `FilledButton` — automatically set `button: true`
+- `Checkbox`, `Switch` — automatically set `checked` state and `value`
+- `Slider` — automatically announces its current `value`
+- `TextField` with `labelText` — automatically provides a persistent label
+
+Your job is mainly to provide `label` and `hint` for custom widgets and icon buttons.
+
+  </div>
+</div>
+
+---

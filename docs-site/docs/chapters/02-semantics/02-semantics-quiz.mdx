@@ -1,0 +1,46 @@
+---
+sidebar_position: 3
+slug: /chapters/semantics/quiz
+title: "Quiz"
+description: "Check your understanding of Chapter 2."
+---
+
+import { Quiz, QuizQuestion } from '@site/src/components/Quiz';
+
+# Check Your Understanding
+
+<Quiz chapterId="ch02">
+  <QuizQuestion
+    question="Which Semantics property provides the text a screen reader announces when it focuses on a widget?"
+    options={[
+      "hint",
+      "value",
+      "label",
+      "tooltip",
+    ]}
+    correctIndex={2}
+    explanation="label is the primary text announced when a screen reader focuses on a node. hint provides additional guidance about what will happen on activation, and value describes the current state or content of the element."
+  />
+  <QuizQuestion
+    question="What does the MergeSemantics widget do?"
+    options={[
+      "Removes all semantics from its subtree",
+      "Combines all descendant semantics nodes into one node",
+      "Copies semantics from a sibling widget",
+      "Adds a spoken label to each child widget",
+    ]}
+    correctIndex={1}
+    explanation="MergeSemantics merges all descendant semantics nodes into a single node. This is useful for compound elements like cards where you want one announcement per item, not one per child widget. Combined with a Semantics(label: ...) wrapper, it creates a single clean announcement."
+  />
+  <QuizQuestion
+    question="When should you use ExcludeSemantics?"
+    options={[
+      "For all images in the app",
+      "For any element a user might interact with",
+      "For purely decorative elements that carry no information",
+      "For text that is already announced by a parent label",
+    ]}
+    correctIndex={2}
+    explanation="ExcludeSemantics hides a widget subtree from the semantics tree. It's appropriate for decorative elements — background patterns, separator lines, repeated decorative icons — that would create noise without adding information. Never use it on elements that carry meaning not conveyed elsewhere."
+  />
+</Quiz>
