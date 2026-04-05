@@ -1,5 +1,6 @@
 ---
 sidebar_position: 1
+slug: /chapters/toolkit
 title: "Chapter 0: Your Accessibility Toolkit"
 description: "Enable a screen reader, learn the essential gestures, and discover the Flutter tools that make accessibility testing fast and repeatable."
 ---
@@ -353,7 +354,7 @@ Now for the developer tooling. Flutter provides two built-in tools for inspectin
 </div>
 
 <Tabs>
-  <TabItem value="before" label="Before">
+  <TabItem value="before" label="Before" default>
 
 ```dart title="lib/main.dart"
 MaterialApp(
@@ -364,7 +365,7 @@ MaterialApp(
 ```
 
   </TabItem>
-  <TabItem value="after" label="After" default>
+  <TabItem value="after" label="After">
 
 ```dart title="lib/main.dart"
 MaterialApp(
@@ -419,46 +420,6 @@ This inspector works on device, simulator, and Flutter Web with no extra tooling
   <div className="ab-callout__header">✓ Checkpoint</div>
   <p>Before moving on, confirm you can: (1) turn your platform's screen reader on and off without help, (2) swipe through elements and double-tap to activate them, and (3) see the semantics overlay when you add <code>showSemanticsDebugger: true</code>. If any of these aren't working, revisit the steps above.</p>
 </div>
-
----
-
-## Check Your Understanding
-
-<details>
-<summary>Question 1: Which gesture activates the currently focused element when using TalkBack or VoiceOver?</summary>
-
-**A) Single tap**
-**B) Double tap** ✅
-**C) Long press**
-**D) Three-finger swipe**
-
-With a screen reader active, a single tap moves focus to an element and announces it. A **double tap** activates it — equivalent to what a regular single tap does without the screen reader.
-
-</details>
-
-<details>
-<summary>Question 2: What does `showSemanticsDebugger: true` do in MaterialApp?</summary>
-
-**A) Enables TalkBack automatically on the device**
-**B) Draws a visual overlay showing the semantics tree nodes** ✅
-**C) Logs the semantics tree to the console**
-**D) Breaks the build so you remember to remove it**
-
-`showSemanticsDebugger: true` adds a visual overlay to the app that outlines and labels every widget that has associated semantics data. It's a great tool for a quick visual audit without needing to use a screen reader.
-
-</details>
-
-<details>
-<summary>Question 3: How do you navigate between elements with a screen reader on a touchscreen?</summary>
-
-**A) Tap each element directly**
-**B) Swipe up and down**
-**C) Swipe right and left** ✅
-**D) Use the volume buttons**
-
-Swiping **right** moves focus to the next accessible element; swiping **left** moves to the previous one. This is the primary navigation gesture on both TalkBack (Android) and VoiceOver (iOS).
-
-</details>
 
 ---
 

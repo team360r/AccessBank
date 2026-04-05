@@ -1,0 +1,46 @@
+---
+sidebar_position: 2
+slug: /chapters/toolkit/quiz
+title: "Quiz"
+description: "Check your understanding of Chapter 0."
+---
+
+import { Quiz, QuizQuestion } from '@site/src/components/Quiz';
+
+# Check Your Understanding
+
+<Quiz chapterId="ch00">
+  <QuizQuestion
+    question="Which gesture activates the currently focused element when using TalkBack or VoiceOver?"
+    options={[
+      "Single tap",
+      "Double tap",
+      "Long press",
+      "Three-finger swipe",
+    ]}
+    correctIndex={1}
+    explanation="With a screen reader active, a single tap moves focus to an element and announces it. A double tap activates it — equivalent to what a regular single tap does without the screen reader."
+  />
+  <QuizQuestion
+    question="What does showSemanticsDebugger: true do in MaterialApp?"
+    options={[
+      "Enables TalkBack automatically on the device",
+      "Draws a visual overlay showing the semantics tree nodes",
+      "Logs the semantics tree to the console",
+      "Breaks the build so you remember to remove it",
+    ]}
+    correctIndex={1}
+    explanation="showSemanticsDebugger: true adds a visual overlay to the app that outlines and labels every widget that has associated semantics data. It's a great tool for a quick visual audit without needing to use a screen reader."
+  />
+  <QuizQuestion
+    question="How do you navigate between elements with a screen reader on a touchscreen?"
+    options={[
+      "Tap each element directly",
+      "Swipe up and down",
+      "Swipe right and left",
+      "Use the volume buttons",
+    ]}
+    correctIndex={2}
+    explanation="Swiping right moves focus to the next accessible element; swiping left moves to the previous one. This is the primary navigation gesture on both TalkBack (Android) and VoiceOver (iOS)."
+  />
+</Quiz>
