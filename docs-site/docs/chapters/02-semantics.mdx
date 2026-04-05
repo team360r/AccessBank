@@ -1,10 +1,448 @@
 ---
 sidebar_position: 3
-title: "Chapter 2: Semantics Deep Dive"
+title: "Chapter 2: Speaking the Language"
+description: "Add semantic labels, hints, and values to the Account Overview screen, merge related nodes, and silence decorative widgets."
 ---
 
-# Chapter 2: Semantics Deep Dive
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
 
-_Coming soon_
+# Speaking the Language
 
-This chapter explores Flutter's `Semantics` widget in depth: labels, hints, values, roles, and how to merge and exclude nodes from the semantic tree.
+> *"That was easier than I thought!"*
+
+**Estimated time:** ~25 minutes | **Focus:** Account Overview | **Branch:** `chapter-2-semantics`
+
+---
+
+Labels are the words your app speaks to users who can't see it. Right now, AccessBank's Account Overview mutters nonsense — raw numbers, generic "Button" announcements, and decorative icons announced as "Image". In this chapter you'll fix all of it.
+
+By the end, navigating the Account Overview by screen reader will feel *good*. Each account card will announce itself as a single, coherent unit. The icon buttons will tell users exactly what they do. And the decorative chrome will stay silent.
+
+---
+
+## Section 1: Adding Semantic Labels
+
+The `label` property on the `Semantics` widget provides the text that a screen reader announces when it focuses on a node. This is the single most important thing you can add.
+
+<div className="ab-step">
+  <div className="ab-step__badge">1</div>
+  <div className="ab-step__content">
+
+For account cards, a good label combines the account type and balance in natural spoken language — not the formatted number that appears on screen.
+
+Notice how the accessible version spells out the dollar amount in words. Screen readers read "$4,285.50" as *"four comma two eight five point five zero"* — not what you want your users to hear when they're trying to check their savings.
+
+  </div>
+</div>
+
+<Tabs>
+  <TabItem value="before" label="Before — inaccessible">
+
+```dart title="lib/screens/account_overview/widgets/account_card.dart"
+// TalkBack announces: "Image" ... "Everyday Checking" ... "4285.50"
+// Three separate elements, no relationship between them.
+Card(
+  child: Row(
+    children: [
+      Icon(Icons.account_balance_wallet_outlined),
+      Column(
+        children: [
+          Text('Everyday Checking'),
+          Text('\$4,285.50'),
+        ],
+      ),
+    ],
+  ),
+)
+```
+
+  </TabItem>
+  <TabItem value="after" label="After — accessible" default>
+
+```dart title="lib/screens/account_overview/widgets/account_card.dart"
+// TalkBack announces: "Everyday Checking, checking account,
+// balance four thousand two hundred eighty-five dollars and fifty cents"
+// One complete, human-readable announcement.
+Semantics(
+  label: 'Everyday Checking, checking account, '
+         'balance four thousand two hundred '
+         'eighty-five dollars and fifty cents',
+  child: Card(
+    child: Row(
+      children: [
+        Icon(Icons.account_balance_wallet_outlined),
+        Column(
+          children: [
+            Text('Everyday Checking'),
+            Text('\$4,285.50'),
+          ],
+        ),
+      ],
+    ),
+  ),
+)
+```
+
+  </TabItem>
+</Tabs>
+
+<div className="ab-callout ab-callout--amber">
+  <div className="ab-callout__header">Why this matters</div>
+  <p>Screen readers announce numbers differently than you might expect. "$4,285.50" becomes "four comma two eight five point five zero" — completely ambiguous. Spelling amounts out in words ("four thousand two hundred eighty-five dollars and fifty cents") removes all ambiguity. This is what the <code>_spellOutAmount()</code> helper in the real code does.</p>
+</div>
+
+---
+
+## Section 2: Hints and Values
+
+Beyond `label`, the `Semantics` widget gives you two more powerful tools for communication.
+
+<div className="ab-step">
+  <div className="ab-step__badge">1</div>
+  <div className="ab-step__content">
+
+**`hint`** — Extra guidance about what will happen when the user activates the element. VoiceOver announces hints after a brief pause following the label: *"Transfer money. Double tap to start a transfer."*
+
+**`value`** — The current state of an element. Used for toggles ("on"/"off"), sliders ("75%"), or any element whose content changes dynamically.
+
+  </div>
+</div>
+
+<div className="ab-step">
+  <div className="ab-step__badge">2</div>
+  <div className="ab-step__content">
+
+The quick-action buttons on the Account Overview are the perfect example. Right now, all four are announced as "Button". With a `label` and `hint`, each one becomes self-documenting.
+
+  </div>
+</div>
+
+<Tabs>
+  <TabItem value="before" label="Before — inaccessible">
+
+```dart title="lib/screens/account_overview/widgets/quick_actions.dart"
+// TalkBack announces: "Button" — four times in a row.
+// Users have no idea what any of these buttons do.
+Row(
+  mainAxisAlignment: MainAxisAlignment.spaceAround,
+  children: [
+    IconButton(
+      iconSize: 32,
+      padding: EdgeInsets.zero,
+      constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
+      icon: const Icon(Icons.swap_horiz),
+      onPressed: () {},
+    ),
+    IconButton(
+      iconSize: 32,
+      padding: EdgeInsets.zero,
+      constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
+      icon: const Icon(Icons.payment),
+      onPressed: () {},
+    ),
+    // ... two more identical-looking buttons
+  ],
+)
+```
+
+  </TabItem>
+  <TabItem value="after" label="After — accessible" default>
+
+```dart title="lib/screens/account_overview/widgets/quick_actions.dart"
+// TalkBack announces: "Transfer money. Double tap to start a transfer."
+// Each button now clearly communicates its purpose and action.
+Row(
+  mainAxisAlignment: MainAxisAlignment.spaceAround,
+  children: [
+    Semantics(
+      label: 'Transfer money',
+      hint: 'Double tap to start a transfer',
+      button: true,
+      child: Tooltip(
+        message: 'Transfer money',
+        child: SizedBox(
+          width: 48,
+          height: 48,
+          child: IconButton(
+            iconSize: 28,
+            padding: EdgeInsets.zero,
+            icon: const Icon(Icons.swap_horiz),
+            onPressed: () {},
+          ),
+        ),
+      ),
+    ),
+    Semantics(
+      label: 'Pay a bill',
+      hint: 'Double tap to pay a bill',
+      button: true,
+      child: Tooltip(
+        message: 'Pay a bill',
+        child: SizedBox(
+          width: 48,
+          height: 48,
+          child: IconButton(
+            iconSize: 28,
+            padding: EdgeInsets.zero,
+            icon: const Icon(Icons.payment),
+            onPressed: () {},
+          ),
+        ),
+      ),
+    ),
+    // More actions follow the same pattern...
+  ],
+)
+```
+
+  </TabItem>
+</Tabs>
+
+<div className="ab-callout ab-callout--blue">
+  <div className="ab-callout__header">💡 Try it yourself</div>
+  <p>Use the toggle in the tutorial panel to switch between the "before" and "after" versions. Enable your screen reader and swipe through the quick-action buttons in both states. Count how many swipes you need to understand all four actions in each version.</p>
+</div>
+
+---
+
+## Section 3: The Semantics Widget — All the Properties You Need
+
+The `Semantics` widget has over 30 properties. Here are the ones you'll reach for most often:
+
+<div className="ab-step">
+  <div className="ab-step__badge">1</div>
+  <div className="ab-step__content">
+
+| Property | Purpose | Example |
+|---|---|---|
+| `label` | What the element *is* | `'Everyday Checking account'` |
+| `hint` | What will happen when activated | `'Double tap to view transactions'` |
+| `value` | Current state or content | `'£1,250.00'` or `'on'` |
+| `button` | Marks the node as a button role | `button: true` |
+| `header` | Marks the node as a heading | `header: true` |
+| `image` | Marks the node as an image | `image: true` |
+| `liveRegion` | Announces changes automatically | `liveRegion: true` |
+| `enabled` | Whether the element is interactive | `enabled: false` |
+| `onTap` | Custom semantic tap action | For non-standard interactive widgets |
+
+  </div>
+</div>
+
+<div className="ab-step">
+  <div className="ab-step__badge">2</div>
+  <div className="ab-step__content">
+
+You don't always need to set all of these manually. Flutter's built-in widgets set role properties automatically:
+
+- `ElevatedButton`, `TextButton`, `FilledButton` — automatically set `button: true`
+- `Checkbox`, `Switch` — automatically set `checked` state and `value`
+- `Slider` — automatically announces its current `value`
+- `TextField` with `labelText` — automatically provides a persistent label
+
+Your job is mainly to provide `label` and `hint` for custom widgets and icon buttons.
+
+  </div>
+</div>
+
+---
+
+## Section 4: MergeSemantics — One Card, One Announcement
+
+Without `MergeSemantics`, a screen reader visits each child of a widget separately. On the Account Overview, that means: icon → account name → balance → three more elements. Six focus stops per account card. Exhausting.
+
+<div className="ab-step">
+  <div className="ab-step__badge">1</div>
+  <div className="ab-step__content">
+
+`MergeSemantics` combines all descendant semantics nodes into a single node. When used together with a `Semantics` label, it creates one clean announcement for the entire card — and prevents the screen reader from diving into child elements separately.
+
+  </div>
+</div>
+
+<Tabs>
+  <TabItem value="before" label="Before — 6 focus stops per card">
+
+```dart title="lib/screens/account_overview/widgets/account_card.dart"
+// Screen reader visits each element separately:
+// 1. Icon: "Image"
+// 2. Account name: "Everyday Checking"
+// 3. Balance: "4285.50"
+// = 3 focus stops just to understand one account card
+Row(
+  children: [
+    Icon(Icons.account_balance_wallet_outlined),
+    Column(
+      children: [
+        Text('Everyday Checking'),
+        Text('\$4,285.50'),
+      ],
+    ),
+  ],
+)
+```
+
+  </TabItem>
+  <TabItem value="after" label="After — 1 focus stop per card" default>
+
+```dart title="lib/screens/account_overview/widgets/account_card.dart"
+// Screen reader announces the whole card as one unit:
+// "Everyday Checking, checking account,
+//  balance four thousand two hundred eighty-five dollars and fifty cents"
+MergeSemantics(
+  child: Semantics(
+    label: spokenLabel, // The complete spoken description
+    child: Row(
+      children: [
+        Icon(Icons.account_balance_wallet_outlined),
+        Column(
+          children: [
+            Text('Everyday Checking'),
+            Text('\$4,285.50'),
+          ],
+        ),
+      ],
+    ),
+  ),
+)
+```
+
+  </TabItem>
+</Tabs>
+
+<div className="ab-callout ab-callout--amber">
+  <div className="ab-callout__header">Why this matters</div>
+  <p>On the Account Overview screen with three account cards, that's the difference between 9+ focus stops versus 3. Screen reader users navigate linearly — every unnecessary stop adds cognitive load and time. The fewer stops required to understand a screen, the better.</p>
+</div>
+
+---
+
+## Section 5: ExcludeSemantics — Silencing the Noise
+
+`ExcludeSemantics` hides a widget subtree from the semantics tree entirely. Decorative elements that add visual interest but carry no information should be invisible to screen readers.
+
+<div className="ab-step">
+  <div className="ab-step__badge">1</div>
+  <div className="ab-step__content">
+
+The account card icon (`Icons.account_balance_wallet_outlined`) is a good example. Its meaning — "this is a bank account" — is already covered by the `label` on the `Semantics` wrapper. Without `ExcludeSemantics`, VoiceOver might announce it separately as "Image", creating redundant noise.
+
+  </div>
+</div>
+
+<Tabs>
+  <TabItem value="before" label="Before — decorative icon is announced">
+
+```dart title="lib/screens/account_overview/widgets/account_card.dart"
+// The icon gets its own semantics announcement: "Image"
+// This is redundant — the label already describes the account type.
+Icon(
+  Icons.account_balance_wallet_outlined,
+  color: inaccessible.lightBlueOnWhite,
+  size: 32,
+)
+```
+
+  </TabItem>
+  <TabItem value="after" label="After — decorative icon is silenced" default>
+
+```dart title="lib/screens/account_overview/widgets/account_card.dart"
+// The icon is completely invisible to screen readers.
+// Its meaning is conveyed by the parent Semantics label instead.
+ExcludeSemantics(
+  child: Icon(
+    _iconForType(account.type),
+    color: AppColors.primary, // Also fixed the contrast!
+    size: 32,
+  ),
+)
+```
+
+  </TabItem>
+</Tabs>
+
+<div className="ab-callout ab-callout--blue">
+  <div className="ab-callout__header">💡 When to use ExcludeSemantics</div>
+  <p>Use it for: background patterns, separator lines, decorative repeated icons, visual flourishes. Do NOT use it on anything that carries meaning not conveyed elsewhere — that would hide information from screen reader users.</p>
+</div>
+
+---
+
+## Section 6: Hear the Difference
+
+<div className="ab-step">
+  <div className="ab-step__badge">1</div>
+  <div className="ab-step__content">
+
+Use the toggle at the top of the tutorial panel to switch between the "Before" and "After" versions of the Account Overview screen.
+
+Enable your screen reader and swipe through both versions. The "after" version should feel dramatically more coherent — each account announces as a single meaningful unit, the quick-action buttons are self-documenting, and the decorative noise is gone.
+
+  </div>
+</div>
+
+<div className="ab-callout ab-callout--blue">
+  <div className="ab-callout__header">💡 Try it yourself</div>
+  <p>Toggle between the accessible and original versions with your screen reader active. Count how many swipes you need to understand the account information in each version. What's the difference?</p>
+</div>
+
+<div className="ab-callout ab-callout--green">
+  <div className="ab-callout__header">✓ Checkpoint</div>
+  <p>In the accessible version, navigating the entire Account Overview should require: one swipe per account card (not six), four clearly labelled quick-action buttons, and no "Image" or "Button" announcements. If you're still hearing those, check that <code>MergeSemantics</code> is wrapping the card and <code>ExcludeSemantics</code> is wrapping the icon.</p>
+</div>
+
+---
+
+## Check Your Understanding
+
+<details>
+<summary>Question 1: Which Semantics property provides the text a screen reader announces when it focuses on a widget?</summary>
+
+**A) hint**
+**B) value**
+**C) label** ✅
+**D) tooltip**
+
+`label` is the primary text announced when a screen reader focuses on a node. `hint` provides additional guidance about what will happen on activation, and `value` describes the current state or content of the element.
+
+</details>
+
+<details>
+<summary>Question 2: What does the MergeSemantics widget do?</summary>
+
+**A) Removes all semantics from its subtree**
+**B) Combines all descendant semantics nodes into one node** ✅
+**C) Copies semantics from a sibling widget**
+**D) Adds a spoken label to each child widget**
+
+`MergeSemantics` merges all descendant semantics nodes into a single node. This is useful for compound elements like cards where you want one announcement per item, not one per child widget. Combined with a `Semantics(label: ...)` wrapper, it creates a single clean announcement.
+
+</details>
+
+<details>
+<summary>Question 3: When should you use ExcludeSemantics?</summary>
+
+**A) For all images in the app**
+**B) For any element a user might interact with**
+**C) For purely decorative elements that carry no information** ✅
+**D) For text that is already announced by a parent label**
+
+`ExcludeSemantics` hides a widget subtree from the semantics tree. It's appropriate for decorative elements — background patterns, separator lines, repeated decorative icons — that would create noise without adding information. Never use it on elements that carry meaning not conveyed elsewhere.
+
+</details>
+
+---
+
+## Deep Dive
+
+- [Semantics class — Flutter API documentation](https://api.flutter.dev/flutter/widgets/Semantics-class.html)
+- [MergeSemantics — Flutter API documentation](https://api.flutter.dev/flutter/widgets/MergeSemantics-class.html)
+- [ExcludeSemantics — Flutter API documentation](https://api.flutter.dev/flutter/widgets/ExcludeSemantics-class.html)
+- [WCAG 1.1.1 — Non-text Content](https://www.w3.org/WAI/WCAG21/Understanding/non-text-content.html)
+- [WCAG 4.1.2 — Name, Role, Value](https://www.w3.org/WAI/WCAG21/Understanding/name-role-value.html)
+
+---
+
+## What's Next
+
+The Account Overview now speaks clearly. But speaking clearly is only half the problem — users also need to be able to *navigate* to what they want efficiently. In **Chapter 3: Finding Your Way**, you'll fix the Login screen's broken focus order, trap focus properly inside modal dialogs, and add skip navigation for keyboard users.

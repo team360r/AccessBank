@@ -1,10 +1,476 @@
 ---
 sidebar_position: 1
-title: "Chapter 0: Setting Up Your Toolkit"
+title: "Chapter 0: Your Accessibility Toolkit"
+description: "Enable a screen reader, learn the essential gestures, and discover the Flutter tools that make accessibility testing fast and repeatable."
 ---
 
-# Chapter 0: Setting Up Your Toolkit
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
 
-_Coming soon_
+# Your Accessibility Toolkit
 
-This chapter covers setting up the accessibility tools you'll use throughout this tutorial: enabling TalkBack on Android, VoiceOver on iOS, Flutter's Semantics Debugger, and the Accessibility Scanner.
+> *"Now I know how to hear what my users hear."*
+
+**Estimated time:** ~15 minutes | **Focus:** Demo screen | **Branch:** `chapter-0-toolkit`
+
+---
+
+Before you write a single line of accessible code, you need to know how to *hear* what your users hear. This chapter is your hands-on introduction to screen readers — the assistive technology that tens of millions of people use every day to navigate their phones.
+
+By the end of this chapter you will be able to turn VoiceOver and TalkBack on (and crucially, **off** again), navigate a screen by swiping, and use Flutter's built-in debugging tools to inspect your app's semantics tree.
+
+---
+
+## Section 1: iOS VoiceOver — The Complete Guide
+
+VoiceOver is Apple's screen reader, built into every iPhone and iPad. When it's on, the touchscreen works completely differently: a single tap announces the element under your finger, and a **double tap** activates it. Don't panic — this is normal.
+
+### Turning VoiceOver On (and Off)
+
+<div className="ab-step">
+  <div className="ab-step__badge">1</div>
+  <div className="ab-step__content">
+
+**The Settings route:** Go to **Settings → Accessibility → VoiceOver** and toggle it on.
+
+Once it's on, your screen will speak every element you touch. The first thing it will say is something like *"VoiceOver on."* You're doing brilliantly already.
+
+  </div>
+</div>
+
+<div className="ab-step">
+  <div className="ab-step__badge">2</div>
+  <div className="ab-step__content">
+
+**Set up the shortcut (do this now, before you turn it on):** Go to **Settings → Accessibility → Accessibility Shortcut** and select **VoiceOver**. Now you can triple-click the side button (or Home button on older iPhones) to toggle VoiceOver instantly.
+
+This shortcut is your escape hatch. Keep it in mind — it works even when you're completely lost inside a VoiceOver session.
+
+  </div>
+</div>
+
+<div className="ab-step">
+  <div className="ab-step__badge">3</div>
+  <div className="ab-step__content">
+
+**Turning VoiceOver OFF:** Triple-click the side button again. Or say *"Hey Siri, turn off VoiceOver."* Or navigate to Settings → Accessibility → VoiceOver and toggle it off (remember: **single tap to focus, double tap to activate**).
+
+  </div>
+</div>
+
+<div className="ab-callout ab-callout--amber">
+  <div className="ab-callout__header">⚠️ The screen now works differently</div>
+  <p>With VoiceOver on, you cannot just tap things to activate them. A single tap <strong>focuses and reads</strong> the element. A <strong>double tap</strong> activates it. This trips everyone up the first time. Take a breath — triple-click the side button if you get stuck.</p>
+</div>
+
+### Essential VoiceOver Gestures
+
+<div className="ab-step">
+  <div className="ab-step__badge">4</div>
+  <div className="ab-step__content">
+
+**Navigate between elements:** Swipe **right** to move to the next element; swipe **left** to move to the previous element. VoiceOver reads each element aloud as you land on it.
+
+  </div>
+</div>
+
+<div className="ab-step">
+  <div className="ab-step__badge">5</div>
+  <div className="ab-step__content">
+
+**Activate (tap) the focused element:** **Double tap** anywhere on the screen to activate the currently focused element. It doesn't matter where on the screen you double tap — VoiceOver activates whatever has focus.
+
+  </div>
+</div>
+
+<div className="ab-step">
+  <div className="ab-step__badge">6</div>
+  <div className="ab-step__content">
+
+**Explore by touch:** Drag your finger slowly around the screen. VoiceOver reads whatever is under your fingertip. This is great for discovering what's on an unfamiliar screen.
+
+  </div>
+</div>
+
+<div className="ab-step">
+  <div className="ab-step__badge">7</div>
+  <div className="ab-step__content">
+
+**Scroll:** Use a **three-finger swipe** up or down to scroll. A regular swipe with VoiceOver active moves focus between elements, so scrolling requires three fingers.
+
+  </div>
+</div>
+
+<div className="ab-step">
+  <div className="ab-step__badge">8</div>
+  <div className="ab-step__content">
+
+**Read everything from here:** **Two-finger swipe up** reads all content from the current element to the end of the screen. Useful for reading long articles or lists without swiping element by element.
+
+  </div>
+</div>
+
+### VoiceOver Gestures That Will Save You
+
+These gestures are less obvious but enormously useful:
+
+<div className="ab-step">
+  <div className="ab-step__badge">9</div>
+  <div className="ab-step__content">
+
+**Go back (the safe escape):** Make a **two-finger scrub** — draw a Z or zigzag shape with two fingers. This is equivalent to the back button and works in most apps. Muscle memory for this one is worth building early.
+
+  </div>
+</div>
+
+<div className="ab-step">
+  <div className="ab-step__badge">10</div>
+  <div className="ab-step__content">
+
+**Screen Curtain (advanced):** **Three-finger triple-tap** turns the display off while VoiceOver remains active. The screen goes black, but you can still navigate by sound. This is how blind users use their phones. Try it for 60 seconds to build real empathy.
+
+  </div>
+</div>
+
+<div className="ab-step">
+  <div className="ab-step__badge">11</div>
+  <div className="ab-step__content">
+
+**Jump to first/last element:** **Four-finger tap at the top** of the screen jumps to the first element; **four-finger tap at the bottom** jumps to the last element. Handy for long screens.
+
+  </div>
+</div>
+
+### Switching Apps with VoiceOver Active
+
+<div className="ab-step">
+  <div className="ab-step__badge">12</div>
+  <div className="ab-step__content">
+
+**Go to the Home Screen:** Swipe up from the bottom of the screen with **one finger** (on Face ID iPhones, this requires a two-stage swipe — VoiceOver intercepts the first swipe, so swipe again). Or just say *"Hey Siri, go home."*
+
+  </div>
+</div>
+
+<div className="ab-step">
+  <div className="ab-step__badge">13</div>
+  <div className="ab-step__content">
+
+**App Switcher:** Double-tap and hold the bottom of the screen, then swipe left or right. Or swipe up, pause mid-screen, then release.
+
+  </div>
+</div>
+
+<div className="ab-callout ab-callout--blue">
+  <div className="ab-callout__header">💡 Try it yourself</div>
+  <p>Enable VoiceOver using the triple-click shortcut. Navigate to your Settings app using only swipes and double-taps. Then navigate back to AccessBank. Time yourself. Most developers find this takes 3–5 minutes the first time — and that's completely normal.</p>
+</div>
+
+### The Rotor
+
+<div className="ab-step">
+  <div className="ab-step__badge">14</div>
+  <div className="ab-step__content">
+
+The **Rotor** is a virtual dial that changes what the swipe-up/swipe-down gestures do. To open it, **rotate two fingers** on the screen as if turning a dial. You'll hear options like "Words", "Characters", "Headings", "Links". Select one, then swipe up/down to navigate by that type of element.
+
+For developers, the most useful Rotor options are **Headings** (navigate between section headers) and **Form Controls** (jump between text fields and buttons).
+
+  </div>
+</div>
+
+---
+
+## Section 2: Android TalkBack — The Complete Guide
+
+TalkBack is Google's screen reader, built into all Android devices. The core model is the same as VoiceOver — single touch to focus and hear, double tap to activate — but the gestures differ.
+
+### Turning TalkBack On (and Off)
+
+<div className="ab-step">
+  <div className="ab-step__badge">1</div>
+  <div className="ab-step__content">
+
+**The Settings route:** Go to **Settings → Accessibility → TalkBack** (the exact path varies by manufacturer — Samsung devices often call it "Screen Reader") and toggle it on. You'll hear a welcome message.
+
+  </div>
+</div>
+
+<div className="ab-step">
+  <div className="ab-step__badge">2</div>
+  <div className="ab-step__content">
+
+**The shortcut (set this up first):** On most Android devices, hold **both volume buttons simultaneously for 3 seconds** to toggle TalkBack on or off. This is your escape hatch — commit it to muscle memory.
+
+  </div>
+</div>
+
+<div className="ab-step">
+  <div className="ab-step__badge">3</div>
+  <div className="ab-step__content">
+
+**Turning TalkBack OFF:** Use the volume button shortcut (hold both volume buttons for 3 seconds), or navigate to Settings → Accessibility → TalkBack and toggle off. Remember: **single tap to focus, double tap to activate**.
+
+  </div>
+</div>
+
+### Essential TalkBack Gestures
+
+<div className="ab-step">
+  <div className="ab-step__badge">4</div>
+  <div className="ab-step__content">
+
+**Navigate between elements:** Swipe **right** for the next element, swipe **left** for the previous. TalkBack reads each element as it gains focus.
+
+  </div>
+</div>
+
+<div className="ab-step">
+  <div className="ab-step__badge">5</div>
+  <div className="ab-step__content">
+
+**Activate the focused element:** **Double tap** anywhere on the screen. Like VoiceOver, you can double tap anywhere — TalkBack activates whatever has the green highlight box.
+
+  </div>
+</div>
+
+<div className="ab-step">
+  <div className="ab-step__badge">6</div>
+  <div className="ab-step__content">
+
+**Scroll:** **Three-finger swipe** up or down to scroll (or two-finger swipe, depending on your TalkBack version and settings).
+
+  </div>
+</div>
+
+<div className="ab-step">
+  <div className="ab-step__badge">7</div>
+  <div className="ab-step__content">
+
+**Reading controls:** Swipe **up then down** (an L-shape gesture) to open the TalkBack menu. Swipe **up then right** to access reading controls and change reading speed.
+
+  </div>
+</div>
+
+### TalkBack Gestures That Will Save You
+
+<div className="ab-step">
+  <div className="ab-step__badge">8</div>
+  <div className="ab-step__content">
+
+**Go back:** Swipe **left then down** (a backwards L-shape). This is the TalkBack equivalent of the back button.
+
+  </div>
+</div>
+
+<div className="ab-step">
+  <div className="ab-step__badge">9</div>
+  <div className="ab-step__content">
+
+**Go to Home Screen:** Swipe **up then left**.
+
+  </div>
+</div>
+
+<div className="ab-step">
+  <div className="ab-step__badge">10</div>
+  <div className="ab-step__content">
+
+**App Switcher:** Swipe **right then left** to open the recent apps screen.
+
+  </div>
+</div>
+
+<div className="ab-step">
+  <div className="ab-step__badge">11</div>
+  <div className="ab-step__content">
+
+**Change reading granularity:** Swipe **up or down** to change what the swipe-left/right gestures navigate by (characters, words, paragraphs, headings). Essential for moving through text fields efficiently.
+
+  </div>
+</div>
+
+---
+
+## Section 3: Practice Exercises
+
+These exercises will build real instinct for the screen-reader experience. Do each one at least once.
+
+<div className="ab-step">
+  <div className="ab-step__badge">1</div>
+  <div className="ab-step__content">
+
+**"Can you survive?"** Turn on your screen reader. Navigate to Settings. Find the Accessibility option. Turn the screen reader off again. All using only screen reader gestures. Most developers take 2–5 minutes the first time. You'll get faster with practice.
+
+  </div>
+</div>
+
+<div className="ab-step">
+  <div className="ab-step__badge">2</div>
+  <div className="ab-step__content">
+
+**"App hop"** With the screen reader on, switch from AccessBank to any other app, then switch back. Notice how much effort is required for something that's trivial with full sight.
+
+  </div>
+</div>
+
+<div className="ab-step">
+  <div className="ab-step__badge">3</div>
+  <div className="ab-step__content">
+
+**"Read a screen"** Enable the screen reader, navigate to the AccessBank Account Overview screen, and swipe through every element in order. Count how many announcements are meaningless ("Image", "Button", or just a raw number). This is what we fix in Chapter 2.
+
+  </div>
+</div>
+
+<div className="ab-step">
+  <div className="ab-step__badge">4</div>
+  <div className="ab-step__content">
+
+**"Eyes closed"** Close your eyes. Use only the screen reader. Try to check your account balance in AccessBank. This is the daily reality for users who rely on assistive technology for their banking.
+
+  </div>
+</div>
+
+<div className="ab-callout ab-callout--amber">
+  <div className="ab-callout__header">Why this matters</div>
+  <p>About 2.2 billion people worldwide have some form of vision impairment. Experiencing the app as a screen reader user — even for 60 seconds — builds more intuition than any amount of reading about accessibility theory. The frustration you feel is the empathy you need.</p>
+</div>
+
+---
+
+## Section 4: Flutter's Semantics Debugger
+
+Now for the developer tooling. Flutter provides two built-in tools for inspecting what assistive technology actually sees.
+
+<div className="ab-step">
+  <div className="ab-step__badge">1</div>
+  <div className="ab-step__content">
+
+**Enable the Semantics Debugger overlay** by setting `showSemanticsDebugger: true` on your `MaterialApp`. Every widget that has semantics data will be outlined and labelled directly on screen. This is a quick visual audit without turning on a full screen reader.
+
+  </div>
+</div>
+
+<Tabs>
+  <TabItem value="before" label="Before">
+
+```dart title="lib/main.dart"
+MaterialApp(
+  title: 'AccessBank',
+  theme: theme,
+  home: const HomeScreen(),
+)
+```
+
+  </TabItem>
+  <TabItem value="after" label="After" default>
+
+```dart title="lib/main.dart"
+MaterialApp(
+  title: 'AccessBank',
+  theme: theme,
+  // Set to true to visualise the semantics tree.
+  showSemanticsDebugger: true,
+  home: const HomeScreen(),
+)
+```
+
+  </TabItem>
+</Tabs>
+
+<div className="ab-callout ab-callout--blue">
+  <div className="ab-callout__header">💡 Try it yourself</div>
+  <p>Add <code>showSemanticsDebugger: true</code> and hot-reload. You'll see coloured boxes appear around every semantics node. Each box shows the node's label. Tap one to see its full semantics data in the debug console. Spot anything that looks wrong?</p>
+</div>
+
+<div className="ab-step">
+  <div className="ab-step__badge">2</div>
+  <div className="ab-step__content">
+
+**Flutter DevTools Accessibility Inspector** — for a deeper dive. Open DevTools by running `flutter run` and clicking the DevTools URL printed in your terminal. Navigate to the **Inspector** tab and look for the Semantics pane. It shows the full semantics tree, lets you browse each node's label, hint, value, and actions, and highlights the corresponding widget in the app.
+
+Use the Semantics Debugger overlay for quick spot-checks. Use DevTools when you need to audit the whole tree systematically.
+
+  </div>
+</div>
+
+<div className="ab-step">
+  <div className="ab-step__badge">3</div>
+  <div className="ab-step__content">
+
+**The AccessGuide Inspector** — the in-app overlay built into this tutorial. Tap the magnifying-glass icon in the tutorial panel to toggle it. Each semantics node on the demo screen gets a coloured border:
+
+- **Green border** — the node has a label ✓
+- **Red border** — an interactive element with no label ✗ (needs fixing!)
+- **Grey border** — non-interactive, no label (usually fine)
+
+This inspector works on device, simulator, and Flutter Web with no extra tooling required.
+
+  </div>
+</div>
+
+<div className="ab-callout ab-callout--blue">
+  <div className="ab-callout__header">💡 Try it yourself</div>
+  <p>Toggle the AccessGuide inspector on the demo Account Overview screen. Count how many elements show a red border (missing labels). In Chapter 2, you'll fix every single one.</p>
+</div>
+
+<div className="ab-callout ab-callout--green">
+  <div className="ab-callout__header">✓ Checkpoint</div>
+  <p>Before moving on, confirm you can: (1) turn your platform's screen reader on and off without help, (2) swipe through elements and double-tap to activate them, and (3) see the semantics overlay when you add <code>showSemanticsDebugger: true</code>. If any of these aren't working, revisit the steps above.</p>
+</div>
+
+---
+
+## Check Your Understanding
+
+<details>
+<summary>Question 1: Which gesture activates the currently focused element when using TalkBack or VoiceOver?</summary>
+
+**A) Single tap**
+**B) Double tap** ✅
+**C) Long press**
+**D) Three-finger swipe**
+
+With a screen reader active, a single tap moves focus to an element and announces it. A **double tap** activates it — equivalent to what a regular single tap does without the screen reader.
+
+</details>
+
+<details>
+<summary>Question 2: What does `showSemanticsDebugger: true` do in MaterialApp?</summary>
+
+**A) Enables TalkBack automatically on the device**
+**B) Draws a visual overlay showing the semantics tree nodes** ✅
+**C) Logs the semantics tree to the console**
+**D) Breaks the build so you remember to remove it**
+
+`showSemanticsDebugger: true` adds a visual overlay to the app that outlines and labels every widget that has associated semantics data. It's a great tool for a quick visual audit without needing to use a screen reader.
+
+</details>
+
+<details>
+<summary>Question 3: How do you navigate between elements with a screen reader on a touchscreen?</summary>
+
+**A) Tap each element directly**
+**B) Swipe up and down**
+**C) Swipe right and left** ✅
+**D) Use the volume buttons**
+
+Swiping **right** moves focus to the next accessible element; swiping **left** moves to the previous one. This is the primary navigation gesture on both TalkBack (Android) and VoiceOver (iOS).
+
+</details>
+
+---
+
+## Deep Dive
+
+- [Android TalkBack — official setup guide](https://support.google.com/accessibility/android/answer/6007100)
+- [Apple VoiceOver — turn on and practice](https://support.apple.com/guide/iphone/turn-on-and-practice-voiceover-iph3e2e415f/ios)
+- [Flutter DevTools — Inspector documentation](https://docs.flutter.dev/tools/devtools/inspector)
+- [Flutter accessibility overview](https://docs.flutter.dev/accessibility-and-internationalization/accessibility)
+
+---
+
+## What's Next
+
+You've got your screen reader working and Flutter's debugging tools in hand. Now it's time to actually use them. In **Chapter 1: Welcome to AccessBank**, you'll take a guided tour of the app — first with your eyes, then with your ears — and start building a mental map of exactly what needs to be fixed.

@@ -1,10 +1,586 @@
 ---
 sidebar_position: 4
-title: "Chapter 3: Navigation & Focus"
+title: "Chapter 3: Finding Your Way"
+description: "Fix focus order on the login form, handle focus traps in dialogs, and add skip navigation so keyboard users aren't forced to tab through every header."
 ---
 
-# Chapter 3: Navigation & Focus
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
 
-_Coming soon_
+# Finding Your Way
 
-This chapter covers focus management for screen readers: controlling focus order, managing focus across route transitions, and using `FocusNode` and `FocusScope` correctly.
+> *"I never thought about Tab order before."*
+
+**Estimated time:** ~20 minutes | **Focus:** Login + Dialogs | **Branch:** `chapter-3-navigation`
+
+---
+
+Broken focus order is one of the most disorienting accessibility failures. Imagine trying to fill in a login form while focus jumps unpredictably from the email field to a button in the corner and back again — with no visual cues, guided only by audio. That's the reality for screen reader users navigating AccessBank's Login screen right now.
+
+In this chapter you'll fix it.
+
+---
+
+## Section 1: What is Focus Order?
+
+<div className="ab-step">
+  <div className="ab-step__badge">1</div>
+  <div className="ab-step__content">
+
+When a screen reader user swipes right to navigate forward, they're moving through the **focus order** — the sequence in which elements receive keyboard/screen reader focus. By default, Flutter traverses widgets in the order they appear in the widget tree (roughly top-to-bottom, left-to-right), which usually works well.
+
+"Usually" is the problem.
+
+  </div>
+</div>
+
+<div className="ab-step">
+  <div className="ab-step__badge">2</div>
+  <div className="ab-step__content">
+
+On the AccessBank Login screen, the floating action button (the help button) was placed early in the widget tree for z-order rendering reasons. So the focus order becomes:
+
+**FAB → Email field → Password field → Sign In button**
+
+Instead of the logical:
+
+**Email field → Password field → Sign In button → FAB**
+
+A screen reader user trying to sign in is immediately confronted with a help button before they've even reached the email field. Deeply confusing.
+
+  </div>
+</div>
+
+---
+
+## Section 2: Fix the Tab Order with FocusTraversalGroup
+
+<div className="ab-step">
+  <div className="ab-step__badge">1</div>
+  <div className="ab-step__content">
+
+`FocusTraversalGroup` lets you define an independent traversal group. Widgets inside the group are ordered relative to each other, and the group as a whole is positioned in the parent traversal sequence. Wrapping `LoginForm` in a group means the form fields are all visited before focus moves to the FAB.
+
+  </div>
+</div>
+
+<Tabs>
+  <TabItem value="before" label="Before — FAB jumps first">
+
+```dart title="lib/screens/login/login_screen.dart"
+// Focus order: FAB → Email → Password → Sign In
+// Because the FAB appears early in the widget tree
+Scaffold(
+  body: LoginForm(),
+  floatingActionButton: HelpFab(),
+)
+```
+
+  </TabItem>
+  <TabItem value="after" label="After — form is fully traversed first" default>
+
+```dart title="lib/screens/login/login_screen.dart"
+// Focus order: Email → Password → Sign In → FAB
+// FocusTraversalGroup ensures the form is traversed before the FAB
+Scaffold(
+  body: FocusTraversalGroup(
+    policy: ReadingOrderTraversalPolicy(),
+    child: LoginForm(),
+  ),
+  floatingActionButton: HelpFab(),
+)
+```
+
+  </TabItem>
+</Tabs>
+
+<div className="ab-callout ab-callout--amber">
+  <div className="ab-callout__header">Why this matters</div>
+  <p>Focus order should match reading order — the sequence a sighted user would naturally read the screen. When it doesn't, screen reader users experience a kind of spatial disorientation: they know roughly where they are, but the navigation jumps don't match their mental model of the screen.</p>
+</div>
+
+---
+
+## Section 3: Custom Traversal Order with FocusTraversalOrder
+
+Sometimes `ReadingOrderTraversalPolicy` still gets it wrong — especially with complex or non-linear layouts. `FocusTraversalOrder` with `OrderedTraversalPolicy` lets you set an explicit numeric sequence on individual widgets.
+
+<div className="ab-step">
+  <div className="ab-step__badge">1</div>
+  <div className="ab-step__content">
+
+The Login form should flow: **Email (1) → Password (2) → Sign In (3) → Biometric (4)**. That's what `NumericFocusOrder` enforces. Notice that in the real code, each field also has its own `FocusNode`, so pressing the Return key on the email field moves focus to the password field programmatically.
+
+  </div>
+</div>
+
+<Tabs>
+  <TabItem value="before" label="Before — inaccessible form">
+
+```dart title="lib/screens/login/widgets/login_form.dart"
+// Inaccessible version: hint text only, no persistent labels,
+// no focus management, vague button text, tiny touch targets.
+Column(
+  crossAxisAlignment: CrossAxisAlignment.stretch,
+  children: [
+    // hintText vanishes when the field is focused — confusing!
+    TextField(
+      controller: _emailController,
+      decoration: const InputDecoration(
+        hintText: 'Email',
+        border: OutlineInputBorder(),
+      ),
+    ),
+    const SizedBox(height: 12),
+    TextField(
+      controller: _passwordController,
+      decoration: const InputDecoration(
+        hintText: 'Password',
+        border: OutlineInputBorder(),
+      ),
+      obscureText: true,
+    ),
+    const SizedBox(height: 16),
+    // "Go" tells screen reader users nothing about this button's purpose
+    FilledButton(
+      onPressed: _submit,
+      child: const Text('Go'),
+    ),
+    const SizedBox(height: 8),
+    // Tiny 32x32 touch target — below WCAG 44x44pt minimum
+    Center(
+      child: SizedBox(
+        width: 32,
+        height: 32,
+        child: IconButton(
+          padding: EdgeInsets.zero,
+          iconSize: 20,
+          icon: const Icon(Icons.fingerprint),
+          onPressed: widget.onSubmit,
+          // No tooltip, no semantics label
+        ),
+      ),
+    ),
+  ],
+)
+```
+
+  </TabItem>
+  <TabItem value="after" label="After — accessible form" default>
+
+```dart title="lib/screens/login/widgets/login_form.dart"
+// Accessible version: persistent labels, explicit focus order,
+// descriptive button text, 48x48 touch targets throughout.
+FocusTraversalGroup(
+  policy: OrderedTraversalPolicy(),
+  child: Column(
+    crossAxisAlignment: CrossAxisAlignment.stretch,
+    children: [
+      // labelText is persistent — stays visible when field is focused
+      FocusTraversalOrder(
+        order: const NumericFocusOrder(1),
+        child: TextField(
+          controller: _emailController,
+          focusNode: _emailFocusNode,
+          decoration: const InputDecoration(
+            labelText: 'Email',
+            hintText: 'you@example.com',
+            border: OutlineInputBorder(),
+          ),
+          keyboardType: TextInputType.emailAddress,
+          autofillHints: const [AutofillHints.email],
+          textInputAction: TextInputAction.next,
+          onSubmitted: (_) => _passwordFocusNode.requestFocus(),
+        ),
+      ),
+      const SizedBox(height: 12),
+      FocusTraversalOrder(
+        order: const NumericFocusOrder(2),
+        child: TextField(
+          controller: _passwordController,
+          focusNode: _passwordFocusNode,
+          decoration: const InputDecoration(
+            labelText: 'Password',
+            border: OutlineInputBorder(),
+          ),
+          obscureText: true,
+          autofillHints: const [AutofillHints.password],
+          textInputAction: TextInputAction.done,
+          onSubmitted: (_) => _submit(),
+        ),
+      ),
+      const SizedBox(height: 16),
+      // "Sign In" is clear and descriptive
+      FocusTraversalOrder(
+        order: const NumericFocusOrder(3),
+        child: SizedBox(
+          height: 48, // 48x48 minimum touch target
+          child: FilledButton(
+            focusNode: _signInFocusNode,
+            onPressed: _submit,
+            child: const Text('Sign In'),
+          ),
+        ),
+      ),
+      const SizedBox(height: 8),
+      // 48x48 touch target + full semantics label and hint
+      Center(
+        child: FocusTraversalOrder(
+          order: const NumericFocusOrder(4),
+          child: Semantics(
+            label: 'Sign in with biometrics',
+            hint: 'Double tap to sign in using fingerprint or face ID',
+            button: true,
+            child: SizedBox(
+              width: 48,
+              height: 48,
+              child: Tooltip(
+                message: 'Sign in with biometrics',
+                child: IconButton(
+                  focusNode: _biometricFocusNode,
+                  padding: EdgeInsets.zero,
+                  iconSize: 28,
+                  icon: const Icon(Icons.fingerprint),
+                  onPressed: widget.onSubmit,
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    ],
+  ),
+)
+```
+
+  </TabItem>
+</Tabs>
+
+<div className="ab-callout ab-callout--blue">
+  <div className="ab-callout__header">💡 Try it yourself</div>
+  <p>Enable your screen reader and navigate through the Login form in both the "before" and "after" versions. In the "before" version, listen for when the biometric button is announced — it's before the email field. In the "after" version, the flow should feel completely natural: email, password, sign in, biometrics.</p>
+</div>
+
+---
+
+## Section 4: Accessible Error Announcements
+
+One more critical Login screen fix: what happens when login fails? In the "before" version, the error message appears silently — the screen reader doesn't announce it because no live region is set.
+
+<div className="ab-step">
+  <div className="ab-step__badge">1</div>
+  <div className="ab-step__content">
+
+`SemanticsService.sendAnnouncement()` lets you push an announcement to the screen reader at any time — not just when focus changes. Use it for validation errors, success confirmations, and any dynamic content change that the user needs to know about.
+
+Pair this with a `Semantics(liveRegion: true)` wrapper on the error text widget for users who do encounter the text visually and navigate to it.
+
+  </div>
+</div>
+
+<Tabs>
+  <TabItem value="before" label="Before — silent failure">
+
+```dart title="lib/screens/login/widgets/login_form.dart"
+void _submitInaccessible() {
+  // Inaccessible: validation error appears visually but
+  // is never announced to screen readers.
+  if (_emailController.text.isEmpty || _passwordController.text.isEmpty) {
+    setState(() => _errorText = 'Invalid credentials');
+    return; // Screen reader user has no idea what happened
+  }
+  widget.onSubmit();
+}
+```
+
+  </TabItem>
+  <TabItem value="after" label="After — error announced and focus moved" default>
+
+```dart title="lib/screens/login/widgets/login_form.dart"
+void _submitAccessible() {
+  if (_emailController.text.isEmpty || _passwordController.text.isEmpty) {
+    const message = 'Sign in failed. Please enter your email and password.';
+    setState(() => _errorText = message);
+
+    // Announce the error immediately to screen readers
+    SemanticsService.sendAnnouncement(
+      View.of(context),
+      message,
+      TextDirection.ltr,
+    );
+
+    // Move focus to the first empty field so the user knows where to go
+    if (_emailController.text.isEmpty) {
+      _emailFocusNode.requestFocus();
+    } else {
+      _passwordFocusNode.requestFocus();
+    }
+    return;
+  }
+  widget.onSubmit();
+}
+
+// In the widget tree, wrap the error text in a liveRegion:
+if (_errorText != null) ...[
+  const SizedBox(height: 8),
+  Semantics(
+    liveRegion: true, // Announces changes to screen readers automatically
+    child: Text(
+      _errorText!,
+      style: TextStyle(
+        color: Theme.of(context).colorScheme.error,
+        fontSize: 13,
+      ),
+    ),
+  ),
+],
+```
+
+  </TabItem>
+</Tabs>
+
+<div className="ab-callout ab-callout--amber">
+  <div className="ab-callout__header">Why this matters</div>
+  <p>A screen reader user who taps "Sign In" and hears nothing — no error, no confirmation — is completely lost. They don't know if the button worked, if they need to try again, or if the app has crashed. Always announce state changes that the user needs to know about.</p>
+</div>
+
+---
+
+## Section 5: Focus Traps in Modal Dialogs
+
+When a modal dialog or bottom sheet opens, focus must stay inside it until the user dismisses it. Otherwise a keyboard user can Tab behind the dialog and interact with the obscured UI — potentially triggering actions they can't see.
+
+<div className="ab-step">
+  <div className="ab-step__badge">1</div>
+  <div className="ab-step__content">
+
+Flutter's `Dialog` widget automatically requests focus when it opens, but you still need to wrap the content in a `FocusTraversalGroup` so that Tab cycles within the dialog and doesn't escape. Set `autofocus: true` on the first interactive element so the user lands in the right place immediately.
+
+  </div>
+</div>
+
+<Tabs>
+  <TabItem value="before" label="Before — focus can escape">
+
+```dart title="lib/widgets/confirm_transfer_dialog.dart"
+// Focus can leak to the background when the user presses Tab.
+// A keyboard user might accidentally tap buttons behind the dialog.
+AlertDialog(
+  title: const Text('Confirm Transfer'),
+  content: TransferSummary(),
+  actions: [
+    TextButton(
+      onPressed: () => Navigator.pop(context),
+      child: const Text('Cancel'),
+    ),
+    ElevatedButton(
+      onPressed: _confirmTransfer,
+      child: const Text('Confirm'),
+    ),
+  ],
+)
+```
+
+  </TabItem>
+  <TabItem value="after" label="After — focus trapped within dialog" default>
+
+```dart title="lib/widgets/confirm_transfer_dialog.dart"
+// Focus is completely trapped within the dialog.
+// Tab cycles: Cancel → Confirm → Cancel → ...
+AlertDialog(
+  title: const Text('Confirm Transfer'),
+  content: FocusTraversalGroup(
+    child: TransferSummary(),
+  ),
+  actions: [
+    TextButton(
+      autofocus: true, // First focusable element gets focus on open
+      onPressed: () => Navigator.pop(context),
+      child: const Text('Cancel'),
+    ),
+    ElevatedButton(
+      onPressed: _confirmTransfer,
+      child: const Text('Confirm'),
+    ),
+  ],
+)
+```
+
+  </TabItem>
+</Tabs>
+
+<div className="ab-callout ab-callout--amber">
+  <div className="ab-callout__header">Why this matters</div>
+  <p>Without focus trapping, keyboard users get lost behind dialogs and may unknowingly trigger actions on the obscured screen. Proper focus trapping is a WCAG 2.1 Level A requirement (Success Criterion 2.1.2, "No Keyboard Trap" — which in this context means focus must be <em>within</em> the dialog, not able to escape without using the dialog's own controls).</p>
+</div>
+
+---
+
+## Section 6: Skip Navigation
+
+When every screen starts with a navigation bar containing five tabs, a keyboard user must press Tab five times before reaching the main content — on every single screen. That's exhausting and unnecessary.
+
+<div className="ab-step">
+  <div className="ab-step__badge">1</div>
+  <div className="ab-step__content">
+
+Skip links let users jump straight to the main content region. In Flutter, you implement this with a `Focus` node that moves focus programmatically to the first element of the main content area when the user activates the skip link. The link itself is only visible when it has keyboard focus (so it doesn't clutter the visual design).
+
+  </div>
+</div>
+
+<Tabs>
+  <TabItem value="before" label="Before — must tab through everything">
+
+```dart title="lib/widgets/app_scaffold.dart"
+// Every screen forces keyboard users to tab through AppBar + BottomNav
+// before reaching any useful content.
+Scaffold(
+  appBar: MainAppBar(),
+  bottomNavigationBar: MainNavBar(),
+  body: content,
+)
+```
+
+  </TabItem>
+  <TabItem value="after" label="After — skip link available" default>
+
+```dart title="lib/widgets/app_scaffold.dart"
+// Skip link appears on keyboard focus and jumps to main content.
+Scaffold(
+  appBar: MainAppBar(),
+  bottomNavigationBar: MainNavBar(),
+  body: Column(
+    children: [
+      // Skip link — only visible when keyboard-focused
+      Semantics(
+        label: 'Skip to main content',
+        child: Focus(
+          onFocusChange: (focused) {
+            setState(() => _skipVisible = focused);
+          },
+          child: GestureDetector(
+            onTap: () => _mainContentFocus.requestFocus(),
+            child: _skipVisible
+                ? const SkipBanner()
+                : const SizedBox.shrink(),
+          ),
+        ),
+      ),
+      Expanded(
+        child: Focus(
+          focusNode: _mainContentFocus,
+          skipTraversal: true, // Not in the normal Tab order
+          child: content,
+        ),
+      ),
+    ],
+  ),
+)
+```
+
+  </TabItem>
+</Tabs>
+
+---
+
+## Section 7: Keyboard-Only Testing
+
+The ultimate validation of your focus-order work is to navigate the entire app without touching the screen — keyboard only.
+
+<div className="ab-step">
+  <div className="ab-step__badge">1</div>
+  <div className="ab-step__content">
+
+**On Android:** Connect a Bluetooth keyboard, or enable Switch Access in Settings → Accessibility → Switch Access. Tab moves focus; Space or Enter activates.
+
+  </div>
+</div>
+
+<div className="ab-step">
+  <div className="ab-step__badge">2</div>
+  <div className="ab-step__content">
+
+**On iOS:** Connect an external keyboard and enable VoiceOver. Use Tab/Shift-Tab to move between elements, Space or Return to activate.
+
+  </div>
+</div>
+
+<div className="ab-step">
+  <div className="ab-step__badge">3</div>
+  <div className="ab-step__content">
+
+While testing, watch for:
+- Elements you can't reach (they're excluded from the focus order)
+- Buttons that don't respond to Space or Enter
+- Focus that disappears when a dialog closes (it should return to the element that opened the dialog)
+- Focus order that doesn't match the visual reading order
+
+  </div>
+</div>
+
+<div className="ab-callout ab-callout--blue">
+  <div className="ab-callout__header">💡 Try it yourself</div>
+  <p>Connect a keyboard (or enable switch access) and navigate the entire Login flow without touching the screen. Can you complete the sign-in — filling in email, password, and tapping Sign In — using only Tab and Enter? If yes, you've done it right.</p>
+</div>
+
+<div className="ab-callout ab-callout--green">
+  <div className="ab-callout__header">✓ Checkpoint</div>
+  <p>In the accessible Login screen: (1) focus order is Email → Password → Sign In → Biometric, (2) pressing Return on the email field moves focus to the password field, (3) failed validation is announced via <code>SemanticsService.sendAnnouncement()</code>, and (4) focus moves to the first empty field after a failed submission. Verify each of these with your screen reader active.</p>
+</div>
+
+---
+
+## Check Your Understanding
+
+<details>
+<summary>Question 1: What widget do you use to define an independent focus traversal group in Flutter?</summary>
+
+**A) FocusScope**
+**B) FocusTraversalGroup** ✅
+**C) Focus**
+**D) FocusNode**
+
+`FocusTraversalGroup` defines a region with its own traversal policy. Widgets inside the group are ordered relative to each other, independently of widgets outside the group. This is the key tool for fixing focus order problems caused by widget-tree ordering.
+
+</details>
+
+<details>
+<summary>Question 2: Why is a focus trap important in modal dialogs?</summary>
+
+**A) To prevent the user from closing the dialog accidentally**
+**B) To stop keyboard users from interacting with content behind the dialog** ✅
+**C) To improve animation performance**
+**D) To ensure the dialog is announced by the screen reader**
+
+Without a focus trap, keyboard users can Tab past the dialog boundary and interact with (or accidentally trigger) elements in the obscured background. Trapping focus keeps interaction within the dialog until it is deliberately dismissed.
+
+</details>
+
+<details>
+<summary>Question 3: What is the purpose of a skip navigation link?</summary>
+
+**A) To hide the navigation bar from sighted users**
+**B) To let keyboard users jump past repetitive navigation to main content** ✅
+**C) To disable keyboard navigation on secondary screens**
+**D) To announce the current page name when the screen loads**
+
+Skip links let keyboard and switch-control users bypass repeated navigation elements (like app bars and tab bars) that would otherwise require many Tab presses to navigate through on every screen.
+
+</details>
+
+---
+
+## Deep Dive
+
+- [Flutter FocusTraversalGroup — API documentation](https://api.flutter.dev/flutter/widgets/FocusTraversalGroup-class.html)
+- [Flutter FocusTraversalOrder — API documentation](https://api.flutter.dev/flutter/widgets/FocusTraversalOrder-class.html)
+- [SemanticsService.sendAnnouncement](https://api.flutter.dev/flutter/semantics/SemanticsService/sendAnnouncement.html)
+- [WCAG 2.1.1 — Keyboard](https://www.w3.org/WAI/WCAG21/Understanding/keyboard.html)
+- [WCAG 2.4.3 — Focus Order](https://www.w3.org/WAI/WCAG21/Understanding/focus-order.html)
+
+---
+
+## What's Next
+
+The app now makes sense by ear and navigates logically by keyboard. But there are users who can see the screen — just not as well as you might assume. In **Chapter 4: See Clearly**, you'll fix the contrast failures, ensure the UI survives large font sizes, tune the dark-mode palette, and stop relying on colour alone to communicate meaning.

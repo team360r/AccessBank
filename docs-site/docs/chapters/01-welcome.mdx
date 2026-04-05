@@ -1,10 +1,399 @@
 ---
 sidebar_position: 2
-title: "Chapter 1: Welcome Screen"
+title: "Chapter 1: Welcome to AccessBank"
+description: "A guided first look at the app — first through sighted eyes, then through a screen reader — and your first encounter with Flutter's semantics tree."
 ---
 
-# Chapter 1: Welcome Screen
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
 
-_Coming soon_
+# Welcome to AccessBank
 
-This chapter walks through making the AccessBank welcome screen accessible: adding semantic labels, fixing heading hierarchy, and ensuring the logo is properly described.
+> *"Oh wow, this is what it's like for some users?"*
+
+**Estimated time:** ~20 minutes | **Focus:** All screens | **Branch:** `chapter-1-setup`
+
+---
+
+AccessBank is a fictional banking app — and it's deliberately broken. Every screen contains real accessibility failures drawn from actual audits of real banking apps. Your job over the coming chapters is to fix them.
+
+But first: let's meet the patient.
+
+---
+
+## Section 1: Tour the App with Your Eyes
+
+Before we bring in the screen reader, spend a few minutes clicking through AccessBank the way a sighted user would. Get familiar with the layout so you have something to compare against when we remove the visual channel.
+
+<div className="ab-step">
+  <div className="ab-step__badge">1</div>
+  <div className="ab-step__content">
+
+**Login screen** — Two text fields (email and password) and a Sign In button. There's also a biometric icon button in the corner. Notice the button text: it says "Go". Seems fine visually. We'll revisit that shortly.
+
+  </div>
+</div>
+
+<div className="ab-step">
+  <div className="ab-step__badge">2</div>
+  <div className="ab-step__content">
+
+**Account Overview** — A list of your accounts with balances. There's a row of icon buttons at the top: transfer, pay, add funds, more. The account names and balances are shown in a light blue on a white card. Looks clean. Stylish, even. But something is very wrong with those colours.
+
+  </div>
+</div>
+
+<div className="ab-step">
+  <div className="ab-step__badge">3</div>
+  <div className="ab-step__content">
+
+**Transaction List** — Recent transactions with filter chips at the top. Each transaction shows an icon, a merchant name, and an amount.
+
+  </div>
+</div>
+
+<div className="ab-step">
+  <div className="ab-step__badge">4</div>
+  <div className="ab-step__content">
+
+**Transfer** — Move money between accounts. Two dropdown selectors, an amount field, and a Confirm button.
+
+  </div>
+</div>
+
+<div className="ab-step">
+  <div className="ab-step__badge">5</div>
+  <div className="ab-step__content">
+
+**Settings** — Profile information and notification preferences, with toggle switches.
+
+  </div>
+</div>
+
+<div className="ab-callout ab-callout--blue">
+  <div className="ab-callout__header">💡 Try it yourself</div>
+  <p>Click through all five screens now. Notice what actions you can take and what information is shown. Hold that mental model — you're about to lose access to most of it.</p>
+</div>
+
+---
+
+## Section 2: The Screen Reader Experience
+
+Now enable TalkBack or VoiceOver. Navigate to the Account Overview screen using *only* screen reader gestures. No peeking.
+
+<div className="ab-step">
+  <div className="ab-step__badge">1</div>
+  <div className="ab-step__content">
+
+Enable your platform's screen reader (triple-click the side button on iOS, or hold both volume buttons on Android). From Chapter 0 you know the drill.
+
+  </div>
+</div>
+
+<div className="ab-step">
+  <div className="ab-step__badge">2</div>
+  <div className="ab-step__content">
+
+Swipe right to move through elements one by one on the Account Overview screen. Listen carefully to each announcement.
+
+You might hear things like: *"Image"... "Button"... "90CAF9"...* or just a raw number like *"4285.50"*. Not an account name. Not a currency. Just noise.
+
+  </div>
+</div>
+
+<div className="ab-step">
+  <div className="ab-step__badge">3</div>
+  <div className="ab-step__content">
+
+Try to answer this question using only what you hear: **Which account has the highest balance?**
+
+If you can't tell, that's the problem. That's exactly what we're here to fix.
+
+  </div>
+</div>
+
+<div className="ab-callout ab-callout--amber">
+  <div className="ab-callout__header">Why this matters</div>
+  <p>About 2.2 billion people worldwide have some form of vision impairment. Even if only a fraction use screen readers, that's still tens of millions of potential AccessBank customers — and right now, our app largely shuts them out from managing their own money.</p>
+</div>
+
+---
+
+## Section 3: Spotting the Problems
+
+Here are the five categories of accessibility failures present in AccessBank. These aren't edge cases — they are the top five issues found in real banking app audits.
+
+<div className="ab-step">
+  <div className="ab-step__badge">1</div>
+  <div className="ab-step__content">
+
+**Missing labels** — The quick-action icon buttons (transfer, pay, add, more) on the Account Overview have no text alternative. TalkBack and VoiceOver both announce "Button" — four times in a row. A user has absolutely no way of knowing what each button does.
+
+  </div>
+</div>
+
+<div className="ab-step">
+  <div className="ab-step__badge">2</div>
+  <div className="ab-step__content">
+
+**Meaningless labels** — The account card icon is announced as "Image". The balance is read as a raw number with no currency or context. These elements have *some* semantics, but the content is useless.
+
+  </div>
+</div>
+
+<div className="ab-step">
+  <div className="ab-step__badge">3</div>
+  <div className="ab-step__content">
+
+**Poor focus order** — The login screen's focus order doesn't match the visual layout. The screen reader jumps around unexpectedly, which is deeply disorienting when you're relying entirely on audio feedback.
+
+  </div>
+</div>
+
+<div className="ab-step">
+  <div className="ab-step__badge">4</div>
+  <div className="ab-step__content">
+
+**Low contrast** — The account name and balance text uses `AppColors.inaccessible.lightBlueOnWhite` — a colour with a contrast ratio of roughly **2.0:1** against the white card background. WCAG requires 4.5:1 for normal text. One in three people over 65 have vision impairment; this text is nearly invisible to them.
+
+  </div>
+</div>
+
+<div className="ab-step">
+  <div className="ab-step__badge">5</div>
+  <div className="ab-step__content">
+
+**Tiny touch targets** — The quick-action icon buttons are set to 32×32px with `EdgeInsets.zero` padding and `BoxConstraints(minWidth: 32, minHeight: 32)`. The WCAG recommended minimum is 44×44px. Users with motor difficulties (including many older adults) routinely miss small targets.
+
+  </div>
+</div>
+
+<div className="ab-callout ab-callout--amber">
+  <div className="ab-callout__header">Why this matters</div>
+  <p>Every one of these issues blocks real users from banking independently. Fixing them isn't just compliance — it's giving people back their financial autonomy. And in many jurisdictions (UK, EU, Australia, Canada), accessible digital services are also a legal requirement.</p>
+</div>
+
+---
+
+## Section 4: Understanding the Semantics Tree
+
+Flutter renders your UI to a canvas — pixels, not DOM elements. Unlike the web, there's no HTML to inspect. So how does assistive technology know what's on screen?
+
+<div className="ab-step">
+  <div className="ab-step__badge">1</div>
+  <div className="ab-step__content">
+
+Flutter maintains a **parallel semantics tree** alongside the widget tree. This is a structured description of every meaningful element on screen — labels, roles, states, and available actions. When you add a `Semantics` widget (or use a built-in widget like `ElevatedButton` that already has semantics), Flutter updates this tree.
+
+The OS accessibility service (VoiceOver or TalkBack) reads the semantics tree, not the pixel canvas. It's the bridge between your Flutter app and your users' assistive technology.
+
+  </div>
+</div>
+
+<div className="ab-step">
+  <div className="ab-step__badge">2</div>
+  <div className="ab-step__content">
+
+Here's the difference between a card with no semantics and one with proper labels. This is the core transformation you'll be making throughout this tutorial.
+
+  </div>
+</div>
+
+<Tabs>
+  <TabItem value="before" label="Before — inaccessible">
+
+```dart title="lib/screens/account_overview/widgets/account_card.dart"
+// TalkBack announces: "Image" ... "4285.50"
+// Two disconnected, meaningless elements. No context whatsoever.
+Widget _buildInaccessibleVersion(BuildContext context) {
+  final inaccessible = AppColors.inaccessible;
+
+  return Card(
+    margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+    child: Padding(
+      padding: const EdgeInsets.all(16),
+      child: Row(
+        children: [
+          Icon(
+            _iconForType(account.type),
+            // Low-contrast icon colour (~2.0:1 on white)
+            color: inaccessible.lightBlueOnWhite,
+            size: 32,
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Low-contrast, no semantic label
+                Text(
+                  account.name,
+                  style: TextStyle(
+                    color: inaccessible.lightBlueOnWhite,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                // Raw number, no currency context for screen readers
+                Text(
+                  '\$${account.balance.toStringAsFixed(2)}',
+                  style: TextStyle(
+                    color: inaccessible.lightBlueOnWhite,
+                    fontSize: 18,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    ),
+  );
+}
+```
+
+  </TabItem>
+  <TabItem value="after" label="After — accessible" default>
+
+```dart title="lib/screens/account_overview/widgets/account_card.dart"
+// TalkBack announces: "Everyday Checking, checking account,
+// balance four thousand two hundred eighty-five dollars and fifty cents"
+// One clear, complete, human-readable announcement.
+Widget _buildAccessibleVersion(BuildContext context) {
+  final spokenLabel =
+      '${account.name}, ${_typeLabel(account.type)}, '
+      'balance ${_spellOutAmount(account.balance)}';
+
+  return MergeSemantics(
+    child: Semantics(
+      label: spokenLabel,
+      child: Card(
+        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Row(
+            children: [
+              // Decorative icon excluded — the spoken label covers its meaning
+              ExcludeSemantics(
+                child: Icon(
+                  _iconForType(account.type),
+                  color: AppColors.primary, // 7.3:1 contrast ratio
+                  size: 32,
+                ),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      account.name,
+                      style: const TextStyle(
+                        color: AppColors.textPrimary, // 18.1:1 on white
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      '\$${account.balance.toStringAsFixed(2)}',
+                      style: const TextStyle(
+                        color: AppColors.textPrimary,
+                        fontSize: 18,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    ),
+  );
+}
+```
+
+  </TabItem>
+</Tabs>
+
+---
+
+## Section 5: Exploring Semantics Nodes
+
+<div className="ab-step">
+  <div className="ab-step__badge">1</div>
+  <div className="ab-step__content">
+
+Toggle on the **AccessGuide inspector** (the magnifying-glass icon in the tutorial panel) and look at the Account Overview screen. Each coloured box represents a `SemanticsNode` — exactly the data that gets sent to TalkBack or VoiceOver.
+
+- **Green border** — the node has a label ✓
+- **Red border** — an interactive element with no label ✗
+- **Grey border** — non-interactive, no label (often fine for decorative elements)
+
+  </div>
+</div>
+
+<div className="ab-callout ab-callout--blue">
+  <div className="ab-callout__header">💡 Try it yourself</div>
+  <p>Toggle the inspector and count how many elements have green borders versus red borders. The red ones are your to-do list for Chapter 2. In the next chapter, you'll fix every single one.</p>
+</div>
+
+<div className="ab-callout ab-callout--green">
+  <div className="ab-callout__header">✓ Checkpoint</div>
+  <p>Before moving on: (1) you've navigated the Account Overview using only your screen reader, (2) you can name at least three categories of accessibility issues in the app, and (3) you understand that Flutter's semantics tree is separate from the widget tree and is what assistive technology reads.</p>
+</div>
+
+---
+
+## Check Your Understanding
+
+<details>
+<summary>Question 1: What is Flutter's semantics tree?</summary>
+
+**A) The widget tree rendered to the canvas**
+**B) A parallel structure that describes the UI to assistive technology** ✅
+**C) A debug overlay shown in DevTools**
+**D) The navigation stack of the app**
+
+Flutter's semantics tree runs alongside the widget tree. It describes each meaningful element's label, role, state, and actions in a way that OS accessibility services like TalkBack and VoiceOver can read aloud. It's the bridge between Flutter's pixel canvas and assistive technology.
+
+</details>
+
+<details>
+<summary>Question 2: Approximately how many people worldwide have some form of vision impairment?</summary>
+
+**A) 220 million**
+**B) 500 million**
+**C) 2.2 billion** ✅
+**D) 4 billion**
+
+According to the World Health Organisation, approximately 2.2 billion people have near or distance vision impairment. This is a huge audience that benefits directly from accessible apps — and a compelling business case alongside the ethical argument.
+
+</details>
+
+<details>
+<summary>Question 3: Which of the following is NOT one of the five accessibility issues found in AccessBank?</summary>
+
+**A) Missing labels on icon buttons**
+**B) Poor focus order**
+**C) Too many animations** ✅
+**D) Low contrast text**
+
+The five issues we identified are: missing labels, meaningless labels, poor focus order, low contrast, and tiny touch targets. Excessive animation is a separate accessibility concern covered in Chapter 6.
+
+</details>
+
+---
+
+## Deep Dive
+
+- [Flutter Semantics class — API documentation](https://api.flutter.dev/flutter/widgets/Semantics-class.html)
+- [WHO — World report on vision](https://www.who.int/publications/i/item/world-report-on-vision)
+- [WCAG 2.1 — Name, Role, Value (Success Criterion 4.1.2)](https://www.w3.org/WAI/WCAG21/Understanding/name-role-value.html)
+- [Flutter accessibility documentation](https://docs.flutter.dev/accessibility-and-internationalization/accessibility)
+
+---
+
+## What's Next
+
+You've seen the problem. Now it's time to solve it. In **Chapter 2: Speaking the Language**, you'll dive deep into the `Semantics` widget API and fix every broken label on the Account Overview screen — transforming it from a confusing wall of noise into something a screen reader user would actually want to use.
