@@ -21,6 +21,11 @@ const config: Config = {
 
   onBrokenLinks: 'throw',
 
+  themes: ['@docusaurus/theme-mermaid'],
+  markdown: {
+    mermaid: true,
+  },
+
   i18n: {
     defaultLocale: 'en',
     locales: ['en'],
