@@ -7,12 +7,11 @@ void main() {
     var notified = false;
     state.addListener(() => notified = true);
 
-    state.update(chapterIndex: 3, stepIndex: 2, isConnected: true);
+    state.update(isConnected: true, showInspector: true);
 
     expect(notified, isTrue);
-    expect(state.chapterIndex, 3);
-    expect(state.stepIndex, 2);
     expect(state.isConnected, isTrue);
+    expect(state.showInspector, isTrue);
   });
 
   test('allowedTabIndex can be set to null via update', () {
@@ -23,7 +22,7 @@ void main() {
 
   test('update without allowedTabIndex leaves it unchanged', () {
     final state = TutorialAppState()..allowedTabIndex = 1;
-    state.update(chapterIndex: 5);
+    state.update(isConnected: true);
     expect(state.allowedTabIndex, 1);
   });
 }

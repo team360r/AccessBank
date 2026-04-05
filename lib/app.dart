@@ -9,7 +9,6 @@ import 'screens/transfer/transfer_screen.dart';
 import 'theme/app_theme.dart';
 import 'tutorial/tutorial_app_state.dart';
 import 'tutorial/tutorial_bridge.dart';
-import 'tutorial/widgets/tutorial_status_bar.dart';
 import 'widgets/access_bank_scaffold.dart';
 
 class AccessBankApp extends StatefulWidget {
@@ -80,23 +79,18 @@ class _HomeScreen extends StatelessWidget {
     return ListenableBuilder(
       listenable: Listenable.merge([appState, tutorialState]),
       builder: (context, _) {
-        return Column(
-          children: [
-            TutorialStatusBar(state: tutorialState),
-            Expanded(
-              child: AccessBankScaffold(
-                accessible: appState.accessible,
-                currentIndex: appState.currentTab,
-                onTabChanged: appState.setTab,
-                allowedTabIndex: tutorialState.allowedTabIndex,
-                body: _TabBody(
-                  tab: appState.currentTab,
-                  accessible: appState.accessible,
-                  appState: appState,
-                ),
-              ),
-            ),
-          ],
+        return AccessBankScaffold(
+          accessible: appState.accessible,
+          currentIndex: appState.currentTab,
+          onTabChanged: appState.setTab,
+          onToggleAccessible: appState.toggleAccessible,
+          allowedTabIndex: tutorialState.allowedTabIndex,
+          showInspector: tutorialState.showInspector,
+          body: _TabBody(
+            tab: appState.currentTab,
+            accessible: appState.accessible,
+            appState: appState,
+          ),
         );
       },
     );

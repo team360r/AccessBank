@@ -81,18 +81,7 @@ class TutorialBridge extends ChangeNotifier {
       case 'lock_nav':
         final allowed = (payload['allowedTabIndex'] as num?)?.toInt();
         tutorialState.update(allowedTabIndex: allowed);
-
-      case 'tutorial_state':
-        _applyTutorialState(payload);
     }
-  }
-
-  void _applyTutorialState(Map<String, dynamic> payload) {
-    tutorialState.update(
-      chapterIndex: (payload['chapterIndex'] as num?)?.toInt(),
-      stepIndex: (payload['stepIndex'] as num?)?.toInt(),
-      allowedTabIndex: (payload['allowedTabIndex'] as num?)?.toInt(),
-    );
   }
 
   void _onDisconnected() {

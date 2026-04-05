@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../tutorial/widgets/a11y_inspector_overlay.dart';
 
 const List<String> _tabLabels = [
   'Overview', 'Transactions', 'Transfer', 'Settings',
@@ -11,33 +12,62 @@ const List<IconData> _tabIcons = [
   Icons.settings_outlined,
 ];
 
-/// App shell with bottom navigation and optional tutorial nav lock.
+/// App shell with bottom navigation, before/after accessibility toggle,
+/// and optional a11y inspector overlay.
 ///
 /// When [allowedTabIndex] is non-null, all tabs except that index are
-/// disabled and show a tooltip explaining which chapter covers them.
+/// disabled and show a snackbar when tapped.
 class AccessBankScaffold extends StatelessWidget {
   const AccessBankScaffold({
     super.key,
     required this.accessible,
     required this.currentIndex,
     required this.onTabChanged,
+    required this.onToggleAccessible,
     required this.body,
     this.allowedTabIndex,
+    this.showInspector = false,
   });
 
   final bool accessible;
   final int currentIndex;
   final ValueChanged<int> onTabChanged;
+  final VoidCallback onToggleAccessible;
   final Widget body;
 
   /// Locks bottom nav to a specific tab. null = all tabs navigable.
   final int? allowedTabIndex;
 
+  /// Whether the a11y inspector overlay is active.
+  final bool showInspector;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('AccessBank')),
-      body: body,
+      appBar: AppBar(
+        title: const Text('AccessBank'),
+        actions: [
+          Semantics(
+            label: accessible
+                ? 'Switch to inaccessible mode'
+                : 'Switch to accessible mode',
+            button: true,
+            child: IconButton(
+              icon: Icon(
+                accessible
+                    ? Icons.accessibility_new
+                    : Icons.accessibility_new_outlined,
+              ),
+              tooltip: accessible ? 'Accessible mode ON' : 'Accessible mode OFF',
+              onPressed: onToggleAccessible,
+            ),
+          ),
+        ],
+      ),
+      body: A11yInspectorOverlay(
+        active: showInspector,
+        child: body,
+      ),
       bottomNavigationBar: accessible
           ? _AccessibleNavBar(
               currentIndex: currentIndex,
@@ -87,7 +117,7 @@ class _AccessibleNavBar extends StatelessWidget {
         return NavigationDestination(
           icon: Semantics(
             label: isLocked
-                ? '${_tabLabels[i]} — locked during this tutorial step'
+                ? '${_tabLabels[i]} — locked'
                 : positionLabel,
             selected: isSelected,
             child: ExcludeSemantics(
@@ -106,10 +136,7 @@ class _AccessibleNavBar extends StatelessWidget {
   void _showLockedTooltip(BuildContext context, int tabIndex) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text(
-          '${_tabLabels[tabIndex]} is covered in a later chapter. '
-          'Follow the tutorial to get there.',
-        ),
+        content: Text('${_tabLabels[tabIndex]} is not available right now.'),
         duration: const Duration(seconds: 2),
       ),
     );
@@ -139,7 +166,7 @@ class _InaccessibleNavBar extends StatelessWidget {
         if (allowedTabIndex != null && i != allowedTabIndex) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('${_tabLabels[i]} is covered in a later chapter.'),
+              content: Text('${_tabLabels[i]} is not available right now.'),
               duration: const Duration(seconds: 2),
             ),
           );
