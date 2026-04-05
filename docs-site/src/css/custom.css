@@ -1,0 +1,199 @@
+/**
+ * AccessBank Tutorial — Custom Styles
+ * Inspired by the Apple SwiftUI tutorial aesthetic: clean, step-numbered,
+ * with distinct callout boxes.
+ */
+
+/* ─── Brand colour palette (deep blue matching AccessBank app) ─── */
+:root {
+  --ifm-color-primary: #1565C0;
+  --ifm-color-primary-dark: #1259AB;
+  --ifm-color-primary-darker: #1153A1;
+  --ifm-color-primary-darkest: #0D4485;
+  --ifm-color-primary-light: #1771D5;
+  --ifm-color-primary-lighter: #1877DF;
+  --ifm-color-primary-lightest: #2286F0;
+  --ifm-code-font-size: 93%;
+  --docusaurus-highlighted-code-line-bg: rgba(21, 101, 192, 0.08);
+
+  /* Callout box colours */
+  --ab-amber-bg: #FFF8E1;
+  --ab-amber-border: #FFB300;
+  --ab-amber-icon: #F57F17;
+  --ab-blue-bg: #E3F2FD;
+  --ab-blue-border: #1565C0;
+  --ab-blue-icon: #0D47A1;
+  --ab-green-bg: #E8F5E9;
+  --ab-green-border: #2E7D32;
+  --ab-green-icon: #1B5E20;
+
+  /* Step badge */
+  --ab-step-bg: #1565C0;
+  --ab-step-text: #ffffff;
+  --ab-step-size: 28px;
+}
+
+[data-theme='dark'] {
+  --ifm-color-primary: #64B5F6;
+  --ifm-color-primary-dark: #42A5F5;
+  --ifm-color-primary-darker: #2196F3;
+  --ifm-color-primary-darkest: #1976D2;
+  --ifm-color-primary-light: #90CAF9;
+  --ifm-color-primary-lighter: #BBDEFB;
+  --ifm-color-primary-lightest: #E3F2FD;
+  --docusaurus-highlighted-code-line-bg: rgba(100, 181, 246, 0.12);
+
+  --ab-amber-bg: #3E2F00;
+  --ab-amber-border: #FFB300;
+  --ab-amber-icon: #FFCA28;
+  --ab-blue-bg: #0A1929;
+  --ab-blue-border: #64B5F6;
+  --ab-blue-icon: #90CAF9;
+  --ab-green-bg: #0A2F0A;
+  --ab-green-border: #66BB6A;
+  --ab-green-icon: #A5D6A7;
+
+  --ab-step-bg: #64B5F6;
+  --ab-step-text: #0A1929;
+}
+
+/* ─── Typography ─── */
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI',
+    sans-serif;
+}
+
+.markdown h1 {
+  font-weight: 700;
+  letter-spacing: -0.5px;
+}
+
+.markdown h2 {
+  font-weight: 600;
+  margin-top: 2.5rem;
+  padding-bottom: 0.4rem;
+  border-bottom: 1px solid var(--ifm-color-emphasis-200);
+}
+
+/* ─── Step numbers (circled badges) ─── */
+/*
+  Usage in MDX:
+    <Step n={1}>Install Flutter SDK</Step>
+  Or use heading auto-counter via CSS if preferred.
+
+  The classes below are used by the Step component in src/components/Step.tsx
+*/
+.ab-step {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  margin: 2rem 0 1.2rem;
+}
+
+.ab-step__badge {
+  flex-shrink: 0;
+  width: var(--ab-step-size);
+  height: var(--ab-step-size);
+  border-radius: 50%;
+  background: var(--ab-step-bg);
+  color: var(--ab-step-text);
+  font-size: 0.85rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  margin-top: 2px;
+  /* subtle ring */
+  box-shadow: 0 0 0 3px rgba(21, 101, 192, 0.15);
+}
+
+.ab-step__content {
+  flex: 1;
+}
+
+.ab-step__title {
+  margin: 0 0 0.3rem;
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--ifm-heading-color);
+}
+
+/* ─── Callout boxes ─── */
+/*
+  Usage in MDX:
+    <WhyItMatters>...</WhyItMatters>
+    <TryItYourself>...</TryItYourself>
+    <Checkpoint>...</Checkpoint>
+*/
+
+.ab-callout {
+  border-left: 4px solid;
+  border-radius: 0 8px 8px 0;
+  padding: 1rem 1.2rem;
+  margin: 1.5rem 0;
+  font-size: 0.95rem;
+}
+
+.ab-callout__header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 700;
+  font-size: 0.85rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  margin-bottom: 0.6rem;
+}
+
+/* Why This Matters — amber */
+.ab-callout--amber {
+  background: var(--ab-amber-bg);
+  border-color: var(--ab-amber-border);
+}
+.ab-callout--amber .ab-callout__header {
+  color: var(--ab-amber-icon);
+}
+
+/* Try It Yourself — blue */
+.ab-callout--blue {
+  background: var(--ab-blue-bg);
+  border-color: var(--ab-blue-border);
+}
+.ab-callout--blue .ab-callout__header {
+  color: var(--ab-blue-icon);
+}
+
+/* Checkpoint / success — green */
+.ab-callout--green {
+  background: var(--ab-green-bg);
+  border-color: var(--ab-green-border);
+}
+.ab-callout--green .ab-callout__header {
+  color: var(--ab-green-icon);
+}
+
+/* ─── Code blocks ─── */
+/* File title chip */
+.theme-code-block-highlighted-line {
+  background-color: var(--docusaurus-highlighted-code-line-bg);
+  display: block;
+  margin: 0 -1rem;
+  padding: 0 1rem;
+  border-left: 3px solid var(--ifm-color-primary);
+}
+
+/* ─── Navbar tweaks ─── */
+.navbar {
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+}
+
+/* ─── Sidebar ─── */
+.menu__link--active {
+  font-weight: 600;
+}
+
+/* ─── Footer ─── */
+.footer--dark {
+  background-color: #0D1117;
+}
