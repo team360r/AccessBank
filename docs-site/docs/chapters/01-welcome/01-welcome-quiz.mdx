@@ -1,0 +1,46 @@
+---
+sidebar_position: 2
+slug: /chapters/welcome/quiz
+title: "Quiz"
+description: "Check your understanding of Chapter 1."
+---
+
+import { Quiz, QuizQuestion } from '@site/src/components/Quiz';
+
+# Check Your Understanding
+
+<Quiz chapterId="ch01">
+  <QuizQuestion
+    question="What is Flutter's semantics tree?"
+    options={[
+      "The widget tree rendered to the canvas",
+      "A parallel structure that describes the UI to assistive technology",
+      "A debug overlay shown in DevTools",
+      "The navigation stack of the app",
+    ]}
+    correctIndex={1}
+    explanation="Flutter's semantics tree runs alongside the widget tree. It describes each meaningful element's label, role, state, and actions in a way that OS accessibility services like TalkBack and VoiceOver can read aloud. It's the bridge between Flutter's pixel canvas and assistive technology."
+  />
+  <QuizQuestion
+    question="Approximately how many people worldwide have some form of vision impairment?"
+    options={[
+      "220 million",
+      "500 million",
+      "2.2 billion",
+      "4 billion",
+    ]}
+    correctIndex={2}
+    explanation="According to the World Health Organisation, approximately 2.2 billion people have near or distance vision impairment. This is a huge audience that benefits directly from accessible apps — and a compelling business case alongside the ethical argument."
+  />
+  <QuizQuestion
+    question="Which of the following is NOT one of the five accessibility issues found in AccessBank?"
+    options={[
+      "Missing labels on icon buttons",
+      "Poor focus order",
+      "Too many animations",
+      "Low contrast text",
+    ]}
+    correctIndex={2}
+    explanation="The five issues we identified are: missing labels, meaningless labels, poor focus order, low contrast, and tiny touch targets. Excessive animation is a separate accessibility concern covered in Chapter 6."
+  />
+</Quiz>

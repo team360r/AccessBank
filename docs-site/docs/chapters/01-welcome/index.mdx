@@ -1,5 +1,6 @@
 ---
-sidebar_position: 2
+sidebar_position: 1
+slug: /chapters/welcome
 title: "Chapter 1: Welcome to AccessBank"
 description: "A guided first look at the app — first through sighted eyes, then through a screen reader — and your first encounter with Flutter's semantics tree."
 ---
@@ -200,7 +201,7 @@ Here's the difference between a card with no semantics and one with proper label
 </div>
 
 <Tabs>
-  <TabItem value="before" label="Before — inaccessible">
+  <TabItem value="before" label="Before — inaccessible" default>
 
 ```dart title="lib/screens/account_overview/widgets/account_card.dart"
 // TalkBack announces: "Image" ... "4285.50"
@@ -236,7 +237,7 @@ Widget _buildInaccessibleVersion(BuildContext context) {
                 const SizedBox(height: 4),
                 // Raw number, no currency context for screen readers
                 Text(
-                  '\$${account.balance.toStringAsFixed(2)}',
+                  '£${account.balance.toStringAsFixed(2)}',
                   style: TextStyle(
                     color: inaccessible.lightBlueOnWhite,
                     fontSize: 18,
@@ -253,11 +254,11 @@ Widget _buildInaccessibleVersion(BuildContext context) {
 ```
 
   </TabItem>
-  <TabItem value="after" label="After — accessible" default>
+  <TabItem value="after" label="After — accessible">
 
 ```dart title="lib/screens/account_overview/widgets/account_card.dart"
 // TalkBack announces: "Everyday Checking, checking account,
-// balance four thousand two hundred eighty-five dollars and fifty cents"
+// balance four thousand two hundred eighty-five pounds and fifty pence"
 // One clear, complete, human-readable announcement.
 Widget _buildAccessibleVersion(BuildContext context) {
   final spokenLabel =
@@ -295,7 +296,7 @@ Widget _buildAccessibleVersion(BuildContext context) {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      '\$${account.balance.toStringAsFixed(2)}',
+                      '£${account.balance.toStringAsFixed(2)}',
                       style: const TextStyle(
                         color: AppColors.textPrimary,
                         fontSize: 18,
@@ -342,46 +343,6 @@ Toggle on the **AccessGuide inspector** (the magnifying-glass icon in the tutori
   <div className="ab-callout__header">✓ Checkpoint</div>
   <p>Before moving on: (1) you've navigated the Account Overview using only your screen reader, (2) you can name at least three categories of accessibility issues in the app, and (3) you understand that Flutter's semantics tree is separate from the widget tree and is what assistive technology reads.</p>
 </div>
-
----
-
-## Check Your Understanding
-
-<details>
-<summary>Question 1: What is Flutter's semantics tree?</summary>
-
-**A) The widget tree rendered to the canvas**
-**B) A parallel structure that describes the UI to assistive technology** ✅
-**C) A debug overlay shown in DevTools**
-**D) The navigation stack of the app**
-
-Flutter's semantics tree runs alongside the widget tree. It describes each meaningful element's label, role, state, and actions in a way that OS accessibility services like TalkBack and VoiceOver can read aloud. It's the bridge between Flutter's pixel canvas and assistive technology.
-
-</details>
-
-<details>
-<summary>Question 2: Approximately how many people worldwide have some form of vision impairment?</summary>
-
-**A) 220 million**
-**B) 500 million**
-**C) 2.2 billion** ✅
-**D) 4 billion**
-
-According to the World Health Organisation, approximately 2.2 billion people have near or distance vision impairment. This is a huge audience that benefits directly from accessible apps — and a compelling business case alongside the ethical argument.
-
-</details>
-
-<details>
-<summary>Question 3: Which of the following is NOT one of the five accessibility issues found in AccessBank?</summary>
-
-**A) Missing labels on icon buttons**
-**B) Poor focus order**
-**C) Too many animations** ✅
-**D) Low contrast text**
-
-The five issues we identified are: missing labels, meaningless labels, poor focus order, low contrast, and tiny touch targets. Excessive animation is a separate accessibility concern covered in Chapter 6.
-
-</details>
 
 ---
 

@@ -1,5 +1,6 @@
 ---
-sidebar_position: 8
+sidebar_position: 1
+slug: /chapters/live-regions
 title: "Chapter 7: Dynamic Content & Live Regions"
 description: "Announce filter changes, balance updates, loading states, snackbars, and route changes so screen reader users are informed of every meaningful change."
 ---
@@ -33,7 +34,7 @@ Call `SemanticsService.sendAnnouncement()` after applying the filter to give a u
 </div>
 
 <Tabs>
-  <TabItem value="before" label="Before — silent filter change">
+  <TabItem value="before" label="Before — silent filter change" default>
 
 ```dart title="lib/screens/transactions/widgets/filter_bar.dart"
 // Filter changes — screen reader hears nothing about the new results
@@ -47,7 +48,7 @@ DropdownButton<String>(
 ```
 
   </TabItem>
-  <TabItem value="after" label="After — filter result announced" default>
+  <TabItem value="after" label="After — filter result announced">
 
 ```dart title="lib/screens/transactions/widgets/filter_bar.dart"
 // Announces result count when category changes
@@ -96,7 +97,7 @@ The account balance on the Overview screen is a perfect candidate. When a transf
 </div>
 
 <Tabs>
-  <TabItem value="before" label="Before — silent balance update">
+  <TabItem value="before" label="Before — silent balance update" default>
 
 ```dart title="lib/screens/account_overview/widgets/account_card.dart"
 // Balance updates silently — screen reader users miss the change
@@ -107,7 +108,7 @@ Text(
 ```
 
   </TabItem>
-  <TabItem value="after" label="After — balance change announced" default>
+  <TabItem value="after" label="After — balance change announced">
 
 ```dart title="lib/screens/account_overview/widgets/account_card.dart"
 // Balance change is automatically announced by the screen reader
@@ -145,7 +146,7 @@ Wrap your loading indicator in `Semantics(liveRegion: true)` and give it a descr
 </div>
 
 <Tabs>
-  <TabItem value="before" label="Before — silent loading">
+  <TabItem value="before" label="Before — silent loading" default>
 
 ```dart title="lib/screens/transactions/transactions_screen.dart"
 // Spinner is visible but completely silent to screen readers
@@ -156,7 +157,7 @@ return TransactionListView(transactions: _transactions);
 ```
 
   </TabItem>
-  <TabItem value="after" label="After — loading state announced" default>
+  <TabItem value="after" label="After — loading state announced">
 
 ```dart title="lib/screens/transactions/transactions_screen.dart"
 if (_isLoading) {
@@ -203,7 +204,7 @@ Three rules for accessible snackbars:
 </div>
 
 <Tabs>
-  <TabItem value="before" label="Before — vague, potentially unannounced">
+  <TabItem value="before" label="Before — vague, potentially unannounced" default>
 
 ```dart title="lib/screens/transfer/transfer_screen.dart"
 // Short vague message; no explicit announcement
@@ -215,7 +216,7 @@ ScaffoldMessenger.of(context).showSnackBar(
 ```
 
   </TabItem>
-  <TabItem value="after" label="After — specific + belt-and-suspenders announcement" default>
+  <TabItem value="after" label="After — specific + belt-and-suspenders announcement">
 
 ```dart title="lib/screens/transfer/transfer_screen.dart"
 ScaffoldMessenger.of(context).showSnackBar(
@@ -259,7 +260,7 @@ A `NavigatorObserver` gives you explicit control over route announcements. Imple
 </div>
 
 <Tabs>
-  <TabItem value="before" label="Before — no route announcement">
+  <TabItem value="before" label="Before — no route announcement" default>
 
 ```dart title="lib/main.dart"
 // No announcement — screen reader users don't know a new screen loaded
@@ -269,7 +270,7 @@ Navigator.of(context).push(
 ```
 
   </TabItem>
-  <TabItem value="after" label="After — NavigatorObserver announces route" default>
+  <TabItem value="after" label="After — NavigatorObserver announces route">
 
 ```dart title="lib/navigation/accessibility_observer.dart"
 class AccessibilityObserver extends NavigatorObserver {
@@ -299,46 +300,6 @@ MaterialApp(
   <div className="ab-callout__header">💡 Try it yourself</div>
   <p>With TalkBack or VoiceOver active, tap through the app: Login → Account Overview → Transfer → Transaction List. In the "after" version with the observer, you should hear a screen name announced on each navigation. In the "before" version, navigation is completely silent.</p>
 </div>
-
----
-
-## Check Your Understanding
-
-<details>
-<summary>Question 1: What does <code>Semantics(liveRegion: true)</code> do?</summary>
-
-**A) Plays a sound when the widget updates**
-**B) Automatically announces content changes to screen reader users** ✅
-**C) Prevents the widget from being re-rendered**
-**D) Marks the widget as interactive**
-
-A live region tells the accessibility service to proactively announce any content change within that node — similar to an ARIA live region on the web. The user hears the update automatically without needing to navigate to the element.
-
-</details>
-
-<details>
-<summary>Question 2: When is it appropriate to call <code>SemanticsService.sendAnnouncement()</code>?</summary>
-
-**A) On every state change in the app**
-**B) Only when a dialog opens**
-**C) For meaningful status changes the user needs to know about but did not initiate by moving focus** ✅
-**D) Only on iOS, not Android**
-
-`SemanticsService.sendAnnouncement()` is appropriate for status changes that users need to know about but that do not cause a focus change: errors, completion messages, filter results, loading state changes, and similar. Overusing it creates accessibility noise — use it for genuinely meaningful events.
-
-</details>
-
-<details>
-<summary>Question 3: What is the most reliable way to ensure screen reader users are aware of route changes?</summary>
-
-**A) Put the route name in every widget's label**
-**B) Use a NavigatorObserver that calls SemanticsService.sendAnnouncement() on push** ✅
-**C) Add a live region to the AppBar title**
-**D) Route changes are always announced automatically**
-
-A `NavigatorObserver` gives you explicit control over route announcements. Flutter's default announcement behaviour may be present on some platforms but is not consistent — a custom observer guarantees your message is spoken on every navigation event.
-
-</details>
 
 ---
 

@@ -1,5 +1,6 @@
 ---
-sidebar_position: 9
+sidebar_position: 1
+slug: /chapters/testing
 title: "Chapter 8: Testing Your Work"
 description: "Write widget tests that assert on the semantics tree, use matchesSemantics to catch regressions, and wire accessibility tests into CI."
 ---
@@ -33,7 +34,7 @@ Once semantics are enabled, use `tester.getSemantics(finder)` to retrieve the `S
 </div>
 
 <Tabs>
-  <TabItem value="before" label="Before — visual-only test">
+  <TabItem value="before" label="Before — visual-only test" default>
 
 ```dart title="test/account_card_test.dart"
 // Only checks what's on screen — not what the screen reader hears
@@ -41,12 +42,12 @@ testWidgets('account card shows balance', (tester) async {
   await tester.pumpWidget(
     const MaterialApp(home: AccountCard(account: testAccount)),
   );
-  expect(find.text('\$4,285.50'), findsOneWidget);
+  expect(find.text('\£4,285.50'), findsOneWidget);
 });
 ```
 
   </TabItem>
-  <TabItem value="after" label="After — semantics-aware test" default>
+  <TabItem value="after" label="After — semantics-aware test">
 
 ```dart title="test/account_card_test.dart"
 // Asserts exactly what a screen reader user will hear
@@ -62,7 +63,7 @@ testWidgets('account card has accessible label', (tester) async {
     matchesSemantics(
       label: 'Everyday Checking account, '
              'balance four thousand two hundred '
-             'eighty-five dollars and fifty cents',
+             'eighty-five pounds and fifty pence',
     ),
   );
 
@@ -105,7 +106,7 @@ The key properties you can assert on:
 </div>
 
 <Tabs>
-  <TabItem value="before" label="Before — vague assertion">
+  <TabItem value="before" label="Before — vague assertion" default>
 
 ```dart title="test/transaction_tile_test.dart"
 // Only checks visual content — not role, state, or actions
@@ -113,7 +114,7 @@ expect(find.text('Delete'), findsOneWidget);
 ```
 
   </TabItem>
-  <TabItem value="after" label="After — precise semantics assertion" default>
+  <TabItem value="after" label="After — precise semantics assertion">
 
 ```dart title="test/transaction_tile_test.dart"
 // Checks semantic role, label, enabled state, and available actions
@@ -209,7 +210,7 @@ Integration tests can drive the app through complete user journeys and assert on
 </div>
 
 <Tabs>
-  <TabItem value="before" label="Before — no accessibility assertions">
+  <TabItem value="before" label="Before — no accessibility assertions" default>
 
 ```dart title="integration_test/login_accessibility_test.dart"
 // Exercises the happy path but checks nothing about accessibility
@@ -224,7 +225,7 @@ testWidgets('user can log in', (tester) async {
 ```
 
   </TabItem>
-  <TabItem value="after" label="After — accessibility assertions included" default>
+  <TabItem value="after" label="After — accessibility assertions included">
 
 ```dart title="integration_test/login_accessibility_test.dart"
 testWidgets('login screen is accessible', (tester) async {
@@ -266,7 +267,7 @@ Tag your accessibility widget tests with `@Tags(['accessibility'])` and your int
 </div>
 
 <Tabs>
-  <TabItem value="before" label="Before — no accessibility CI step">
+  <TabItem value="before" label="Before — no accessibility CI step" default>
 
 ```yaml title=".github/workflows/test.yml"
 # No accessibility step — regressions go undetected until a real user reports them
@@ -275,7 +276,7 @@ Tag your accessibility widget tests with `@Tags(['accessibility'])` and your int
 ```
 
   </TabItem>
-  <TabItem value="after" label="After — dedicated accessibility CI step" default>
+  <TabItem value="after" label="After — dedicated accessibility CI step">
 
 ```yaml title=".github/workflows/test.yml"
 # Widget accessibility tests run on every PR
@@ -298,46 +299,6 @@ Tag your accessibility widget tests with `@Tags(['accessibility'])` and your int
   <div className="ab-callout__header">✓ Checkpoint</div>
   <p>You have three layers of accessibility verification: automated widget tests (fast, catches regressions), manual screen-reader testing (catches confusing labels), and CI integration (prevents regressions from merging). Any single layer alone is insufficient — together they form a robust safety net.</p>
 </div>
-
----
-
-## Check Your Understanding
-
-<details>
-<summary>Question 1: What does <code>tester.ensureSemantics()</code> do in a Flutter widget test?</summary>
-
-**A) Enables TalkBack in the test environment**
-**B) Activates the semantics system and returns a handle for cleanup** ✅
-**C) Asserts that all widgets have semantic labels**
-**D) Generates a semantics audit report**
-
-`tester.ensureSemantics()` activates Flutter's semantics system for the duration of the test and returns a `SemanticsHandle`. Call `.dispose()` at the end of the test to clean up. Without it, semantics are not built and `getSemantics` will fail.
-
-</details>
-
-<details>
-<summary>Question 2: What is the key advantage of <code>matchesSemantics</code> over checking widget text with <code>find.text()</code>?</summary>
-
-**A) matchesSemantics is faster**
-**B) matchesSemantics checks accessibility roles, states, and actions — not just visible text** ✅
-**C) find.text() is deprecated**
-**D) matchesSemantics works on all Flutter versions**
-
-`find.text()` only checks visible text content. `matchesSemantics` checks the full semantic node including role (`isButton`), state (`isEnabled`, `isChecked`), available actions (`hasTapAction`), and semantic label — giving you much more thorough accessibility coverage.
-
-</details>
-
-<details>
-<summary>Question 3: Why should you run accessibility tests in CI?</summary>
-
-**A) CI environments have better screen readers than local machines**
-**B) So regressions are caught automatically before merging** ✅
-**C) Flutter accessibility tests only work in CI**
-**D) To generate WCAG compliance certificates**
-
-Manual audits are valuable but not enough — developers forget, reviewers miss details, and fixes get accidentally reverted. Running accessibility tests in CI makes them a required part of the development workflow, so regressions are caught automatically on every pull request.
-
-</details>
 
 ---
 

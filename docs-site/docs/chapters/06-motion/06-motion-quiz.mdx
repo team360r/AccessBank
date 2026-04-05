@@ -1,0 +1,46 @@
+---
+sidebar_position: 2
+slug: /chapters/motion/quiz
+title: "Quiz"
+description: "Check your understanding of Chapter 6."
+---
+
+import { Quiz, QuizQuestion } from '@site/src/components/Quiz';
+
+# Check Your Understanding
+
+<Quiz chapterId="ch06">
+  <QuizQuestion
+    question="Which Flutter API do you use to check whether the user has enabled 'Reduce Motion' on their device?"
+    options={[
+      "MediaQuery.accessibilityFeaturesOf(context).reduceMotion",
+      "MediaQuery.disableAnimationsOf(context)",
+      "Theme.of(context).animationTheme.reduceMotion",
+      "WidgetsBinding.instance.window.semanticsEnabled",
+    ]}
+    correctIndex={1}
+    explanation="MediaQuery.disableAnimationsOf(context) returns true when the user has enabled Reduce Motion (iOS) or Remove Animations (Android). Respond by setting animation durations to Duration.zero."
+  />
+  <QuizQuestion
+    question="What is the recommended minimum touch target size according to Material Design and Apple's HIG?"
+    options={[
+      "24×24 dp",
+      "36×36 dp",
+      "48×48 dp",
+      "56×56 dp",
+    ]}
+    correctIndex={2}
+    explanation="Both Material Design (48×48 dp) and Apple HIG (44×44 pt) specify this as the minimum for reliable interaction. Smaller targets are frequently missed by users with motor impairments or those using the device while in motion."
+  />
+  <QuizQuestion
+    question="If a feature is only accessible via a long press gesture, which users are excluded?"
+    options={[
+      "Only users with very large fingers",
+      "Screen reader users, Switch Control/Switch Access users, and anyone who cannot hold a long press",
+      "Users on Android only",
+      "Nobody — all users can long-press",
+    ]}
+    correctIndex={1}
+    explanation="Long-press gestures are not announced or accessible to screen reader users, keyboard users, or switch-control users. Any action only reachable via long press must also have an equivalent button or menu option."
+  />
+</Quiz>

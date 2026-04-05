@@ -1,0 +1,46 @@
+---
+sidebar_position: 2
+slug: /chapters/polish/quiz
+title: "Final Assessment"
+description: "Final assessment for Chapter 9."
+---
+
+import { Quiz, QuizQuestion } from '@site/src/components/Quiz';
+
+# Final Assessment
+
+<Quiz chapterId="ch09">
+  <QuizQuestion
+    question="You discover that a button works perfectly with TalkBack on Android but is not focusable with VoiceOver on iOS. What is the most likely cause?"
+    options={[
+      "The button is using the wrong widget type",
+      "A platform-specific behaviour difference — possibly a missing semantic role or an interaction that works differently on each platform",
+      "TalkBack is more advanced than VoiceOver",
+      "Flutter does not support VoiceOver",
+    ]}
+    correctIndex={1}
+    explanation="TalkBack and VoiceOver have different implementations and occasionally behave differently for the same semantics tree. Platform-specific issues are common for custom components, complex interactions, and live region announcements. Always test on both platforms using real devices."
+  />
+  <QuizQuestion
+    question="Which of these is the most important single change you can make to an app's accessibility?"
+    options={[
+      "Adding semantic labels to every unlabelled interactive element",
+      "Increasing all font sizes by 20%",
+      "Adding a dark mode",
+      "Removing all animations",
+    ]}
+    correctIndex={0}
+    explanation="Unlabelled interactive elements (buttons, links, icon buttons) are completely invisible to screen reader users. Adding labels to these elements is the highest-impact single change because it determines whether the app is usable at all — not just slightly more comfortable."
+  />
+  <QuizQuestion
+    question="A colleague says 'we don't need to worry about accessibility because only 1% of our users have disabilities.' What is the best response?"
+    options={[
+      "They are right — focus on the 99%",
+      "Accessibility also benefits users in bright sunlight, users with temporary injuries, older users, and improves overall UX quality for everyone",
+      "Accessibility should be a separate app",
+      "Accessibility is only legally required for government apps",
+    ]}
+    correctIndex={1}
+    explanation="The '1% argument' misses the breadth of accessibility. Improvements for users with disabilities typically improve the experience for everyone: better contrast helps in sunlight, larger touch targets help users in motion, semantic labels improve search indexing, and accessible forms reduce error rates for all users."
+  />
+</Quiz>

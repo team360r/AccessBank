@@ -1,0 +1,46 @@
+---
+sidebar_position: 2
+slug: /chapters/live-regions/quiz
+title: "Quiz"
+description: "Check your understanding of Chapter 7."
+---
+
+import { Quiz, QuizQuestion } from '@site/src/components/Quiz';
+
+# Check Your Understanding
+
+<Quiz chapterId="ch07">
+  <QuizQuestion
+    question="What does Semantics(liveRegion: true) do?"
+    options={[
+      "Plays a sound when the widget updates",
+      "Automatically announces content changes to screen reader users",
+      "Prevents the widget from being re-rendered",
+      "Marks the widget as interactive",
+    ]}
+    correctIndex={1}
+    explanation="A live region tells the accessibility service to proactively announce any content change within that node — similar to an ARIA live region on the web. The user hears the update automatically without needing to navigate to the element."
+  />
+  <QuizQuestion
+    question="When is it appropriate to call SemanticsService.sendAnnouncement()?"
+    options={[
+      "On every state change in the app",
+      "Only when a dialog opens",
+      "For meaningful status changes the user needs to know about but did not initiate by moving focus",
+      "Only on iOS, not Android",
+    ]}
+    correctIndex={2}
+    explanation="SemanticsService.sendAnnouncement() is appropriate for status changes that users need to know about but that do not cause a focus change: errors, completion messages, filter results, loading state changes, and similar. Overusing it creates accessibility noise — use it for genuinely meaningful events."
+  />
+  <QuizQuestion
+    question="What is the most reliable way to ensure screen reader users are aware of route changes?"
+    options={[
+      "Put the route name in every widget's label",
+      "Use a NavigatorObserver that calls SemanticsService.sendAnnouncement() on push",
+      "Add a live region to the AppBar title",
+      "Route changes are always announced automatically",
+    ]}
+    correctIndex={1}
+    explanation="A NavigatorObserver gives you explicit control over route announcements. Flutter's default announcement behaviour may be present on some platforms but is not consistent — a custom observer guarantees your message is spoken on every navigation event."
+  />
+</Quiz>

@@ -1,5 +1,6 @@
 ---
-sidebar_position: 10
+sidebar_position: 1
+slug: /chapters/polish
 title: "Chapter 9: The Polished App"
 description: "Full audit, platform differences, custom semantics actions, lean semantics tree, resources, and a celebration of everything you've built."
 ---
@@ -91,7 +92,7 @@ This is perfect for features like "Copy reference number" or "Report an issue" �
 </div>
 
 <Tabs>
-  <TabItem value="before" label="Before — tap and long-press only">
+  <TabItem value="before" label="Before — tap and long-press only" default>
 
 ```dart title="lib/screens/transactions/widgets/transaction_tile.dart"
 // Only tap and long-press available — hidden features for screen reader users
@@ -103,7 +104,7 @@ GestureDetector(
 ```
 
   </TabItem>
-  <TabItem value="after" label="After — custom actions in screen reader menu" default>
+  <TabItem value="after" label="After — custom actions in screen reader menu">
 
 ```dart title="lib/screens/transactions/widgets/transaction_tile.dart"
 // Custom actions appear in TalkBack's local context menu
@@ -153,7 +154,7 @@ Guidelines for a lean semantics tree:
 </div>
 
 <Tabs>
-  <TabItem value="before" label="Before — 5 separate semantics nodes">
+  <TabItem value="before" label="Before — 5 separate semantics nodes" default>
 
 ```dart title="lib/screens/account_overview/widgets/account_card.dart"
 // Every child widget generates its own semantics node
@@ -170,7 +171,7 @@ Semantics(
 ```
 
   </TabItem>
-  <TabItem value="after" label="After — 1 merged semantics node" default>
+  <TabItem value="after" label="After — 1 merged semantics node">
 
 ```dart title="lib/screens/account_overview/widgets/account_card.dart"
 // One clean node per card — decorative icons excluded
@@ -261,46 +262,6 @@ That is a complete accessibility toolkit. Now go use it.
   <div className="ab-callout__header">✓ Final Checkpoint</div>
   <p>A person with a vision impairment can now check their balance independently. A person with a motor impairment can now make a transfer without help. An older user with reduced contrast sensitivity can now read every number clearly. That is not just good engineering — it is the right thing to do.</p>
 </div>
-
----
-
-## Final Assessment
-
-<details>
-<summary>Question 1: You discover that a button works perfectly with TalkBack on Android but is not focusable with VoiceOver on iOS. What is the most likely cause?</summary>
-
-**A) The button is using the wrong widget type**
-**B) A platform-specific behaviour difference — possibly a missing semantic role or an interaction that works differently on each platform** ✅
-**C) TalkBack is more advanced than VoiceOver**
-**D) Flutter does not support VoiceOver**
-
-TalkBack and VoiceOver have different implementations and occasionally behave differently for the same semantics tree. Platform-specific issues are common for custom components, complex interactions, and live region announcements. Always test on both platforms using real devices.
-
-</details>
-
-<details>
-<summary>Question 2: Which of these is the most important single change you can make to an app's accessibility?</summary>
-
-**A) Adding semantic labels to every unlabelled interactive element** ✅
-**B) Increasing all font sizes by 20%**
-**C) Adding a dark mode**
-**D) Removing all animations**
-
-Unlabelled interactive elements (buttons, links, icon buttons) are completely invisible to screen reader users. Adding labels to these elements is the highest-impact single change because it determines whether the app is *usable at all* — not just slightly more comfortable.
-
-</details>
-
-<details>
-<summary>Question 3: A colleague says "we don't need to worry about accessibility because only 1% of our users have disabilities." What is the best response?</summary>
-
-**A) They are right — focus on the 99%**
-**B) Accessibility also benefits users in bright sunlight, users with temporary injuries, older users, and improves overall UX quality for everyone** ✅
-**C) Accessibility should be a separate app**
-**D) Accessibility is only legally required for government apps**
-
-The "1% argument" misses the breadth of accessibility. Improvements for users with disabilities typically improve the experience for everyone: better contrast helps in sunlight, larger touch targets help users in motion, semantic labels improve search indexing, and accessible forms reduce error rates for all users. Accessibility is not a zero-sum trade-off.
-
-</details>
 
 ---
 

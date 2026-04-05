@@ -1,0 +1,46 @@
+---
+sidebar_position: 2
+slug: /chapters/testing/quiz
+title: "Quiz"
+description: "Check your understanding of Chapter 8."
+---
+
+import { Quiz, QuizQuestion } from '@site/src/components/Quiz';
+
+# Check Your Understanding
+
+<Quiz chapterId="ch08">
+  <QuizQuestion
+    question="What does tester.ensureSemantics() do in a Flutter widget test?"
+    options={[
+      "Enables TalkBack in the test environment",
+      "Activates the semantics system and returns a handle for cleanup",
+      "Asserts that all widgets have semantic labels",
+      "Generates a semantics audit report",
+    ]}
+    correctIndex={1}
+    explanation="tester.ensureSemantics() activates Flutter's semantics system for the duration of the test and returns a SemanticsHandle. Call .dispose() at the end of the test to clean up. Without it, semantics are not built and getSemantics will fail."
+  />
+  <QuizQuestion
+    question="What is the key advantage of matchesSemantics over checking widget text with find.text()?"
+    options={[
+      "matchesSemantics is faster",
+      "matchesSemantics checks accessibility roles, states, and actions — not just visible text",
+      "find.text() is deprecated",
+      "matchesSemantics works on all Flutter versions",
+    ]}
+    correctIndex={1}
+    explanation="find.text() only checks visible text content. matchesSemantics checks the full semantic node including role (isButton), state (isEnabled, isChecked), available actions (hasTapAction), and semantic label — giving you much more thorough accessibility coverage."
+  />
+  <QuizQuestion
+    question="Why should you run accessibility tests in CI?"
+    options={[
+      "CI environments have better screen readers than local machines",
+      "So regressions are caught automatically before merging",
+      "Flutter accessibility tests only work in CI",
+      "To generate WCAG compliance certificates",
+    ]}
+    correctIndex={1}
+    explanation="Manual audits are valuable but not enough — developers forget, reviewers miss details, and fixes get accidentally reverted. Running accessibility tests in CI makes them a required part of the development workflow, so regressions are caught automatically on every pull request."
+  />
+</Quiz>
