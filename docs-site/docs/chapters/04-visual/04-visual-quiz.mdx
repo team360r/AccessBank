@@ -1,0 +1,41 @@
+---
+sidebar_position: 3
+slug: /chapters/visual/quiz
+title: "Quiz"
+description: "Check your understanding of Chapter 4."
+---
+
+import { Quiz, QuizQuestion } from '@site/src/components/Quiz';
+
+# Check Your Understanding
+
+<Quiz chapterId="ch04">
+  <QuizQuestion
+    question="What is the WCAG AA minimum contrast ratio for normal-sized body text?"
+    options={["3:1", "4.5:1", "7:1", "2:1"]}
+    correctIndex={1}
+    explanation="WCAG 2.1 Success Criterion 1.4.3 requires a 4.5:1 contrast ratio for normal text (below 18pt regular or 14pt bold). Large text requires a minimum of 3:1. WCAG AAA for normal text requires 7:1."
+  />
+  <QuizQuestion
+    question="What happens when you set textScaleFactor: 1.0 on a Text widget?"
+    options={[
+      "The text becomes slightly larger",
+      "The user's system font-size preference is ignored",
+      "The text is hidden from screen readers",
+      "The text is rendered at the system default size",
+    ]}
+    correctIndex={1}
+    explanation="Setting textScaleFactor: 1.0 (or textScaler: TextScaler.noScaling) overrides the device's system font-size setting, forcing text to render at the default scale even when the user has requested larger text. This is an accessibility violation under WCAG 1.4.4."
+  />
+  <QuizQuestion
+    question="Which WCAG criterion requires that information is not conveyed by colour alone?"
+    options={[
+      "1.3.1 Info and Relationships",
+      "1.4.1 Use of Colour",
+      "1.4.3 Contrast (Minimum)",
+      "2.4.6 Headings and Labels",
+    ]}
+    correctIndex={1}
+    explanation="WCAG 1.4.1 'Use of Colour' states that colour must not be the only visual means of conveying information, indicating an action, prompting a response, or distinguishing a visual element. Always pair colour with shape, icon, or text."
+  />
+</Quiz>

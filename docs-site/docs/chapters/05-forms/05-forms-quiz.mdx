@@ -1,0 +1,46 @@
+---
+sidebar_position: 3
+slug: /chapters/forms/quiz
+title: "Quiz"
+description: "Check your understanding of Chapter 5."
+---
+
+import { Quiz, QuizQuestion } from '@site/src/components/Quiz';
+
+# Check Your Understanding
+
+<Quiz chapterId="ch05">
+  <QuizQuestion
+    question="Why should you use InputDecoration.labelText instead of only hintText for form fields?"
+    options={[
+      "labelText has better typography",
+      "hintText is not supported on all platforms",
+      "labelText stays visible as a floating label when the user types; hintText disappears",
+      "labelText is required by Flutter",
+    ]}
+    correctIndex={2}
+    explanation="hintText disappears as soon as the user starts typing, leaving them with no label to refer back to. labelText floats above the field and remains visible, which benefits both sighted users and screen reader users who need context while editing."
+  />
+  <QuizQuestion
+    question="What does SemanticsService.sendAnnouncement() do?"
+    options={[
+      "Adds a tooltip to the nearest Semantics widget",
+      "Inserts a spoken message into the accessibility announcement queue without requiring focus change",
+      "Logs an accessibility event to the console",
+      "Sets the label of the currently focused widget",
+    ]}
+    correctIndex={1}
+    explanation="SemanticsService.sendAnnouncement() sends a live-region announcement to the platform's accessibility service. The message is spoken by the screen reader without the user having to move focus — ideal for error messages and status updates."
+  />
+  <QuizQuestion
+    question="Which combination of improvements makes the Transfer amount field most accessible?"
+    options={[
+      "labelText + decimal number keyboard + live error announcement",
+      "hintText only",
+      "Large font size + border colour change",
+      "Placeholder text + onSubmitted callback",
+    ]}
+    correctIndex={0}
+    explanation="The accessible amount field combines: a visible labelText, a numberWithOptions(decimal: true) keyboard, and a SemanticsService.sendAnnouncement() call in onChanged for live error feedback — giving sighted, screen reader, and motor-impaired users the best experience."
+  />
+</Quiz>

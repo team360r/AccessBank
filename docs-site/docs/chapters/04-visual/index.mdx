@@ -1,5 +1,6 @@
 ---
-sidebar_position: 5
+sidebar_position: 1
+slug: /chapters/visual
 title: "Chapter 4: See Clearly"
 description: "Fix contrast failures, scale gracefully with large fonts, tune dark mode, and stop relying on colour alone to communicate meaning."
 ---
@@ -52,7 +53,7 @@ The fix in AccessBank is to switch from the inaccessible palette to `AppColors.p
 </div>
 
 <Tabs>
-  <TabItem value="before" label="Before — fails WCAG 1.4.3">
+  <TabItem value="before" label="Before — fails WCAG 1.4.3" default>
 
 ```dart title="lib/screens/account_overview/widgets/account_card.dart"
 // AppColors.inaccessible.lightBlueOnWhite = #90CAF9
@@ -73,7 +74,7 @@ Text(
   ),
 ),
 Text(
-  '\$${account.balance.toStringAsFixed(2)}',
+  '£${account.balance.toStringAsFixed(2)}',
   style: TextStyle(
     color: inaccessible.lightBlueOnWhite, // FAILS WCAG AA
     fontSize: 18,
@@ -82,7 +83,7 @@ Text(
 ```
 
   </TabItem>
-  <TabItem value="after" label="After — passes WCAG 1.4.3" default>
+  <TabItem value="after" label="After — passes WCAG 1.4.3">
 
 ```dart title="lib/screens/account_overview/widgets/account_card.dart"
 // AppColors.primary = #1565C0 — contrast on white: ~7.3:1 ✓
@@ -102,7 +103,7 @@ Text(
   ),
 ),
 Text(
-  '\$${account.balance.toStringAsFixed(2)}',
+  '£${account.balance.toStringAsFixed(2)}',
   style: const TextStyle(
     color: AppColors.textPrimary, // 18.1:1 on white ✓
     fontSize: 18,
@@ -145,7 +146,7 @@ Remove any explicit scale overrides and test at 200% font size — that's the WC
 </div>
 
 <Tabs>
-  <TabItem value="before" label="Before — ignores user preference">
+  <TabItem value="before" label="Before — ignores user preference" default>
 
 ```dart title="lib/screens/account_overview/widgets/account_card.dart"
 // Bad: forces the default scale regardless of the user's system settings.
@@ -158,7 +159,7 @@ Text(
 ```
 
   </TabItem>
-  <TabItem value="after" label="After — respects user preference" default>
+  <TabItem value="after" label="After — respects user preference">
 
 ```dart title="lib/screens/account_overview/widgets/account_card.dart"
 // Good: no explicit scale factor — Flutter applies MediaQuery automatically.
@@ -204,7 +205,7 @@ The patterns to use instead:
 </div>
 
 <Tabs>
-  <TabItem value="before" label="Before — overflows at large text">
+  <TabItem value="before" label="Before — overflows at large text" default>
 
 ```dart title="lib/screens/account_overview/widgets/account_card.dart"
 // This looks fine at 100% but clips text at 200% font size.
@@ -223,7 +224,7 @@ SizedBox(
 ```
 
   </TabItem>
-  <TabItem value="after" label="After — grows with text" default>
+  <TabItem value="after" label="After — grows with text">
 
 ```dart title="lib/screens/account_overview/widgets/account_card.dart"
 // minHeight: 56 sets the default size but allows the container to grow.
@@ -259,198 +260,3 @@ ConstrainedBox(
 </div>
 
 ---
-
-## Section 4: Dark Mode Done Right
-
-Dark mode isn't just a visual preference — for many users with photosensitivity or migraine conditions, it's a necessity. But dark mode introduces its own contrast challenges. Colours that pass 4.5:1 on white backgrounds often fail on dark surfaces.
-
-<div className="ab-step">
-  <div className="ab-step__badge">1</div>
-  <div className="ab-step__content">
-
-Each theme variant needs its own contrast-tested palette. The `AppColors` class in AccessBank defines accessible colours for the light theme — but a dark theme needs different values for `onSurface`, `textSecondary`, and other roles.
-
-  </div>
-</div>
-
-<Tabs>
-  <TabItem value="before" label="Before — fails in dark mode">
-
-```dart title="lib/theme/app_theme.dart"
-// onSurface: #9E9E9E on dark surface #1E1E1E
-// Contrast ratio: ~3.8:1 — FAILS WCAG AA for normal text (needs 4.5:1)
-ThemeData darkTheme = ThemeData.dark().copyWith(
-  colorScheme: const ColorScheme.dark(
-    surface: Color(0xFF1E1E1E),
-    onSurface: Color(0xFF9E9E9E), // ~3.8:1 — fails WCAG AA
-  ),
-);
-```
-
-  </TabItem>
-  <TabItem value="after" label="After — passes in dark mode" default>
-
-```dart title="lib/theme/app_theme.dart"
-// onSurface: #D4D4D4 on dark surface #1E1E1E
-// Contrast ratio: ~9.2:1 — passes WCAG AA AND AAA
-ThemeData darkTheme = ThemeData.dark().copyWith(
-  colorScheme: const ColorScheme.dark(
-    surface: Color(0xFF1E1E1E),
-    onSurface: Color(0xFFD4D4D4), // ~9.2:1 — passes WCAG AAA ✓
-  ),
-);
-```
-
-  </TabItem>
-</Tabs>
-
-<div className="ab-callout ab-callout--blue">
-  <div className="ab-callout__header">💡 Material 3 shortcut</div>
-  <p>If you use Material 3's dynamic colour system with a seed colour (<code>ColorScheme.fromSeed(seedColor: AppColors.primary)</code>), Flutter generates a full colour scheme with accessible contrast ratios built in — for both light and dark modes. It's the easiest way to get contrast right without manually testing every colour pair.</p>
-</div>
-
----
-
-## Section 5: Beyond Colour — Don't Rely on Colour Alone
-
-About 300 million people are colour-blind — most commonly with red-green confusion (deuteranopia or protanopia). If your app uses colour as the *only* way to communicate information, those users miss it entirely.
-
-<div className="ab-step">
-  <div className="ab-step__badge">1</div>
-  <div className="ab-step__content">
-
-WCAG 1.4.1 ("Use of Colour") states that colour must not be the only visual means of conveying information, indicating an action, prompting a response, or distinguishing a visual element.
-
-The fix: always pair colour with a secondary indicator — an icon, a text label, a shape, or a pattern.
-
-  </div>
-</div>
-
-<div className="ab-step">
-  <div className="ab-step__badge">2</div>
-  <div className="ab-step__content">
-
-In AccessBank, transaction amounts show green for positive and red for negative. A user with red-green colour-blindness sees both as the same brownish-grey. Adding directional icons (`arrow_upward` / `arrow_downward`) makes the distinction clear regardless of colour perception.
-
-  </div>
-</div>
-
-<Tabs>
-  <TabItem value="before" label="Before — colour only">
-
-```dart title="lib/widgets/balance_indicator.dart"
-// Colour alone — invisible to users with red-green colour blindness.
-// Both "positive" and "negative" indicators look identical to ~8% of men.
-Container(
-  width: 8,
-  height: 8,
-  decoration: BoxDecoration(
-    color: isPositive ? Colors.green : Colors.red,
-    shape: BoxShape.circle,
-  ),
-)
-```
-
-  </TabItem>
-  <TabItem value="after" label="After — colour + icon + semantic label" default>
-
-```dart title="lib/widgets/balance_indicator.dart"
-// Colour + directional icon + semantic label.
-// The meaning is clear regardless of how you perceive colour.
-Row(
-  mainAxisSize: MainAxisSize.min,
-  children: [
-    Icon(
-      isPositive ? Icons.arrow_upward : Icons.arrow_downward,
-      color: isPositive ? AppColors.success : AppColors.error,
-      size: 14,
-      semanticLabel: isPositive ? 'Positive balance' : 'Overdrawn',
-    ),
-    const SizedBox(width: 4),
-    Container(
-      width: 8,
-      height: 8,
-      decoration: BoxDecoration(
-        // Use accessible colour values with sufficient contrast
-        color: isPositive ? AppColors.success : AppColors.error,
-        shape: BoxShape.circle,
-      ),
-    ),
-  ],
-)
-```
-
-  </TabItem>
-</Tabs>
-
-<div className="ab-callout ab-callout--amber">
-  <div className="ab-callout__header">Why this matters</div>
-  <p>About 300 million people are colour-blind globally — roughly 8% of men and 0.5% of women. In a banking app, distinguishing positive from negative balances, successful from failed transactions, and healthy from overdrawn accounts is critical. Colour alone never communicates meaning reliably.</p>
-</div>
-
-<div className="ab-callout ab-callout--blue">
-  <div className="ab-callout__header">💡 Try it yourself</div>
-  <p>There are many colour-blindness simulation tools you can use to preview your app. <a href="https://www.toptal.com/designers/colorfilter">Toptal Color Blind Filter</a> can simulate different types of colour blindness on screenshots. Take a screenshot of AccessBank and run it through the red-green blind simulation. Can you still distinguish positive from negative amounts?</p>
-</div>
-
-<div className="ab-callout ab-callout--green">
-  <div className="ab-callout__header">✓ Checkpoint</div>
-  <p>After completing this chapter: (1) all text in the app passes a 4.5:1 contrast check (use a tool to verify), (2) no <code>textScaleFactor: 1.0</code> overrides exist in the codebase, (3) account cards use <code>ConstrainedBox</code> rather than fixed-height <code>SizedBox</code>, and (4) balance indicators use both colour and icon to communicate direction. Test at 200% font size to confirm nothing overflows.</p>
-</div>
-
----
-
-## Check Your Understanding
-
-<details>
-<summary>Question 1: What is the WCAG AA minimum contrast ratio for normal-sized body text?</summary>
-
-**A) 3:1**
-**B) 4.5:1** ✅
-**C) 7:1**
-**D) 2:1**
-
-WCAG 2.1 Success Criterion 1.4.3 requires a 4.5:1 contrast ratio for normal text (below 18pt regular or 14pt bold). Large text (18pt regular or 14pt bold and above) requires a minimum of 3:1. WCAG AAA for normal text requires 7:1.
-
-</details>
-
-<details>
-<summary>Question 2: What happens when you set textScaleFactor: 1.0 on a Text widget?</summary>
-
-**A) The text becomes slightly larger**
-**B) The user's system font-size preference is ignored** ✅
-**C) The text is hidden from screen readers**
-**D) The text is rendered at the system default size**
-
-Setting `textScaleFactor: 1.0` (or the newer `textScaler: TextScaler.noScaling`) overrides the device's system font-size setting, forcing text to render at the default scale even when the user has requested larger text. This is an accessibility violation under WCAG 1.4.4.
-
-</details>
-
-<details>
-<summary>Question 3: Which WCAG criterion requires that information is not conveyed by colour alone?</summary>
-
-**A) 1.3.1 Info and Relationships**
-**B) 1.4.1 Use of Colour** ✅
-**C) 1.4.3 Contrast (Minimum)**
-**D) 2.4.6 Headings and Labels**
-
-WCAG 1.4.1 "Use of Colour" states that colour must not be the only visual means of conveying information, indicating an action, prompting a response, or distinguishing a visual element. Always pair colour with shape, icon, or text.
-
-</details>
-
----
-
-## Deep Dive
-
-- [WebAIM Contrast Checker](https://webaim.org/resources/contrastchecker/)
-- [WCAG 1.4.3 — Contrast (Minimum)](https://www.w3.org/WAI/WCAG21/Understanding/contrast-minimum.html)
-- [WCAG 1.4.4 — Resize Text](https://www.w3.org/WAI/WCAG21/Understanding/resize-text.html)
-- [WCAG 1.4.1 — Use of Colour](https://www.w3.org/WAI/WCAG21/Understanding/use-of-color.html)
-- [Flutter — Material 3 colour system](https://docs.flutter.dev/ui/design/material/color)
-- [Colour blindness simulation — Toptal](https://www.toptal.com/designers/colorfilter)
-
----
-
-## What's Next
-
-The app now looks as good as it sounds — accessible to users with low vision, colour blindness, and large-text preferences. Next up is **Chapter 5: Forms That Work**, where you'll go deeper into form accessibility: autocomplete, error announcement patterns, required field indicators, and how to handle complex form interactions gracefully with a screen reader.

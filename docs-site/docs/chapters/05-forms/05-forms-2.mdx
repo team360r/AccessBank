@@ -1,0 +1,175 @@
+---
+sidebar_position: 2
+slug: /chapters/forms/part-2
+title: "Forms That Work — Part 2"
+description: "Live validation and smart input types."
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+## Section 4: Live Validation on the Transfer Form
+
+The Transfer screen's amount field accepts a dollar value but says nothing until the user hits Confirm. Real-time validation with an accessible announcement gives users immediate feedback as they type.
+
+<div className="ab-step">
+  <div className="ab-step__badge">1</div>
+  <div className="ab-step__content">
+
+Use `onChanged` to validate and `SemanticsService.sendAnnouncement()` to announce the result. The Transfer form's accessible step already demonstrates this — it validates that the amount is a positive number and fires an announcement if not.
+
+  </div>
+</div>
+
+<Tabs>
+  <TabItem value="before" label="Before — no live feedback" default>
+
+```dart title="lib/screens/transfer/widgets/transfer_form.dart"
+// Placeholder-only, number keyboard, no live validation
+TextField(
+  decoration: const InputDecoration(
+    hintText: 'Amount',
+    border: OutlineInputBorder(),
+  ),
+  keyboardType: TextInputType.number,
+  onChanged: onAmountChanged,
+),
+```
+
+  </TabItem>
+  <TabItem value="after" label="After — live validation + announcement">
+
+```dart title="lib/screens/transfer/widgets/transfer_form.dart"
+String? _amountError;
+
+void _validateAmount(String value) {
+  widget.onAmountChanged(value);
+  final parsed = double.tryParse(value);
+  if (value.isNotEmpty && (parsed == null || parsed <= 0)) {
+    const msg = 'Please enter a valid amount greater than zero';
+    setState(() => _amountError = msg);
+    SemanticsService.sendAnnouncement(
+      View.of(context),
+      msg,
+      TextDirection.ltr,
+    );
+  } else {
+    setState(() => _amountError = null);
+  }
+}
+
+TextField(
+  decoration: InputDecoration(
+    labelText: 'Amount',
+    hintText: '0.00',
+    prefixText: '£',
+    border: const OutlineInputBorder(),
+    errorText: _amountError,   // Shows red error text below field
+  ),
+  keyboardType: const TextInputType.numberWithOptions(decimal: true),
+  textInputAction: TextInputAction.next,
+  onChanged: _validateAmount,
+),
+```
+
+  </TabItem>
+</Tabs>
+
+<div className="ab-callout ab-callout--amber">
+  <div className="ab-callout__header">Why this matters</div>
+  <p>Live validation catches errors at the point of entry rather than at submission. For screen reader users, this means one announcement at the right moment rather than a wall of errors to navigate after tapping Confirm. For users with motor impairments, it means fewer form submissions and less re-entry.</p>
+</div>
+
+---
+
+## Section 5: Smart Input Types and Autofill
+
+Setting the right `keyboardType` and `autofillHints` on each field improves the experience for everyone — especially users with motor impairments who find typing difficult.
+
+<div className="ab-step">
+  <div className="ab-step__badge">1</div>
+  <div className="ab-step__content">
+
+`autofillHints` enables iOS AutoFill and Android Autofill Service to populate credentials from password managers. Combined with a logical `textInputAction` chain (`next` → `next` → `done`), the user can move through the entire form using only the keyboard return key.
+
+  </div>
+</div>
+
+<Tabs>
+  <TabItem value="before" label="Before — generic inputs" default>
+
+```dart title="lib/screens/login/widgets/login_form.dart"
+// Generic keyboard; no autofill; no logical next-field action
+TextField(
+  decoration: const InputDecoration(hintText: 'Email'),
+  controller: _emailController,
+),
+TextField(
+  decoration: const InputDecoration(hintText: 'Password'),
+  controller: _passwordController,
+  obscureText: true,
+),
+// Vague button label — no context for screen readers
+FilledButton(onPressed: _submit, child: const Text('Go')),
+```
+
+  </TabItem>
+  <TabItem value="after" label="After — smart inputs">
+
+```dart title="lib/screens/login/widgets/login_form.dart"
+// Email keyboard + autofill + logical next action
+TextField(
+  controller: _emailController,
+  focusNode: _emailFocusNode,
+  decoration: const InputDecoration(
+    labelText: 'Email',
+    hintText: 'you@example.com',
+    border: OutlineInputBorder(),
+  ),
+  keyboardType: TextInputType.emailAddress,
+  autofillHints: const [AutofillHints.email],
+  textInputAction: TextInputAction.next,
+  onSubmitted: (_) => _passwordFocusNode.requestFocus(),
+),
+// Password keyboard + autofill + submit on done
+TextField(
+  controller: _passwordController,
+  focusNode: _passwordFocusNode,
+  decoration: const InputDecoration(
+    labelText: 'Password',
+    border: OutlineInputBorder(),
+  ),
+  obscureText: true,
+  autofillHints: const [AutofillHints.password],
+  textInputAction: TextInputAction.done,
+  onSubmitted: (_) => _submit(),
+),
+// Descriptive button label — clear context for screen readers
+SizedBox(
+  height: 48, // Minimum 48×48 touch target
+  child: FilledButton(onPressed: _submit, child: const Text('Sign In')),
+),
+```
+
+  </TabItem>
+</Tabs>
+
+<div className="ab-callout ab-callout--blue">
+  <div className="ab-callout__header">💡 Try it yourself</div>
+  <p>On a real iOS or Android device, open the "after" version of the Login screen and tap the email field. Does the email keyboard appear? Does tapping "next" on the keyboard move you to the password field? Does iOS offer to AutoFill credentials? These should all work in the accessible version.</p>
+</div>
+
+---
+
+## Deep Dive
+
+- [SemanticsService class — Flutter API documentation](https://api.flutter.dev/flutter/semantics/SemanticsService-class.html)
+- [WCAG 3.3 — Input Assistance](https://www.w3.org/WAI/WCAG21/Understanding/input-assistance)
+- [TextFormField — Flutter API documentation](https://api.flutter.dev/flutter/material/TextFormField-class.html)
+- [AutofillHints — Flutter API documentation](https://api.flutter.dev/flutter/services/AutofillHints-class.html)
+
+---
+
+## What's Next
+
+Forms are fixed. Now let's look at something that affects users every time they interact with the app: motion and touch targets. In **Chapter 6: Motion & Interaction**, you'll respect system-wide reduce-motion preferences, enforce 48×48 dp minimum touch targets, and provide button alternatives to every swipe gesture so that motor-impaired users can perform every action in AccessBank.
