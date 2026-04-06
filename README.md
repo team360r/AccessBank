@@ -65,17 +65,35 @@ This tutorial uses a three-panel workflow inspired by Apple's SwiftUI tutorials:
 
 ### Chapter Branches
 
-Each chapter has a corresponding Git branch containing the completed, accessible version of that chapter's code. Use them as reference material:
+Every chapter has a matching **git branch** containing the app exactly as it should look after completing that chapter. The branches build incrementally — each one adds only the accessibility fixes introduced in that chapter:
+
+| Branch | What it contains |
+|--------|-----------------|
+| `chapter-0-toolkit` | Starter app with no accessibility fixes |
+| `chapter-1-setup` | + Semantics tree inspection, identified issues |
+| `chapter-2-semantics` | + Semantic labels, MergeSemantics, ExcludeSemantics |
+| `chapter-3-navigation` | + Focus traversal order, keyboard nav, focus traps |
+| `chapter-4-visual` | + Contrast fixes, text scaling, dark mode, color-blind support |
+| `chapter-5-forms` | + Form labels, error announcements, validation, autofill |
+| `chapter-6-motion` | + Reduce motion, touch targets, swipe alternatives |
+| `chapter-7-live` | + Live region announcements, loading states |
+| `chapter-8-testing` | + Widget tests with semantics matchers, CI checks |
+| `chapter-9-polish` | + Full audit, platform-specific tweaks — the finished app |
+
+**Stuck on a chapter?** Check out the branch to see the solution:
 
 ```bash
+# See the completed code for chapter 2
 git checkout chapter-2-semantics
+
+# Compare your work against the solution
+git diff chapter-2-semantics -- lib/
+
+# Go back to your working branch
+git checkout main
 ```
 
-> **WARNING:** Chapter branches are read-only reference material. Do not commit to them. Create your own branch to experiment:
->
-> ```bash
-> git checkout -b my-accessibility-work
-> ```
+> **Tip:** You don't need to use the branches at all if you're following along and writing the code yourself — they're a safety net, not a requirement.
 
 ### Before/After Toggle
 

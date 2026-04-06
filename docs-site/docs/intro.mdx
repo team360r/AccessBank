@@ -54,6 +54,27 @@ graph TD
     C8 --> C9["Ch 9: Polish"]
 ```
 
+## Chapter Branches
+
+Every chapter has a matching git branch that contains AccessBank exactly as it should look after completing that chapter. The branches build incrementally — `chapter-1-setup` has the unmodified starter app with issues identified, `chapter-2-semantics` adds semantic labels, `chapter-5-forms` adds accessible form handling, and so on up to `chapter-9-polish` which is the fully accessible app.
+
+Use them to check your work, catch up if you fall behind, or skip ahead:
+
+```bash
+# See the finished code for any chapter
+git checkout chapter-2-semantics
+
+# Compare your work against the solution
+git diff chapter-2-semantics -- lib/
+
+# Go back to where you were
+git checkout main
+```
+
+:::tip
+You don't need to use the branches at all if you're following along and writing the code yourself — they're a safety net, not a requirement.
+:::
+
 ## Prerequisites
 
 - Flutter SDK 3.x+ — [Install Flutter](https://docs.flutter.dev/get-started/install)
