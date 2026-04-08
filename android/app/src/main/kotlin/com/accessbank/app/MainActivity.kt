@@ -1,4 +1,4 @@
-package com.accessbank.accessible
+package com.accessbank.app
 
 import io.flutter.embedding.android.FlutterActivity
 

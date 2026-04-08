@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:accessible/tutorial/tutorial_app_state.dart';
+import 'package:accessbank/tutorial/tutorial_app_state.dart';
 
 void main() {
   test('update notifies listeners and sets fields', () {

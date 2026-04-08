@@ -30,7 +30,7 @@ The tutorial is delivered through a **browser-based guide** (Docusaurus site) th
 
 ```bash
 git clone <repo-url>
-cd accessible
+cd AccessBank
 ./setup.sh
 ```
 
@@ -48,7 +48,7 @@ Finally, open the project in your IDE:
 
 ```bash
 code .              # VS Code
-# or open the accessible/ folder in Android Studio
+# or open the AccessBank/ folder in Android Studio
 ```
 
 ---

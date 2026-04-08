@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:accessible/screens/login/login_screen.dart';
-import 'package:accessible/screens/login/widgets/login_form.dart';
+import 'package:accessbank/screens/login/login_screen.dart';
+import 'package:accessbank/screens/login/widgets/login_form.dart';
 
 void main() {
   group('Navigation — Focus traversal on accessible LoginScreen', () {

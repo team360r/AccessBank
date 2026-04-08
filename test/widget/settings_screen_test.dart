@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:accessible/screens/settings/settings_screen.dart';
-import 'package:accessible/app_state.dart';
+import 'package:accessbank/screens/settings/settings_screen.dart';
+import 'package:accessbank/app_state.dart';
 
 void main() {
   late AppState appState;

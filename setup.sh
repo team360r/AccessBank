@@ -74,7 +74,7 @@ configure_ios_signing() {
   rm -f "${pbxproj}.bak"
 
   echo "  ✓ Team ID set to $team_id"
-  echo "  ✓ Bundle ID: com.accessbank.accessible (Xcode will auto-create a profile)"
+  echo "  ✓ Bundle ID: com.accessbank.app (Xcode will auto-create a profile)"
 }
 
 # Only prompt for iOS signing on macOS
@@ -98,7 +98,7 @@ echo "    the app on your connected device or simulator."
 echo ""
 echo "    Then open the project in your IDE:"
 echo "      VS Code:        code ."
-echo "      Android Studio:  Open the accessible/ folder"
+echo "      Android Studio:  Open the AccessBank/ folder"
 echo ""
 echo "  Happy learning! 🎉"
 echo ""

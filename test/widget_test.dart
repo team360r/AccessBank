@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:accessible/app.dart';
-import 'package:accessible/screens/login/login_screen.dart';
+import 'package:accessbank/app.dart';
+import 'package:accessbank/screens/login/login_screen.dart';
 
 void main() {
   testWidgets('AccessBank app smoke test — login screen renders', (WidgetTester tester) async {

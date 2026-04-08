@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:accessible/screens/transactions/transactions_screen.dart';
+import 'package:accessbank/screens/transactions/transactions_screen.dart';
 
 void main() {
   group('TransactionsScreen', () {

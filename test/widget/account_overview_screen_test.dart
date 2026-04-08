@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:accessible/screens/account_overview/account_overview_screen.dart';
+import 'package:accessbank/screens/account_overview/account_overview_screen.dart';
 
 void main() {
   group('AccountOverviewScreen', () {

@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/semantics.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:accessible/screens/account_overview/widgets/account_card.dart';
-import 'package:accessible/screens/login/widgets/login_form.dart';
-import 'package:accessible/screens/settings/widgets/settings_tile.dart';
-import 'package:accessible/data/mock_accounts.dart';
+import 'package:accessbank/screens/account_overview/widgets/account_card.dart';
+import 'package:accessbank/screens/login/widgets/login_form.dart';
+import 'package:accessbank/screens/settings/widgets/settings_tile.dart';
+import 'package:accessbank/data/mock_accounts.dart';
 
 void main() {
   group('Semantics — AccountCard', () {
